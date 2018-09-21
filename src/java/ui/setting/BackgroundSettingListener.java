@@ -10,7 +10,7 @@ public class BackgroundSettingListener implements MouseMotionListener, MouseWhee
     private int[] movedPoint;
     private int accuracy = 20;
 
-    public BackgroundSettingListener(JPanel panel,int[][] sourcePoints) {
+    public BackgroundSettingListener(JPanel panel, int[][] sourcePoints) {
         this.panel = panel;
         this.sourcePoints = sourcePoints;
     }
@@ -84,9 +84,6 @@ public class BackgroundSettingListener implements MouseMotionListener, MouseWhee
         int x = e.getX();
         int y = e.getY();
         movedPoint = getNearestPoint(x, y);
-        if (movedPoint != null) {
-            System.out.println(" Поймали точку - " + movedPoint[0] + " " + movedPoint[1]);
-        }
     }
 
     @Override
@@ -112,11 +109,14 @@ public class BackgroundSettingListener implements MouseMotionListener, MouseWhee
     }
 
     @Override
-    public void mouseDragged(MouseEvent e) {}
+    public void mouseDragged(MouseEvent e) {
+    }
 
     @Override
-    public void mouseMoved(MouseEvent e) {}
+    public void mouseMoved(MouseEvent e) {
+    }
 
     @Override
-    public void mouseWheelMoved(MouseWheelEvent e) {}
+    public void mouseWheelMoved(MouseWheelEvent e) {
+    }
 }

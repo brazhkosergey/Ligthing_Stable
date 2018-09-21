@@ -4,6 +4,7 @@ import entity.AddressSaver;
 import entity.MainVideoCreator;
 import ui.camera.CameraPanel;
 import ui.camera.VideoBytesSaver;
+import ui.setting.BackgroundImagePanel;
 import ui.video.VideoPlayer;
 import entity.sound.SoundSaver;
 import ui.setting.CameraAddressSetting;
@@ -98,6 +99,9 @@ public class MainFrame extends JFrame {
 
 
     public static Map<Integer, int[][]> linePoints;
+    public static Map<Integer, List<int[]>> linesForHideZoneParsing;
+
+    public static int[][] camerasPosition;
 
     /**
      * address saver to save and restore setting data
@@ -166,12 +170,6 @@ public class MainFrame extends JFrame {
      */
     private static int showFramesPercent = 15;
 
-
-    /**
-     * Thread set the socket server to wait request from sensor
-     */
-    private Thread alarmThread;
-
     private MainFrame() {
         super("LIGHTNING STABLE");
         imagesForBlock = new HashMap<>();
@@ -181,6 +179,7 @@ public class MainFrame extends JFrame {
         videoSaversMap = new HashMap<>();
         colorRGBNumberSet = new HashSet<>();
         linePoints = new HashMap<>();
+        linesForHideZoneParsing = new HashMap<>();
 
         this.getContentPane().setLayout(new BorderLayout());
         this.setMinimumSize(new Dimension(1150, 700));
@@ -222,11 +221,45 @@ public class MainFrame extends JFrame {
         pack();
     }
 
-    public static void addLinePoint(int groupNumber, int[][]list) {
+    public static void addLinePoint(int groupNumber, int[][] list, boolean edit) {
         linePoints.put(groupNumber, list);
-        addressSaver.saveLinePoints(groupNumber, list);
+        if (edit) {
+            addressSaver.saveLinePoints(groupNumber, list);
+        }
+
+        if (list != null) {
+            linesForHideZoneParsing.put(groupNumber, getLineForParsing(list));
+        }
     }
 
+    private static List<int[]> getLineForParsing(int[][] linePoints) {
+
+        List<int[]> listToReturn = new LinkedList<>();
+
+        double[][] pointsToDrawLine;
+        double[] onePointToDrawLine = new double[2];
+
+        pointsToDrawLine = new double[4][];
+        for (int i = 1; i < 5; i++) {
+            pointsToDrawLine[i - 1] = new double[2];
+        }
+
+        for (int i = 0; i < linePoints.length; i++) {
+            if (linePoints.length > i + 3) {
+                for (int j = 0; j < 4; j++) {
+                    int pointNumber = i + j;
+                    pointsToDrawLine[j][0] = linePoints[pointNumber][0];
+                    pointsToDrawLine[j][1] = linePoints[pointNumber][1];
+                }
+
+                for (double t = 0; t < 1; t += 0.001) {
+                    BackgroundImagePanel.eval(onePointToDrawLine, pointsToDrawLine, t);
+                    listToReturn.add(new int[]{(int) onePointToDrawLine[0], (int) onePointToDrawLine[1]});
+                }
+            }
+        }
+        return listToReturn;
+    }
 
 
     /**
@@ -353,7 +386,11 @@ public class MainFrame extends JFrame {
         memoryUpdateThread.setName("Memory Update Main Thread");
         memoryUpdateThread.start();
 
-        alarmThread = new Thread(() -> {
+        /*
+      Thread set the socket server to wait request from sensor
+     */ /**
+         * Thread set the socket server to wait request from sensor
+         */Thread alarmThread = new Thread(() -> {
             ServerSocket ss = null;
             try {
                 ss = new ServerSocket(port);
@@ -867,6 +904,15 @@ public class MainFrame extends JFrame {
 
     public static Map<Integer, CameraPanel> getCameras() {
         return cameras;
+    }
+
+    public static void setCamerasPosition(int[][] camerasPosition) {
+        MainFrame.camerasPosition = camerasPosition;
+        addressSaver.setCamerasPosition(camerasPosition);
+    }
+
+    public static int[][] getCamerasPosition() {
+        return camerasPosition;
     }
 }
 

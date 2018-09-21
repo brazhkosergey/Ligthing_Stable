@@ -7,7 +7,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-class BackgroundImagePanel extends JPanel {
+public class BackgroundImagePanel extends JPanel {
     private BufferedImage bufferedImage;
     private int[][] sourcePoints;
     private double[][] pointsToDrawLine;
@@ -82,7 +82,7 @@ class BackgroundImagePanel extends JPanel {
         }
 
         if (savePoints) {
-            MainFrame.addLinePoint(groupNumber, linePointsToSave);
+            MainFrame.addLinePoint(groupNumber, linePointsToSave,true);
             savePoints = false;
         }
     }

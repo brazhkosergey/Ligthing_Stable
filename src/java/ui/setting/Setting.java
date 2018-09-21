@@ -10,8 +10,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * setting panel
@@ -34,9 +32,12 @@ public class Setting extends JPanel {
     private JLabel wrongPasswordLabel;
     private JTextField passwordTextField;
 
+    private SarcophagusSettingPanel sarcophagusSettingPanel;
+
     private Setting() {
         this.setPreferredSize(new Dimension(1120, 540));
         this.setLayout(new BorderLayout());
+        sarcophagusSettingPanel = new SarcophagusSettingPanel(MainFrame.getCamerasPosition());
         buildSetting();
     }
 
@@ -339,7 +340,7 @@ public class Setting extends JPanel {
         this.add(allSettingPane, BorderLayout.CENTER);
     }
 
-    private void buildHideZoneSetting(JPanel folderSettingPanel) {
+    private void buildHideZoneSetting(JPanel hideZoneSettingPanel) {
         JPanel backgroundSettingPanel = new JPanel(new BorderLayout());
         backgroundSettingPanel.setPreferredSize(new Dimension(375, 340));
         backgroundSettingPanel.setBorder(BorderFactory.createEtchedBorder());
@@ -407,10 +408,40 @@ public class Setting extends JPanel {
 
         southBackgroundSettingPanel.add(backgroundSettingComboBox);
         southBackgroundSettingPanel.add(editBackGroundButton);
+
         backgroundSettingPanel.add(backgroundSettingLabel, BorderLayout.NORTH);
         backgroundSettingPanel.add(backgroundPreViewPanel, BorderLayout.CENTER);
         backgroundSettingPanel.add(southBackgroundSettingPanel, BorderLayout.SOUTH);
-        folderSettingPanel.add(backgroundSettingPanel);
+
+        hideZoneSettingPanel.add(backgroundSettingPanel);
+
+
+        JPanel cameraPositionSetting = new JPanel();
+        cameraPositionSetting.setPreferredSize(new Dimension(375, 173));
+        cameraPositionSetting.setBorder(BorderFactory.createEtchedBorder());
+
+        JLabel setCameraPositionLabel = new JLabel(MainFrame.getBundle().getString("setCameraPositionLabel"));
+        setCameraPositionLabel.setFont(new Font(null, Font.BOLD, 20));
+        setCameraPositionLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        setCameraPositionLabel.setPreferredSize(new Dimension(350, 40));
+
+
+        JButton setCameraPositionButton = new JButton(MainFrame.getBundle().getString("editButton"));
+        setCameraPositionButton.setPreferredSize(new Dimension(150, 70));
+        setCameraPositionButton.setFont(new Font(null, Font.BOLD, 20));
+        setCameraPositionButton.addActionListener((as) -> {
+            this.removeAll();
+            this.add(sarcophagusSettingPanel);
+            this.revalidate();
+            this.repaint();
+        });
+
+
+        cameraPositionSetting.add(setCameraPositionLabel);
+        cameraPositionSetting.add(setCameraPositionButton);
+
+
+        hideZoneSettingPanel.add(cameraPositionSetting);
     }
 
     /**
@@ -463,14 +494,13 @@ public class Setting extends JPanel {
                         if (ints.length > i + 3) {
                             for (int j = 0; j < 4; j++) {
                                 int pointNumber = i + j;
-                                pointsToDrawLine[j][0] = (double) ints[pointNumber][0] / bufferedImage.getWidth() * imageWidth+x;
-                                pointsToDrawLine[j][1] = (double) ints[pointNumber][1] / bufferedImage.getHeight() * imageHeight+y;
+                                pointsToDrawLine[j][0] = (double) ints[pointNumber][0] / bufferedImage.getWidth() * imageWidth + x;
+                                pointsToDrawLine[j][1] = (double) ints[pointNumber][1] / bufferedImage.getHeight() * imageHeight + y;
                             }
 
                             for (double t = 0; t < 1; t += 0.001) {
                                 BackgroundImagePanel.eval(onePointToDrawLine, pointsToDrawLine, t);
                                 g.fillRect((int) onePointToDrawLine[0], (int) onePointToDrawLine[1], 2, 2);
-                                System.out.println("Рисуем "+ onePointToDrawLine[0]+" "+onePointToDrawLine[1]);
                             }
                         }
                     }
@@ -518,27 +548,22 @@ public class Setting extends JPanel {
             JPanel westPanel = new JPanel(new BorderLayout());
             westPanel.setBorder(BorderFactory.createEtchedBorder());
 
-            JButton backButton = new JButton("<html>&#11178</html>");
-            backButton.setFont(new Font(null, Font.BOLD, 30));
-            backButton.addActionListener((f) -> {
-                Setting.getSetting().removeAll();
-                Setting.getSetting().add(passwordPane, BorderLayout.NORTH);
-                Setting.getSetting().add(allSettingPane, BorderLayout.CENTER);
-                passwordTextField.setText("");
-                allSettingPane.setVisible(true);
-                passwordPane.setVisible(false);
-                wrongPasswordLabel.setVisible(false);
-                Setting.getSetting().revalidate();
-                Setting.getSetting().repaint();
-            });
-
             JButton saveButton = new JButton("<html>&#128190</html>");
             saveButton.setFont(new Font(null, Font.BOLD, 30));
             saveButton.addActionListener((t) -> {
                 backgroundImagePanel.setSavePoints(true);
                 backgroundImagePanel.revalidate();
                 backgroundImagePanel.repaint();
+                saveButton.setForeground(new Color(52, 117, 38));
             });
+
+            JButton backButton = new JButton("<html>&#11178</html>");
+            backButton.setFont(new Font(null, Font.BOLD, 30));
+            backButton.addActionListener((f) -> {
+                Setting.getSetting().backToSetting();
+                saveButton.setForeground(Color.DARK_GRAY);
+            });
+
 
             westPanel.add(saveButton, BorderLayout.NORTH);
             westPanel.add(backButton, BorderLayout.SOUTH);
@@ -546,5 +571,18 @@ public class Setting extends JPanel {
             this.add(westPanel, BorderLayout.WEST);
             this.add(scrollPane, BorderLayout.CENTER);
         }
+    }
+
+
+    public void backToSetting() {
+        Setting.getSetting().removeAll();
+        Setting.getSetting().add(passwordPane, BorderLayout.NORTH);
+        Setting.getSetting().add(allSettingPane, BorderLayout.CENTER);
+        passwordTextField.setText("");
+        allSettingPane.setVisible(true);
+        passwordPane.setVisible(false);
+        wrongPasswordLabel.setVisible(false);
+        Setting.getSetting().revalidate();
+        Setting.getSetting().repaint();
     }
 }

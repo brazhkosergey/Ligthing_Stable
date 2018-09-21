@@ -12,8 +12,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import ui.setting.CameraAddressSetting;
@@ -26,16 +24,12 @@ import ui.main.MainFrame;
 @XmlRootElement(name = "address")
 public class AddressSaver {
 
+    private String PASS;
     /**
      * all data will save in array
      */
     private String[] arr = new String[24];
-//    private String[] arr = new String[30];
 
-    private int[][] firstGroup;
-    private int[][] secondGroup;
-    private int[][] thirdGroup;
-    private int[][] fourthGroup;
     /**
      * audio module address
      */
@@ -71,10 +65,22 @@ public class AddressSaver {
      */
     private String path;
 
-    /**
-     * password to enter setting, will be changed manual
-     */
-    private String password = "PASS";
+    private int[][] firstGroup;
+    private int[][] secondGroup;
+    private int[][] thirdGroup;
+    private int[][] fourthGroup;
+    private int[][] camerasPosition;
+
+    private AddressSaver() {
+        camerasPosition = new int[4][];
+        camerasPosition[0] = new int[]{70, 90};
+        camerasPosition[1] = new int[]{90, 140};
+        camerasPosition[2] = new int[]{30, 140};
+        camerasPosition[3] = new int[]{180, 150};
+        PASS = "PASS";
+    }
+
+
 
     /**
      * save data from camera setting
@@ -268,15 +274,26 @@ public class AddressSaver {
         MainFrame.setOpacitySetting(opacity);
         MainFrame.setCountSecondsToSaveVideo(timeToSave);
 
-        MainFrame.addLinePoint(1, firstGroup);
-        MainFrame.addLinePoint(2, secondGroup);
-        MainFrame.addLinePoint(3, thirdGroup);
-        MainFrame.addLinePoint(4, fourthGroup);
-
+        MainFrame.addLinePoint(1, firstGroup,false);
+        MainFrame.addLinePoint(2, secondGroup,false);
+        MainFrame.addLinePoint(3, thirdGroup,false);
+        MainFrame.addLinePoint(4, fourthGroup,false);
+        MainFrame.setCamerasPosition(camerasPosition);
         if (path != null) {
             MainFrame.setPath(path);
         }
         MainFrame.setPort(port);
-        MainFrame.setPassword(password);
+        /*
+      password to enter setting, will be changed manual
+     */ /**
+         * password to enter setting, will be changed manual
+         * */
+//        String password = "PASS";
+        MainFrame.setPassword(PASS);
+    }
+
+    public void setCamerasPosition(int[][] camerasPosition) {
+        this.camerasPosition = camerasPosition;
+        savePasswordSaverToFile();
     }
 }
