@@ -75,6 +75,10 @@ public class VideoFilesPanel extends JPanel {
             for (File fileFromFolder : files) {
                 try {
                     fileName = fileFromFolder.getName();
+                    if (fileName.contains("{")) {
+                        fileName = fileName.split("\\{")[0];
+                    }
+
                     long dataLong = Long.parseLong(fileName);
                     listOfFilesNames.add(dataLong);
                     File[] bytesFromOneCamera = fileFromFolder.listFiles();
@@ -84,7 +88,6 @@ public class VideoFilesPanel extends JPanel {
                             int cameraGroupNumber = Integer.parseInt(oneFolder.getName().substring(0, 1));
                             if (!oneFolder.getName().contains(".jpg")) {
                                 map.put(cameraGroupNumber, oneFolder);
-                                System.out.println(cameraGroupNumber + " = " + oneFolder.getName());
                             }
                         }
                         mapOfFiles.put(dataLong, map);
@@ -110,31 +113,30 @@ public class VideoFilesPanel extends JPanel {
         for (int i = listOfFilesNames.size() - 1; i >= 0; i--) {
             Long dataLong = listOfFilesNames.get(i);
             Date date = new Date(dataLong);
-
-            Map<Integer, File> fileWithVideos = mapOfFiles.get(dataLong);
-
+            Map<Integer, File> folderWithVideos = mapOfFiles.get(dataLong);
             boolean greenColor = false;
+            boolean hideZoneDetected = false;
+            String hideZoneName = null;
             int videoSize = 0;
             for (int cameraGroup = 1; cameraGroup < 5; cameraGroup++) {
-                File files1 = fileWithVideos.get(cameraGroup);
-                if (files1 != null) {
-                    String name = files1.getName();
-
-                    System.out.println("121 - " + name);
-
+                File folderFromOneCameraGroup = folderWithVideos.get(cameraGroup);
+                if (folderFromOneCameraGroup != null) {
+                    String name = folderFromOneCameraGroup.getName();
                     int first = name.indexOf("[");
                     int second = name.indexOf("]");
                     String substring = name.substring(first + 1, second);
                     greenColor = substring.contains("(");
-                    //todo сюда же добавить парсинг в имени файла попадания в мертвую зону
-
-
-                    videoSize = files1.listFiles().length;
+                    if (folderFromOneCameraGroup.getParentFile().getName().contains("{")) {
+                        hideZoneName = folderFromOneCameraGroup.getParentFile().getName().split("\\{")[1];
+                        hideZoneName = hideZoneName.substring(0, hideZoneName.length() - 1);
+                        hideZoneDetected = hideZoneName.length() > 1;
+                    }
+                    videoSize = Objects.requireNonNull(folderFromOneCameraGroup.listFiles()).length;
                     break;
                 }
             }
 
-            int countFiles = fileWithVideos.size();
+            int countFiles = folderWithVideos.size();
             numberLabel = new JLabel(String.valueOf(i + 1));
             numberLabel.setPreferredSize(new Dimension(40, 30));
             numberLabel.setFont(new Font(null, Font.BOLD, 15));
@@ -158,21 +160,25 @@ public class VideoFilesPanel extends JPanel {
             int finalI = i + 1;
             showVideoButton.addActionListener((ActionEvent e) -> {
                 VideoPlayer.setShowVideoPlayer(true);
-                currentPlayer = new VideoPlayer(fileWithVideos, dateFormat.format(new Date(dataLong)), finalI);
+                currentPlayer = new VideoPlayer(folderWithVideos, dateFormat.format(new Date(dataLong)), finalI);
                 MainFrame.setCentralPanel(currentPlayer);
             });
 
             hideZoneButton = new JButton("<html>&#128065</html>");
-            hideZoneButton.setFont(new Font(null, Font.BOLD, 17));
+            hideZoneButton.setFont(new Font(null, Font.BOLD, 20));
+            if (hideZoneDetected) {
+                hideZoneButton.setForeground(new Color(3, 156, 11));
+            }
             hideZoneButton.setFocusable(false);
+            String finalHideZoneName = hideZoneName;
             hideZoneButton.addActionListener((pf) -> {
-                MainFrame.setCentralPanel(new HideZoneMainPanel(false));
+                MainFrame.setCentralPanel(new HideZoneMainPanel(false, finalHideZoneName));
             });
 
             deleteButton = new JButton("<html>&#10006</html>");
             deleteButton.setFont(new Font(null, Font.BOLD, 17));
             deleteButton.addActionListener((e) -> {
-                new DelFrame(fileWithVideos, date);
+                new DelFrame(folderWithVideos, date);
             });
 
             mainVideoPanel = new JPanel(new FlowLayout());

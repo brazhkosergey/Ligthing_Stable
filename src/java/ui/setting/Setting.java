@@ -38,7 +38,7 @@ public class Setting extends JPanel {
     private Setting() {
         this.setPreferredSize(new Dimension(1120, 540));
         this.setLayout(new BorderLayout());
-        sarcophagusSettingPanel = new SarcophagusSettingPanel(Storage.getCamerasPosition());
+        sarcophagusSettingPanel = new SarcophagusSettingPanel(Storage.getAddressSaver().getCamerasPosition());
         buildSetting();
     }
 
@@ -522,7 +522,6 @@ public class Setting extends JPanel {
         }
     }
 
-
     private class HideZoneLineMarkerPanel extends JPanel {
         private BufferedImage background;
         private int groupNumber;
@@ -574,8 +573,7 @@ public class Setting extends JPanel {
         }
     }
 
-
-    public void backToSetting() {
+    void backToSetting() {
         Setting.getSetting().removeAll();
         Setting.getSetting().add(passwordPane, BorderLayout.NORTH);
         Setting.getSetting().add(allSettingPane, BorderLayout.CENTER);

@@ -25,6 +25,7 @@ public class Storage {
 
     private static Map<Integer, int[][]> linePoints;
     private static Map<Integer, List<int[]>> linesForHideZoneParsing;
+    private static Map<Integer, List<Double>> pixelsSizesForHideZoneParsing;
 
     private static int[][] camerasPosition;
 
@@ -85,8 +86,8 @@ public class Storage {
         colorRGBNumberSet = new HashSet<>();
         linePoints = new HashMap<>();
         linesForHideZoneParsing = new HashMap<>();
+        pixelsSizesForHideZoneParsing = new HashMap<>();
     }
-
 
     public static void startAllCameras() {
 
@@ -113,20 +114,46 @@ public class Storage {
         }
     }
 
-    public static void addLinePoint(int groupNumber, int[][] list, boolean edit) {
+    public static void addLinePoint(int groupNumber, int[][] list, boolean editOrStartApp) {
         linePoints.put(groupNumber, list);
-        if (edit) {
+        if (editOrStartApp) {
             addressSaver.saveLinePoints(groupNumber, list);
         }
 
         if (list != null) {
             linesForHideZoneParsing.put(groupNumber, getLineForParsing(list));
         }
+
     }
 
-    public static CameraGroup[] getCameraGroups() {
-        return cameraGroups;
-    }
+//    private List<Double> getPixelsSizesForHideZoneParsing(int groupNumber, List<int[]> linesForHideZoneParsing) {
+//        double[] groupNumberViewAnglesTangences = Storage.getAddressSaver().getCamerasViewAnglesTangences()[groupNumber - 1];
+//        double angleMin = Math.atan(groupNumberViewAnglesTangences[0]);
+//        double angleMax = Math.atan(groupNumberViewAnglesTangences[1]);
+//        double angleIncrement = angleMax - angleMin;
+//        double distanceToSarcophagus = Storage.getAddressSaver().getCamerasPosition()[groupNumber - 1][0] / Math.sin(angleMin);
+//        double distanceToView = distanceToSarcophagus * Math.tan(angleIncrement);
+//
+//        double[] distances = new double[linesForHideZoneParsing.size()];
+//
+//        double totalLineLength = 0.0;
+//
+//        for (int i = 1; i < linesForHideZoneParsing.size(); i++) {
+//            int[] previousPoint = linesForHideZoneParsing.get(i);
+//            int[] currentPoint = linesForHideZoneParsing.get(i);
+//            double distanceBetweenPoints = Math.sqrt(Math.pow(Math.abs(previousPoint[0] - currentPoint[0]), 2.0) +
+//                    Math.pow(Math.abs(previousPoint[1] - currentPoint[1]), 2.0));
+//            distances[i - 1] = distanceBetweenPoints;
+//            totalLineLength += distanceBetweenPoints;
+//        }
+//        double onePixelLength = totalLineLength / 100000;
+////        for(){
+////
+////        }
+//
+//
+//
+//    }
 
     private static List<int[]> getLineForParsing(int[][] linePoints) {
 
@@ -157,6 +184,10 @@ public class Storage {
         return listToReturn;
     }
 
+    public static CameraGroup[] getCameraGroups() {
+        return cameraGroups;
+    }
+
     public static Map<Integer, int[][]> getLinePoints() {
         return linePoints;
     }
@@ -171,15 +202,6 @@ public class Storage {
 
     public static void setLinesForHideZoneParsing(Map<Integer, List<int[]>> linesForHideZoneParsing) {
         Storage.linesForHideZoneParsing = linesForHideZoneParsing;
-    }
-
-    public static int[][] getCamerasPosition() {
-        return camerasPosition;
-    }
-
-    public static void setCamerasPosition(int[][] camerasPosition) {
-        Storage.camerasPosition = camerasPosition;
-        addressSaver.setCamerasPosition(camerasPosition);
     }
 
     public static AddressSaver getAddressSaver() {

@@ -289,7 +289,7 @@ public class SarcophagusSettingPanel extends JPanel {
 
             position[3][0]=Integer.parseInt(fourthCameraLeftRightTextField.getText());
             position[3][1]=Integer.parseInt(fourthCameraUpDownTextField.getText());
-            Storage.setCamerasPosition(position);
+            Storage.getAddressSaver().setCamerasPosition(position);
             saveButton.setForeground(new Color(47, 123, 21));
         });
 

@@ -111,11 +111,11 @@ public class VideoPlayer extends JPanel {
     private int currentSliderPosition = 0;
 
     /**
-     * @param foldersWithTemporaryVideoFiles folder to search files
-     * @param dateToShow                     - date, to show on pane;
-     * @param videoNumberInList              - number to show on panel
+     * @param foldersWithVideoFiles folder to search files
+     * @param dateToShow            - date, to show on pane;
+     * @param videoNumberInList     - number to show on panel
      */
-    VideoPlayer(Map<Integer,File> foldersWithTemporaryVideoFiles, String dateToShow, int videoNumberInList) {
+    VideoPlayer(Map<Integer, File> foldersWithVideoFiles, String dateToShow, int videoNumberInList) {
         this.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
         this.setLayout(new BorderLayout());
         centralPane = new JPanel(new BorderLayout());
@@ -124,82 +124,84 @@ public class VideoPlayer extends JPanel {
         mainVideoPane.setLayout(mainVideoPaneLayout);
 
         List<Thread> threadList = new ArrayList<>();
-        Map<Integer, Boolean> eventFrameNumberMap = new HashMap<>();
+        Map<Integer, Boolean> eventFrameNumberMap = new TreeMap<>();
         eventPercent = new HashMap<>();
         eventFrameNumberList = new ArrayList<>();
         oneVideoPlayerPanelsList = new ArrayList<>();
 
-        for (int j = 1; j < 5; j++) {
-            File folder = foldersWithTemporaryVideoFiles.get(j);
+        String hideZoneName = null;
+        boolean hideZoneDetected = false;
 
+        for (int j = 1; j < 5; j++) {
+            File folder = foldersWithVideoFiles.get(j);
             if (folder != null) {
                 String name = folder.getName();
-                if(name.length()>5){
+                if (hideZoneName == null && folder.getParentFile().getName().contains("{")) {
+                    hideZoneName = folder.getParentFile().getName().split("\\{")[1];
+                    hideZoneName = hideZoneName.substring(0, hideZoneName.length() - 1);
+                    hideZoneDetected = hideZoneName.length() > 1;
+                }
+                int i = name.indexOf(")");
+                String totalFpsString = name.substring(2, i);
+                int totalFPS = Integer.parseInt(totalFpsString);
 
-                    System.out.println("Имя файла - "+name);
-
-                    int i = name.indexOf(")");
-                    String totalFpsString = name.substring(2, i);
-                    int totalFPS = Integer.parseInt(totalFpsString);
-
-                    if (FPS < totalFPS) {
-                        FPS = totalFPS;
-                        totalCountFrames = 0;
-                        File[] files = folder.listFiles();
-                        if (files != null) {
-                            for (File file : files) {
-                                try {
-                                    String fileName = file.getName();
-                                    String[] fileNameSplit = fileName.split("\\.");
-                                    String[] lastSplit = fileNameSplit[0].split("-");
-                                    String countFramesString = lastSplit[1];
-                                    int countFrames = Integer.parseInt(countFramesString);
-                                    totalCountFrames += countFrames;
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
+                if (FPS < totalFPS) {
+                    FPS = totalFPS;
+                    totalCountFrames = 0;
+                    File[] files = folder.listFiles();
+                    if (files != null) {
+                        for (File file : files) {
+                            try {
+                                String fileName = file.getName();
+                                String[] fileNameSplit = fileName.split("\\.");
+                                String[] lastSplit = fileNameSplit[0].split("-");
+                                String countFramesString = lastSplit[1];
+                                int countFrames = Integer.parseInt(countFramesString);
+                                totalCountFrames += countFrames;
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
                         }
+                    }
 
-                        eventFrameNumberMap.clear();
-                        eventFrameNumberList.clear();
-                        int first = name.indexOf("[");
-                        int second = name.indexOf("]");
-                        String substring = name.substring(first + 1, second);
-                        String[] eventsSplit = substring.split(",");
-                        for (String aSplit : eventsSplit) {
-                            boolean contains = aSplit.contains("(");
-                            if (contains) {
-                                String s = aSplit.substring(1, aSplit.length() - 1);
-                                try {
-                                    int i1 = Integer.parseInt(s);
-                                    eventFrameNumberMap.put(i1, contains);
-                                    eventFrameNumberList.add(i1);
-                                } catch (Exception ex) {
-                                    ex.printStackTrace();
-                                }
-                            } else {
-                                try {
-                                    int i1 = Integer.parseInt(aSplit);
-                                    eventFrameNumberMap.put(i1, contains);
-                                    eventFrameNumberList.add(i1);
-                                } catch (Exception ex) {
-                                    ex.printStackTrace();
-                                }
+                    eventFrameNumberMap.clear();
+                    eventFrameNumberList.clear();
+                    int first = name.indexOf("[");
+                    int second = name.indexOf("]");
+                    String substring = name.substring(first + 1, second);
+                    String[] eventsSplit = substring.split(",");
+                    for (String aSplit : eventsSplit) {
+                        boolean contains = aSplit.contains("(");
+                        if (contains) {
+                            String s = aSplit.substring(1, aSplit.length() - 1);
+                            try {
+                                int i1 = Integer.parseInt(s);
+                                eventFrameNumberMap.put(i1, contains);
+                                eventFrameNumberList.add(i1);
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                        } else {
+                            try {
+                                int i1 = Integer.parseInt(aSplit);
+                                eventFrameNumberMap.put(i1, contains);
+                                eventFrameNumberList.add(i1);
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
                             }
                         }
-                        Collections.sort(eventFrameNumberList);
+                    }
+                    Collections.sort(eventFrameNumberList);
 
-                        tempEventsMapPartSize = new HashMap<>();
-                        int lastFrame = 0;
-                        for (int k = 0; k < eventFrameNumberList.size(); k++) {
-                            Integer integer = eventFrameNumberList.get(k);
-                            tempEventsMapPartSize.put(k, (integer - lastFrame));
-                            lastFrame = integer;
+                    tempEventsMapPartSize = new HashMap<>();
+                    int lastFrame = 0;
+                    for (int k = 0; k < eventFrameNumberList.size(); k++) {
+                        Integer integer = eventFrameNumberList.get(k);
+                        tempEventsMapPartSize.put(k, (integer - lastFrame));
+                        lastFrame = integer;
 
-                            if (k == eventFrameNumberList.size() - 1) {
-                                tempEventsMapPartSize.put(k + 1, (totalCountFrames - lastFrame));
-                            }
+                        if (k == eventFrameNumberList.size() - 1) {
+                            tempEventsMapPartSize.put(k + 1, (totalCountFrames - lastFrame));
                         }
                     }
                 }
@@ -382,10 +384,14 @@ public class VideoPlayer extends JPanel {
         JButton hideZoneButton = new JButton("<html>&#128065</html>");
         hideZoneButton.setFont(new Font(null, Font.BOLD, 30));
         hideZoneButton.setFocusable(false);
-        hideZoneButton.addActionListener((e) -> {
-            MainFrame.setCentralPanel(new HideZoneMainPanel(true));
-        });
+        if (hideZoneDetected) {
+            hideZoneButton.setForeground(new Color(3, 156, 11));
+        }
 
+        String finalHideZoneName = hideZoneName;
+        hideZoneButton.addActionListener((e) -> {
+            MainFrame.setCentralPanel(new HideZoneMainPanel(true, finalHideZoneName));
+        });
 
         backButton.setPreferredSize(new Dimension(62, 40));
         hideZoneButton.setPreferredSize(new Dimension(62, 40));
@@ -677,12 +683,9 @@ public class VideoPlayer extends JPanel {
      * @param position - current position(0-999)
      */
     private void setSliderPosition(int position) {
-
-
         if (position > 499) {
             position = 499;
         }
-
         for (int i = 0; i < position - 1; i++) {
             if (eventPercent.containsKey(i)) {
                 if (eventPercent.get(i)) {

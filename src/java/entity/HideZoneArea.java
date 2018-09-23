@@ -1,7 +1,5 @@
 package entity;
 
-import org.apache.log4j.Logger;
-
 public class HideZoneArea {
 
     private String nameOfArea;

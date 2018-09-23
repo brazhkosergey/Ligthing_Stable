@@ -1,6 +1,7 @@
 package entity;
 
 import entity.Storage.Storage;
+import ui.main.MainFrame;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,6 +28,9 @@ public class NewVideoInformFrame extends JFrame {
         okButton.addActionListener((e) -> {
             this.dispose();
             VideoCreator.restartNewVideoFrame();
+            MainFrame.showSecondsAlreadySaved("");
+            VideoCreator.setShowInformMessage(false);
+            MainFrame.showVideoFilesPanel();
         });
 
         JLabel label = new JLabel("Test");

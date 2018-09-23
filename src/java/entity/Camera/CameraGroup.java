@@ -85,16 +85,6 @@ public class CameraGroup {
     private int stopSaveVideoInt;
 
     /**
-     * Thread to mark one second, and update data from setting
-     */
-    private Thread timerThread;
-
-    /**
-     * Thread to save image bytes to files
-     */
-    private Thread saveBytesThread;
-
-    /**
      * date when lightning was
      */
 //    private Date date;
@@ -114,9 +104,9 @@ public class CameraGroup {
 
         dequeImagesTime = new ConcurrentLinkedDeque<>();
         buffMapImages = new HashMap<>();
-        eventsFramesNumber = new HashMap<>();
+        eventsFramesNumber = new TreeMap<>();
 
-        timerThread = new Thread(() -> {
+        Thread timerThread = new Thread(() -> {
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
@@ -170,7 +160,11 @@ public class CameraGroup {
         });
         timerThread.setName("VideoCreatorTimer Thread " + groupNumber);
         timerThread.start();
-        saveBytesThread = new Thread(() -> {
+        /*
+      Thread to save image bytes to files
+     */ /**
+         * Thread to save image bytes to files
+         */Thread saveBytesThread = new Thread(() -> {
             while (true) {
                 if (oneSecond) {
                     try {
@@ -200,7 +194,8 @@ public class CameraGroup {
                                                         } else {
 //                                                            log.error(cameraGroupNumber+" Количество кадров - "+totalCountFrames);
 //                                                            System.out.println(cameraGroupNumber+" Количество кадров - "+totalCountFrames);
-                                                            totalCountFrames = totalCountFrames - 1;//in case when temporary stream was not converted to byte array, but was added null to collection
+
+                                                            totalCountFrames -= 1;//in case when temporary stream was not converted to byte array, but was added null to collection
 //                                                            log.error(cameraGroupNumber+" Потеряли кадр , байты пришли в виде НУЛЛ "+totalCountFrames);
 //                                                            System.out.println(cameraGroupNumber+" Потеряли кадр , байты пришли в виде НУЛЛ "+totalCountFrames);
                                                         }

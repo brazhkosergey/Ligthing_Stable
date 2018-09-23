@@ -211,12 +211,8 @@ class OneVideoPlayerPanel extends JPanel {
                 }
             }
 
-            String absolutePathToImage = folderWithFilesBytesToShowVideo.getAbsolutePath() + "\\" + numberVideoPanel + ".jpg";
-            System.out.println("Изображениие - " + absolutePathToImage);
-
+            String absolutePathToImage = folderWithFilesBytesToShowVideo.getParentFile().getAbsolutePath() + "\\" + numberVideoPanel + ".jpg";
             File imageFile = new File(absolutePathToImage);
-
-
             if (imageFile.exists()) {
                 try {
                     FileInputStream fileInputStream = new FileInputStream(imageFile);
@@ -737,24 +733,24 @@ class OneVideoPlayerPanel extends JPanel {
     private void readBytesImageToBuff() {
         while (!setPosition && VideoPlayer.isShowVideoPlayer()) {
             t = x;
-            try {
-                x = bufferedInputStream.read();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            temporaryStream.write(x);
-            if (x == 216 && t == 255) {// начало изображения
-                temporaryStream.reset();
-                temporaryStream.write(t);
+                try {
+                    x = bufferedInputStream.read();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 temporaryStream.write(x);
-            } else if (x == 217 && t == 255) {//конец изображения
-                byte[] imageBytes = temporaryStream.toByteArray();
-                framesBytesInBuffMap.put(++numberOfFrameFromStartVideo, imageBytes);
-                frameInBuffDeque.addFirst(numberOfFrameFromStartVideo);
-                return;
-            }
-            if (x < 0) {
-                return;
+                if (x == 216 && t == 255) {// начало изображения
+                    temporaryStream.reset();
+                    temporaryStream.write(t);
+                    temporaryStream.write(x);
+                } else if (x == 217 && t == 255) {//конец изображения
+                    byte[] imageBytes = temporaryStream.toByteArray();
+                    framesBytesInBuffMap.put(++numberOfFrameFromStartVideo, imageBytes);
+                    frameInBuffDeque.addFirst(numberOfFrameFromStartVideo);
+                    return;
+                }
+                if (x < 0) {
+                    return;
             }
         }
     }

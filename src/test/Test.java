@@ -1,21 +1,18 @@
+import entity.HideZoneLightingSearcher;
 import ui.setting.SarcophagusSettingPanel;
 import ui.setting.Setting;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 
 public class Test {
 
     public static void main(String[] args) {
+        File file = new File("C:\\LIGHTNING_STABLE\\bytes\\1537688884305");
+        File fileSmall = new File("C:\\LIGHTNING_STABLE\\bytes\\1537561021388");
 
-
-        JFrame frame = new JFrame();
-        frame.setPreferredSize(new Dimension(1120,540));
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        SarcophagusSettingPanel sarcophagusSettingPanel = new SarcophagusSettingPanel(null);
-        frame.getContentPane().setLayout(new BorderLayout());
-        frame.add(sarcophagusSettingPanel,BorderLayout.CENTER);
-        frame.pack();
+        HideZoneLightingSearcher.addHideZoneAreaName(file);
+        HideZoneLightingSearcher.addHideZoneAreaName(fileSmall);
     }
 }

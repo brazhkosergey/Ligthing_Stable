@@ -1,7 +1,5 @@
 package entity;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -9,15 +7,12 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 
 import entity.Camera.CameraGroup;
 import entity.Storage.Storage;
 import ui.setting.CameraAddressSetting;
-import ui.main.MainFrame;
 
 /**
  * Class save data from setting to .txt file. xml format
@@ -30,7 +25,6 @@ public class AddressSaver {
     /**
      * all data will save in array
      */
-//    private String[] arr = new String[24];
     private String[][] camerasIdentificationInformation;
 
     /**
@@ -73,20 +67,34 @@ public class AddressSaver {
     private int[][] thirdGroup;
     private int[][] fourthGroup;
     private int[][] camerasPosition;
+    private double[][] camerasViewAnglesTangences;
+    private int hideZoneIdentificationAccuracyCountOfFramesToAnalise;
+    private int hideZoneIdentificationAccuracyComparePixels;
 
     private AddressSaver() {
         camerasPosition = new int[4][];
         camerasPosition[0] = new int[]{70, 90};
         camerasPosition[1] = new int[]{90, 140};
-        camerasPosition[2] = new int[]{30, 140};
-        camerasPosition[3] = new int[]{180, 150};
+        camerasPosition[2] = new int[]{180, 150};
+        camerasPosition[3] = new int[]{30, 140};
+
+        camerasViewAnglesTangences = new double[4][];
+        for (int i = 0; i < camerasPosition.length; i++) {
+            camerasViewAnglesTangences[i] = new double[]{(double) camerasPosition[i][0] / camerasPosition[i][1],
+                    (double) (camerasPosition[i][0] + 160) / camerasPosition[i][1]};
+        }
 
         camerasIdentificationInformation = new String[8][];
         for (int i = 0; i < 8; i++) {
             camerasIdentificationInformation[i] = new String[3];
         }
-
+        hideZoneIdentificationAccuracyCountOfFramesToAnalise = 1;
+        hideZoneIdentificationAccuracyComparePixels = 5;
         PASS = "PASS";
+    }
+
+    public int[][] getCamerasPosition() {
+        return camerasPosition;
     }
 
     public String[][] getCamerasIdentificationInformation() {
@@ -240,7 +248,7 @@ public class AddressSaver {
         Storage.addLinePoint(2, secondGroup, false);
         Storage.addLinePoint(3, thirdGroup, false);
         Storage.addLinePoint(4, fourthGroup, false);
-        Storage.setCamerasPosition(camerasPosition);
+
         if (path != null) {
             Storage.setPath(path);
         }
@@ -250,10 +258,26 @@ public class AddressSaver {
 
     public void setCamerasPosition(int[][] camerasPosition) {
         this.camerasPosition = camerasPosition;
+        for (int i = 0; i < camerasPosition.length; i++) {
+            camerasViewAnglesTangences[i][0] = (double) camerasPosition[i][0] / camerasPosition[i][1];
+            camerasViewAnglesTangences[i][1] = (double) (camerasPosition[i][0] + 160) / camerasPosition[i][1];
+        }
         savePasswordSaverToFile();
     }
 
     public String getAudioAddress() {
         return audioAddress;
+    }
+
+    public int getHideZoneIdentificationAccuracyCountOfFramesToAnalise() {
+        return hideZoneIdentificationAccuracyCountOfFramesToAnalise;
+    }
+
+    public int getHideZoneIdentificationAccuracyComparePixels() {
+        return hideZoneIdentificationAccuracyComparePixels;
+    }
+
+    public double[][] getCamerasViewAnglesTangences() {
+        return camerasViewAnglesTangences;
     }
 }

@@ -481,6 +481,7 @@ public class MainFrame extends JFrame {
         cameraButton.setPreferredSize(new Dimension(120, 30));
         cameraButton.addActionListener((e) -> {
             VideoPlayer.setShowVideoPlayer(false);
+            cameraAddressSetting.setSaveButtonDefaultColor();
             setCentralPanel(cameraAddressSetting);
             mainLabel.setText(Storage.getBundle().getString("camerassettingpage"));
         });
@@ -600,7 +601,7 @@ public class MainFrame extends JFrame {
                 blockPanel.add(cameraPanel);
             }
 
-            cameraBlock.put(groupNumber+1, blockPanel);
+            cameraBlock.put(groupNumber + 1, blockPanel);
             allCameraPanel.add(blockPanel);
         }
         centralPanel.add(allCameraPanel);
@@ -624,7 +625,7 @@ public class MainFrame extends JFrame {
         centralPanel.repaint();
     }
 
-    public void showVideoFilesPanel() {
+    public static void showVideoFilesPanel() {
         VideoPlayer.setShowVideoPlayer(false);
         videoFilesPanel.showVideos();
         setCentralPanel(videoFilesPanel);

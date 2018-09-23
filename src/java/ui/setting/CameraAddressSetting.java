@@ -26,6 +26,7 @@ public class CameraAddressSetting extends JPanel {
     private JTextField[][] textFields;
     private JTextField addressAudioTextField;
     private Map<Integer, JLabel> labelMap;
+    private JButton saveButton;
 
     private CameraAddressSetting() {
         textFields = new JTextField[8][];
@@ -45,11 +46,12 @@ public class CameraAddressSetting extends JPanel {
     }
 
     private void buildCameraSetting() {
-        JButton saveButton = new JButton(Storage.getBundle().getString("savepartvideobutton"));
+        saveButton = new JButton(Storage.getBundle().getString("savepartvideobutton"));
         saveButton.setFont(new Font(null, Font.BOLD, 17));
         saveButton.addActionListener((e) -> {
             saveCameraInformationToAddressSaver();
             Storage.startAllCameras();
+            saveButton.setForeground(new Color(46, 139, 87));
         });
 
         mainCameraSettingPanel = new JPanel();
@@ -278,5 +280,8 @@ public class CameraAddressSetting extends JPanel {
         if (addressAudio != null) {
             addressAudioTextField.setText(addressAudio);
         }
+    }
+    public void setSaveButtonDefaultColor(){
+        saveButton.setForeground(Color.BLACK);
     }
 }

@@ -72,7 +72,6 @@ public class VideoCreator {
             }
 
             if (!saveVideoEnable) {
-//                date = new Date(System.currentTimeMillis());
                 folderForBytes = new File(Storage.getPath() + "\\bytes\\" + System.currentTimeMillis());
                 boolean mkdirs = folderForBytes.mkdirs();
                 if (mkdirs) {
@@ -109,9 +108,6 @@ public class VideoCreator {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-
-//                    HideZoneLightingSearcher.addHideZoneAreaName(date);
-
                     continueSaveVideoThread = null;
                 });
                 continueSaveVideoThread.start();
@@ -145,29 +141,27 @@ public class VideoCreator {
         }
         saveVideoEnable = false;
 
-
         Thread lookingForHideZoneLightingThread = new Thread(() -> {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
             File storageFolder = new File(Storage.getPath() + "\\bytes\\");
             File[] videoFiles = storageFolder.listFiles();
-            for (File file : videoFiles) {
-                if (!file.getName().contains("{")) {
 
-                    srtgvf
-                    file.renameTo(new File(file.getAbsolutePath()+"{f5}"));
-
-                    wrtvadf
-
+            if (videoFiles != null) {
+                for (File file : videoFiles) {
+                    if (!file.getName().contains("{")) {
+                        HideZoneLightingSearcher.addHideZoneAreaName(file);
+                    }
                 }
             }
         });
         lookingForHideZoneLightingThread.start();
     }
+
+
 
 
     static void restartNewVideoFrame() {
