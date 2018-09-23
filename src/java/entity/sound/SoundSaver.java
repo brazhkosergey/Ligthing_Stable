@@ -1,6 +1,7 @@
 package entity.sound;
 
-import entity.MainVideoCreator;
+import entity.Storage.Storage;
+import entity.VideoCreator;
 import ui.main.MainFrame;
 
 import javax.sound.sampled.*;
@@ -115,7 +116,7 @@ public class SoundSaver extends Thread {
                         MainFrame.audioPacketCount.setText(audioFPS + " : " + FPSDeque.size());
                         FPSDeque.addFirst(audioFPS);
                         if (!startSaveAudio) {
-                            sizeAudioSecond = MainFrame.getSecondsToSave();
+                            sizeAudioSecond = Storage.getSecondsToSave();
                             while (FPSDeque.size() > sizeAudioSecond) {
                                 Integer integer = FPSDeque.pollLast();
                                 for (int j = 0; j < integer; j++) {
@@ -194,22 +195,18 @@ public class SoundSaver extends Thread {
         if (connect) {
             RTSPSeqNb = 1;
             send_RTSP_request("SETUP");
-            if (parse_server_response() != 200)
-                System.out.println("Invalid Server Response");
-            else {
+            if (parse_server_response() == 200) {
                 state = READY;
-                System.out.println("New RTSP state: READY");
             }
         }
+
     }
 
     public void PLAY() {
         if (connect && state == READY) {
             RTSPSeqNb++;
             send_RTSP_request("PLAY");
-            if (parse_server_response() != 200) {
-                System.out.println("Invalid Server Response");
-            } else {
+            if (parse_server_response() == 200) {
                 state = PLAYING;
                 mainThread.start();
                 updateDataThread.start();
@@ -227,7 +224,7 @@ public class SoundSaver extends Thread {
     }
 
     private void saveSoundToFile(Map<Long, byte[]> mainMapSaveFile) {
-        MainVideoCreator.saveAudioBytes(mainMapSaveFile);
+        VideoCreator.saveAudioBytes(mainMapSaveFile);
     }
 
     private int parse_server_response() {

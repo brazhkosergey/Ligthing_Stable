@@ -1,5 +1,6 @@
 package ui.setting;
 
+import entity.Storage.Storage;
 import org.apache.log4j.Logger;
 import ui.camera.CameraPanel;
 import ui.main.MainFrame;
@@ -15,7 +16,7 @@ import java.io.IOException;
  * setting panel
  */
 public class Setting extends JPanel {
-    private static Logger log = Logger.getLogger(Setting.class);
+    private static Logger log = Logger.getLogger("file");
 
     private static Setting setting;
 
@@ -37,7 +38,7 @@ public class Setting extends JPanel {
     private Setting() {
         this.setPreferredSize(new Dimension(1120, 540));
         this.setLayout(new BorderLayout());
-        sarcophagusSettingPanel = new SarcophagusSettingPanel(MainFrame.getCamerasPosition());
+        sarcophagusSettingPanel = new SarcophagusSettingPanel(Storage.getCamerasPosition());
         buildSetting();
     }
 
@@ -60,25 +61,25 @@ public class Setting extends JPanel {
         firstPanel.setPreferredSize(new Dimension(690, 80));
 
         JPanel checkBoxPane = new JPanel(new FlowLayout());
-        JCheckBox testModeCheckBox = new JCheckBox(MainFrame.getBundle().getString("testmode"));
+        JCheckBox testModeCheckBox = new JCheckBox(Storage.getBundle().getString("testmode"));
         testModeCheckBox.setHorizontalAlignment(SwingConstants.CENTER);
         testModeCheckBox.setSelected(false);
-        programCatchEnableCheckBox = new JCheckBox(MainFrame.getBundle().getString("programcatchcheckboxlabel"));
-        programCatchEnableCheckBox.setSelected(MainFrame.isProgramLightCatchEnable());
+        programCatchEnableCheckBox = new JCheckBox(Storage.getBundle().getString("programcatchcheckboxlabel"));
+        programCatchEnableCheckBox.setSelected(Storage.isProgramLightCatchEnable());
         checkBoxPane.add(programCatchEnableCheckBox);
         checkBoxPane.add(testModeCheckBox);
 
         JPanel timePanel = new JPanel(new FlowLayout());
         timeTextField = new JTextField();
-        timeTextField.setText(String.valueOf(MainFrame.getSecondsToSave()));
+        timeTextField.setText(String.valueOf(Storage.getSecondsToSave()));
         timeTextField.setHorizontalAlignment(SwingConstants.CENTER);
         timeTextField.setPreferredSize(new Dimension(50, 25));
-        JLabel textLabel = new JLabel(MainFrame.getBundle().getString("timetosavevideolabel"));
+        JLabel textLabel = new JLabel(Storage.getBundle().getString("timetosavevideolabel"));
 
-        portLabel = new JLabel("port - " + MainFrame.getPort());
+        portLabel = new JLabel("port - " + Storage.getPort());
         defaultPort = new JTextField();
         defaultPort.setHorizontalAlignment(SwingConstants.CENTER);
-        defaultPort.setText(String.valueOf(MainFrame.getPort()));
+        defaultPort.setText(String.valueOf(Storage.getPort()));
         defaultPort.setPreferredSize(new Dimension(50, 25));
 
         timePanel.add(textLabel);
@@ -94,12 +95,12 @@ public class Setting extends JPanel {
         programLightCatchSettingPanel.setBorder(BorderFactory.createEtchedBorder());
         programLightCatchSettingPanel.setPreferredSize(new Dimension(690, 215));
 
-        JLabel headLabel = new JLabel(MainFrame.getBundle().getString("programcatchsettinglabel"));
+        JLabel headLabel = new JLabel(Storage.getBundle().getString("programcatchsettinglabel"));
         headLabel.setHorizontalAlignment(SwingConstants.CENTER);
         headLabel.setFont(new Font(null, Font.BOLD, 17));
         headLabel.setPreferredSize(new Dimension(680, 25));
 
-        JLabel lightSensitivityLabel = new JLabel(MainFrame.getBundle().getString("photosensitivitysettinglabel") + MainFrame.getColorLightNumber());
+        JLabel lightSensitivityLabel = new JLabel(Storage.getBundle().getString("photosensitivitysettinglabel") + Storage.getColorLightNumber());
         lightSensitivityLabel.setPreferredSize(new Dimension(680, 25));
 
         JPanel whitePanel = new JPanel(new FlowLayout());
@@ -114,7 +115,7 @@ public class Setting extends JPanel {
         JLabel whiteColorLabel = new JLabel(stringBuilder.toString());
         whiteColorLabel.setPreferredSize(new Dimension(680, 25));
         whiteColorLabel.setFont(new Font(null, Font.ITALIC, 25));
-        whiteColorLabel.setForeground(new Color(MainFrame.getColorLightNumber(), MainFrame.getColorLightNumber(), MainFrame.getColorLightNumber()));
+        whiteColorLabel.setForeground(new Color(Storage.getColorLightNumber(), Storage.getColorLightNumber(), Storage.getColorLightNumber()));
         whitePanel.add(whiteColorLabel);
 
         JSlider lightSensitivitySlider = new JSlider();
@@ -123,14 +124,14 @@ public class Setting extends JPanel {
         lightSensitivitySlider.setPaintTicks(true);
         lightSensitivitySlider.setMinimum(140);
         lightSensitivitySlider.setMaximum(230);
-        lightSensitivitySlider.setValue(MainFrame.getColorLightNumber());
+        lightSensitivitySlider.setValue(Storage.getColorLightNumber());
         lightSensitivitySlider.addChangeListener(e -> {
             int value = lightSensitivitySlider.getValue();
             whiteColorLabel.setForeground(new Color(value, value, value));
-            lightSensitivityLabel.setText(MainFrame.getBundle().getString("photosensitivitysettinglabel") + value);
+            lightSensitivityLabel.setText(Storage.getBundle().getString("photosensitivitysettinglabel") + value);
         });
 
-        JLabel changeWhiteLabel = new JLabel(MainFrame.getBundle().getString("lightening") + MainFrame.getPercentDiffWhite() + " %");
+        JLabel changeWhiteLabel = new JLabel(Storage.getBundle().getString("lightening") + Storage.getPercentDiffWhite() + " %");
         changeWhiteLabel.setPreferredSize(new Dimension(680, 25));
 
         JSlider sliderChangeWhite = new JSlider();
@@ -139,9 +140,9 @@ public class Setting extends JPanel {
         sliderChangeWhite.setPaintTicks(true);
         sliderChangeWhite.setMinimum(2);
         sliderChangeWhite.setMaximum(9);
-        sliderChangeWhite.setValue(MainFrame.getPercentDiffWhite());
+        sliderChangeWhite.setValue(Storage.getPercentDiffWhite());
         sliderChangeWhite.addChangeListener(e -> {
-            changeWhiteLabel.setText(MainFrame.getBundle().getString("lightening") + sliderChangeWhite.getValue() + " %");
+            changeWhiteLabel.setText(Storage.getBundle().getString("lightening") + sliderChangeWhite.getValue() + " %");
         });
 
         programLightCatchSettingPanel.add(headLabel);
@@ -155,16 +156,16 @@ public class Setting extends JPanel {
         otherSetting.setPreferredSize(new Dimension(690, 68));
         otherSetting.setBorder(BorderFactory.createEtchedBorder());
 
-        JLabel opacityLabel = new JLabel(MainFrame.getBundle().getString("backimageopacitylabel") + MainFrame.getOpacitySetting() + " %");
+        JLabel opacityLabel = new JLabel(Storage.getBundle().getString("backimageopacitylabel") + Storage.getOpacitySetting() + " %");
         opacityLabel.setPreferredSize(new Dimension(680, 25));
         JSlider slider = new JSlider();
         slider.setPreferredSize(new Dimension(680, 28));
         slider.setMinorTickSpacing(2);
         slider.setPaintTicks(true);
-        slider.setValue(MainFrame.getOpacitySetting());
+        slider.setValue((int) (Storage.getOpacitySetting() * 100));
         slider.addChangeListener(e -> {
             int value = slider.getValue();
-            opacityLabel.setText(MainFrame.getBundle().getString("backimageopacitylabel") + value + " %");
+            opacityLabel.setText(Storage.getBundle().getString("backimageopacitylabel") + value + " %");
         });
 
         otherSetting.add(opacityLabel);
@@ -173,7 +174,7 @@ public class Setting extends JPanel {
         JPanel countImageToShowPanel = new JPanel(new FlowLayout());
         countImageToShowPanel.setPreferredSize(new Dimension(690, 68));
         countImageToShowPanel.setBorder(BorderFactory.createEtchedBorder());
-        JLabel countShowLabel = new JLabel(MainFrame.getBundle().getString("showframescountlabel") + MainFrame.getShowFramesPercent());
+        JLabel countShowLabel = new JLabel(Storage.getBundle().getString("showframescountlabel") + Storage.getShowFramesPercent());
         countShowLabel.setPreferredSize(new Dimension(680, 25));
         JSlider countShowSlider = new JSlider();
         countShowSlider.setPreferredSize(new Dimension(680, 28));
@@ -181,10 +182,10 @@ public class Setting extends JPanel {
         countShowSlider.setMaximum(60);
         countShowSlider.setMinorTickSpacing(2);
         countShowSlider.setPaintTicks(true);
-        countShowSlider.setValue(MainFrame.getShowFramesPercent());
+        countShowSlider.setValue(Storage.getShowFramesPercent());
         countShowSlider.addChangeListener(e -> {
             int value = countShowSlider.getValue();
-            countShowLabel.setText(MainFrame.getBundle().getString("showframescountlabel") + value);
+            countShowLabel.setText(Storage.getBundle().getString("showframescountlabel") + value);
         });
 
         countImageToShowPanel.add(countShowLabel);
@@ -199,12 +200,12 @@ public class Setting extends JPanel {
         pathPanel.setPreferredSize(new Dimension(375, 60));
         pathPanel.setBorder(BorderFactory.createEtchedBorder());
 
-        JLabel addressSaverLabel = new JLabel(MainFrame.getBundle().getString("foldertosavevideo"));
+        JLabel addressSaverLabel = new JLabel(Storage.getBundle().getString("foldertosavevideo"));
         addressSaverLabel.setFont(new Font(null, Font.BOLD, 15));
         addressSaverLabel.setPreferredSize(new Dimension(370, 20));
         addressSaverLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        defaultFolder = new JTextField(MainFrame.getPath());//"C:\\ipCamera\\"
+        defaultFolder = new JTextField(Storage.getPath());//"C:\\ipCamera\\"
         defaultFolder.setPreferredSize(new Dimension(365, 25));
 
         pathPanel.add(addressSaverLabel);
@@ -218,14 +219,14 @@ public class Setting extends JPanel {
                 MainFrame.setTestMode(testModeCheckBox.isSelected());
 
                 int value = countShowSlider.getValue();
-                MainFrame.setShowFramesPercent(value);
+                Storage.setShowFramesPercent(value);
 
-                MainFrame.setProgramLightCatchEnable(programCatchEnableCheckBox.isSelected());
+                Storage.setProgramLightCatchEnable(programCatchEnableCheckBox.isSelected());
                 int changeWhitePercent = sliderChangeWhite.getValue();
-                MainFrame.setPercentDiffWhite(changeWhitePercent);
+                Storage.setPercentDiffWhite(changeWhitePercent);
 
                 int lightSensitivity = lightSensitivitySlider.getValue();
-                MainFrame.getMainFrame().setColorLightNumber(lightSensitivity);
+                Storage.setColorLightNumber(lightSensitivity);
 
                 String text = timeTextField.getText();
                 int countSecondsToSaveVideo = Integer.parseInt(text);
@@ -235,10 +236,10 @@ public class Setting extends JPanel {
                     timeTextField.setText(String.valueOf(countSecondsToSaveVideo));
                 }
 
-                MainFrame.setCountSecondsToSaveVideo(countSecondsToSaveVideo);
+                Storage.setSecondsToSave(countSecondsToSaveVideo);
 
                 int opacity = slider.getValue();
-                MainFrame.setOpacitySetting(opacity);
+                Storage.setOpacitySetting(opacity);
 
                 int port = 9999;
                 try {
@@ -246,7 +247,7 @@ public class Setting extends JPanel {
                 } catch (Exception ignored) {
                 }
 
-                MainFrame.setPort(port);
+                Storage.setPort(port);
                 portLabel.setText("port сервера - " + port);
 
                 String path = defaultFolder.getText();
@@ -264,7 +265,7 @@ public class Setting extends JPanel {
 //                    MainFrame.setPath(path);
 //                }
 
-                MainFrame.addressSaver.saveSetting(countSecondsToSaveVideo, programCatchEnableCheckBox.isSelected(), changeWhitePercent, lightSensitivity, opacity, port, path);
+                Storage.getAddressSaver().saveSetting(countSecondsToSaveVideo, programCatchEnableCheckBox.isSelected(), changeWhitePercent, lightSensitivity, opacity, port, path);
                 log.info("Настройки изменены. Время сохранения: " + countSecondsToSaveVideo +
                         ", Фиксируем програмные сработки: " + programCatchEnableCheckBox.isSelected() +
                         ", процент вспышки на изображении: " + changeWhitePercent +
@@ -274,8 +275,8 @@ public class Setting extends JPanel {
                         ", путь к папке для сохранения данных: " + path +
                         ", тестовый режим: " + testModeCheckBox.isSelected() + ".");
 
-                saveButton.setText(MainFrame.getBundle().getString("savedbutton"));
-                MainFrame.showInformMassage(MainFrame.getBundle().getString("savedbutton"), new Color(46, 139, 87));
+                saveButton.setText(Storage.getBundle().getString("savedbutton"));
+                MainFrame.showInformMassage(Storage.getBundle().getString("savedbutton"), new Color(46, 139, 87));
                 saveButton.setForeground(new Color(46, 139, 87));
             } catch (Exception exc) {
                 log.error(exc.getMessage());
@@ -307,20 +308,20 @@ public class Setting extends JPanel {
         passwordPane = new JPanel(new FlowLayout());
         passwordPane.setPreferredSize(new Dimension(1000, 500));
         passwordPane.setBackground(Color.LIGHT_GRAY);
-        JLabel passwordLabel = new JLabel(MainFrame.getBundle().getString("editpasswordlabel"));
+        JLabel passwordLabel = new JLabel(Storage.getBundle().getString("editpasswordlabel"));
 
-        wrongPasswordLabel = new JLabel(MainFrame.getBundle().getString("wrongpasswordlabel"));
+        wrongPasswordLabel = new JLabel(Storage.getBundle().getString("wrongpasswordlabel"));
         wrongPasswordLabel.setHorizontalAlignment(SwingConstants.CENTER);
         wrongPasswordLabel.setPreferredSize(new Dimension(900, 30));
         wrongPasswordLabel.setVisible(false);
 
         passwordTextField = new JTextField();
         passwordTextField.setPreferredSize(new Dimension(150, 30));
-        JButton passwordButton = new JButton(MainFrame.getBundle().getString("editpasswordbutton"));
+        JButton passwordButton = new JButton(Storage.getBundle().getString("editpasswordbutton"));
         passwordButton.setPreferredSize(new Dimension(150, 30));
         passwordButton.addActionListener((e) -> {
             String passwordString = passwordTextField.getText();
-            if (passwordString.length() > 1 && passwordString.compareTo(MainFrame.getPassword()) == 0) {
+            if (passwordString.length() > 1 && passwordString.compareTo(Storage.getPassword()) == 0) {
                 passwordPane.setVisible(false);
                 allSettingPane.setVisible(true);
             } else {
@@ -345,7 +346,7 @@ public class Setting extends JPanel {
         backgroundSettingPanel.setPreferredSize(new Dimension(375, 340));
         backgroundSettingPanel.setBorder(BorderFactory.createEtchedBorder());
 
-        JLabel backgroundSettingLabel = new JLabel(MainFrame.getBundle().getString("backgroundSettingLabel"));
+        JLabel backgroundSettingLabel = new JLabel(Storage.getBundle().getString("backgroundSettingLabel"));
         backgroundSettingLabel.setFont(new Font(null, Font.BOLD, 17));
         backgroundSettingLabel.setHorizontalAlignment(SwingConstants.CENTER);
         backgroundSettingLabel.setAlignmentX(CENTER_ALIGNMENT);
@@ -360,12 +361,12 @@ public class Setting extends JPanel {
 
         JComboBox<String> backgroundSettingComboBox = new JComboBox<>();
         for (int groupNumber = 1; groupNumber < 5; groupNumber++) {
-            backgroundSettingComboBox.addItem(MainFrame.getBundle().getString("cameragroupsetting") + groupNumber);
+            backgroundSettingComboBox.addItem(Storage.getBundle().getString("cameragroupsetting") + groupNumber);
         }
 
         backgroundSettingComboBox.addActionListener((event) -> {
             int selectedIndex = backgroundSettingComboBox.getSelectedIndex();
-            File imageFile = new File(MainFrame.getDefaultPath() + "\\buff\\" + (selectedIndex + 1) + ".jpg");
+            File imageFile = new File(Storage.getDefaultPath() + "\\buff\\" + (selectedIndex + 1) + ".jpg");
             BufferedImage bufferedImage = null;
             if (imageFile.exists()) {
                 try {
@@ -383,10 +384,10 @@ public class Setting extends JPanel {
         backgroundSettingComboBox.setSelectedIndex(0);
         backgroundSettingComboBox.setPreferredSize(new Dimension(257, 25));
 
-        JButton editBackGroundButton = new JButton(MainFrame.getBundle().getString("editButton"));
+        JButton editBackGroundButton = new JButton(Storage.getBundle().getString("editButton"));
         editBackGroundButton.addActionListener((r) -> {
             int selectedIndex = backgroundSettingComboBox.getSelectedIndex() + 1;
-            File imageFile = new File(MainFrame.getDefaultPath() + "\\buff\\" + selectedIndex + ".jpg");
+            File imageFile = new File(Storage.getDefaultPath() + "\\buff\\" + selectedIndex + ".jpg");
             BufferedImage bufferedImage = null;
             if (imageFile.exists()) {
                 try {
@@ -420,13 +421,13 @@ public class Setting extends JPanel {
         cameraPositionSetting.setPreferredSize(new Dimension(375, 173));
         cameraPositionSetting.setBorder(BorderFactory.createEtchedBorder());
 
-        JLabel setCameraPositionLabel = new JLabel(MainFrame.getBundle().getString("setCameraPositionLabel"));
+        JLabel setCameraPositionLabel = new JLabel(Storage.getBundle().getString("setCameraPositionLabel"));
         setCameraPositionLabel.setFont(new Font(null, Font.BOLD, 20));
         setCameraPositionLabel.setHorizontalAlignment(SwingConstants.CENTER);
         setCameraPositionLabel.setPreferredSize(new Dimension(350, 40));
 
 
-        JButton setCameraPositionButton = new JButton(MainFrame.getBundle().getString("editButton"));
+        JButton setCameraPositionButton = new JButton(Storage.getBundle().getString("editButton"));
         setCameraPositionButton.setPreferredSize(new Dimension(150, 70));
         setCameraPositionButton.setFont(new Font(null, Font.BOLD, 20));
         setCameraPositionButton.addActionListener((as) -> {
@@ -486,7 +487,7 @@ public class Setting extends JPanel {
                 int x = (panelWidth - imageWidth) / 2;
                 int y = (panelHeight - imageHeight) / 2;
                 g.drawImage(smallBufferedImage, x, y, null);
-                int[][] ints = MainFrame.linePoints.get(groupNumber);
+                int[][] ints = Storage.getLinePoints().get(groupNumber);
 
                 if (ints != null) {
                     g.setColor(Color.GREEN);

@@ -1,6 +1,8 @@
 package ui.video;
 
-import entity.MainVideoCreator;
+import entity.Camera.ServiceCamera;
+import entity.Storage.Storage;
+import entity.VideoCreator;
 import ui.camera.CameraPanel;
 import ui.main.MainFrame;
 
@@ -174,10 +176,8 @@ class OneVideoPlayerPanel extends JPanel {
             Collections.sort(eventFrameNumberList);
 
             framesInFiles = new HashMap<>();
-            String[] split1 = name.split("-");
-            String[] fpsSplit = split1[1].split("\\.");
-            int i1 = fpsSplit[0].indexOf(")");
-            String totalFpsString = fpsSplit[0].substring(2, i1);
+            int i1 = name.indexOf(")");
+            String totalFpsString = name.substring(2, i1);
             totalFPSForFile = Integer.parseInt(totalFpsString);
 
             File[] files = folder.listFiles();
@@ -211,14 +211,18 @@ class OneVideoPlayerPanel extends JPanel {
                 }
             }
 
-            String absolutePathToImage = folderWithFilesBytesToShowVideo.getAbsolutePath().replace(".tmp", ".jpg");
+            String absolutePathToImage = folderWithFilesBytesToShowVideo.getAbsolutePath() + "\\" + numberVideoPanel + ".jpg";
+            System.out.println("Изображениие - " + absolutePathToImage);
+
             File imageFile = new File(absolutePathToImage);
+
+
             if (imageFile.exists()) {
                 try {
                     FileInputStream fileInputStream = new FileInputStream(imageFile);
                     backGround = ImageIO.read(fileInputStream);
                     fileInputStream.close();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -227,10 +231,10 @@ class OneVideoPlayerPanel extends JPanel {
             videoStreamLayer = new JLayer<JPanel>(videoPlayerToShowOneVideo, layerUI);
             videoStreamLayer.setAlignmentX(CENTER_ALIGNMENT);
 
-            informLabel = new JLabel(MainFrame.getBundle().getString("clickplaylabel"));
+            informLabel = new JLabel(Storage.getBundle().getString("clickplaylabel"));
         } else {
             blockHaveVideo = false;
-            informLabel = new JLabel(MainFrame.getBundle().getString("cameradoesnotwork"));
+            informLabel = new JLabel(Storage.getBundle().getString("cameradoesnotwork"));
         }
 
         informLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -246,57 +250,57 @@ class OneVideoPlayerPanel extends JPanel {
         exportPanel.setPreferredSize(new Dimension(190, 235));
         exportPanel.setBorder(BorderFactory.createEtchedBorder());
 
-        JLabel label = new JLabel(MainFrame.getBundle().getString("savevideolabel"));
+        JLabel label = new JLabel(Storage.getBundle().getString("savevideolabel"));
         label.setPreferredSize(new Dimension(150, 30));
         label.setHorizontalTextPosition(SwingConstants.CENTER);
         label.setHorizontalAlignment(SwingConstants.CENTER);
-        JButton exportButton = new JButton(MainFrame.getBundle().getString("savevideobutton"));
+        JButton exportButton = new JButton(Storage.getBundle().getString("savevideobutton"));
         exportButton.setFocusable(false);
         exportButton.setPreferredSize(new Dimension(178, 50));
         exportButton.addActionListener((e) -> {
             if (folder != null) {
                 Thread thread = new Thread(() -> {
-                    MainVideoCreator.encodeVideoXuggle(folder);
+                    ServiceCamera.encodeVideoXuggle(folder);
                 });
                 thread.setName("EncodeVideoThread. Number " + numberVideoPanel);
                 thread.start();
             }
         });
 
-        JButton imageButton = new JButton(MainFrame.getBundle().getString("saveframebutton"));
+        JButton imageButton = new JButton(Storage.getBundle().getString("saveframebutton"));
         imageButton.setFocusable(false);
         imageButton.setPreferredSize(new Dimension(87, 50));
         imageButton.addActionListener((e) -> {
             saveImage(false);
         });
 
-        JButton imageBackGroundButton = new JButton(MainFrame.getBundle().getString("saveframebutton") + " +");
+        JButton imageBackGroundButton = new JButton(Storage.getBundle().getString("saveframebutton") + " +");
         imageBackGroundButton.setPreferredSize(new Dimension(87, 50));
         imageBackGroundButton.addActionListener((e) -> {
             saveImage(true);
         });
 
-        currentFrameLabel = new JLabel(MainFrame.getBundle().getString("framenumberlabel"));
+        currentFrameLabel = new JLabel(Storage.getBundle().getString("framenumberlabel"));
         currentFrameLabel.setPreferredSize(new Dimension(150, 15));
-        JLabel totalFrameLabel = new JLabel(MainFrame.getBundle().getString("totalframecountlabel") + totalCountFrames);
+        JLabel totalFrameLabel = new JLabel(Storage.getBundle().getString("totalframecountlabel") + totalCountFrames);
         totalFrameLabel.setPreferredSize(new Dimension(150, 15));
 
         currentFPSLabel = new JLabel();
         currentFPSLabel.setPreferredSize(new Dimension(150, 15));
 
-        JLabel totalFPSLabel = new JLabel(MainFrame.getBundle().getString("totalword") + " FPS: " + totalFPSForFile);
+        JLabel totalFPSLabel = new JLabel(Storage.getBundle().getString("totalword") + " FPS: " + totalFPSForFile);
         totalFPSLabel.setPreferredSize(new Dimension(150, 15));
 
         partExportPanel = new JPanel(new FlowLayout());
         partExportPanel.setBorder(BorderFactory.createLineBorder(Color.lightGray));
         partExportPanel.setPreferredSize(new Dimension(190, 300));
-        JLabel partExportLabel = new JLabel(MainFrame.getBundle().getString("partsavelabel"));
+        JLabel partExportLabel = new JLabel(Storage.getBundle().getString("partsavelabel"));
         partExportLabel.setPreferredSize(new Dimension(190, 25));
         partExportLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        JLabel startPartExportLabel = new JLabel(MainFrame.getBundle().getString("firstframelabel"));
+        JLabel startPartExportLabel = new JLabel(Storage.getBundle().getString("firstframelabel"));
         startPartExportLabel.setPreferredSize(new Dimension(100, 25));
-        JLabel endPartExportLabel = new JLabel(MainFrame.getBundle().getString("lastframelabel"));
+        JLabel endPartExportLabel = new JLabel(Storage.getBundle().getString("lastframelabel"));
         endPartExportLabel.setPreferredSize(new Dimension(100, 25));
 
         JTextField startPartExportTextField = new JTextField();
@@ -304,13 +308,13 @@ class OneVideoPlayerPanel extends JPanel {
         JTextField endPartExportTextField = new JTextField();
         endPartExportTextField.setPreferredSize(new Dimension(70, 25));
 
-        JLabel informPartExportLabel = new JLabel(MainFrame.getBundle().getString("firstinformvideoplayerlabel"));
+        JLabel informPartExportLabel = new JLabel(Storage.getBundle().getString("firstinformvideoplayerlabel"));
         informPartExportLabel.setFocusable(false);
         informPartExportLabel.setPreferredSize(new Dimension(190, 50));
         informPartExportLabel.setHorizontalAlignment(SwingConstants.CENTER);
         informPartExportLabel.setHorizontalTextPosition(SwingConstants.CENTER);
 
-        JButton partExportButton = new JButton(MainFrame.getBundle().getString("savepartvideobutton"));
+        JButton partExportButton = new JButton(Storage.getBundle().getString("savepartvideobutton"));
         partExportButton.setFocusable(false);
         partExportButton.setPreferredSize(new Dimension(100, 50));
         partExportButton.addActionListener((w) -> {
@@ -325,24 +329,24 @@ class OneVideoPlayerPanel extends JPanel {
                     endFrameInt = Integer.parseInt(endFrameText);
                     continueSave = true;
                 } catch (Exception e) {
-                    informPartExportLabel.setText(MainFrame.getBundle().getString("wrongframenumberlabel"));
+                    informPartExportLabel.setText(Storage.getBundle().getString("wrongframenumberlabel"));
                     e.printStackTrace();
                 }
 
                 if (startFrame < 1 || endFrameInt < 1) {
                     continueSave = false;
-                    informPartExportLabel.setText(MainFrame.getBundle().getString("secondinformvideoplayerlabel")
-                            + startFrame + MainFrame.getBundle().getString("thirdinformvideoplayerlabel") + endFrameInt + "<hr></html>");
+                    informPartExportLabel.setText(Storage.getBundle().getString("secondinformvideoplayerlabel")
+                            + startFrame + Storage.getBundle().getString("thirdinformvideoplayerlabel") + endFrameInt + "<hr></html>");
                 }
 
                 if (endFrameInt > totalCountFrames || endFrameInt > totalCountFrames) {
                     continueSave = false;
-                    informPartExportLabel.setText(MainFrame.getBundle().getString("fourthinformvideoplayerlabel") + startFrame + " : " + endFrameInt + "<hr></html>");
+                    informPartExportLabel.setText(Storage.getBundle().getString("fourthinformvideoplayerlabel") + startFrame + " : " + endFrameInt + "<hr></html>");
                 }
 
                 if (startFrame > endFrameInt) {
                     continueSave = false;
-                    informPartExportLabel.setText(MainFrame.getBundle().getString("fifthinformvideoplayerlabel"));
+                    informPartExportLabel.setText(Storage.getBundle().getString("fifthinformvideoplayerlabel"));
                 }
 
                 if (continueSave) {
@@ -411,10 +415,10 @@ class OneVideoPlayerPanel extends JPanel {
                             }
                         }
 
-                        String pathToVideo = MainFrame.getPath() + "\\" + dateString + ".from " + firstFile + " till " + lastFile + ". group -" + numberVideoPanel + ".mp4";
+                        String pathToVideo = Storage.getPath() + "\\" + dateString + ".from " + firstFile + " till " + lastFile + ". group -" + numberVideoPanel + ".mp4";
                         System.out.println(dateString);
-                        informPartExportLabel.setText(MainFrame.getBundle().getString("sixinformvideoplayerlabel") + (lastFile - firstFile) + MainFrame.getBundle().getString("seveninformvideoplayerlabel") + totalFramesToSave + ".<hr></html>");
-                        MainVideoCreator.savePartOfVideoFile(pathToVideo, filesToSave, totalFPS, imageToConnect);
+                        informPartExportLabel.setText(Storage.getBundle().getString("sixinformvideoplayerlabel") + (lastFile - firstFile) + Storage.getBundle().getString("seveninformvideoplayerlabel") + totalFramesToSave + ".<hr></html>");
+                        ServiceCamera.savePartOfVideoFile(pathToVideo, filesToSave, totalFPS, imageToConnect);
                     }
                 }
             });
@@ -461,7 +465,7 @@ class OneVideoPlayerPanel extends JPanel {
             int i = currentFrameNumber;
             BufferedImage image = readImage(framesBytesInBuffMap.get(i));
             if (image != null) {
-                String path = MainFrame.getPath() + "\\" + System.currentTimeMillis() + "-" + numberVideoPanel + ".jpg";
+                String path = Storage.getPath() + "\\" + System.currentTimeMillis() + "-" + numberVideoPanel + ".jpg";
                 File file = new File(path);
                 System.out.println("Путь к файлу - " + path);
                 try {
@@ -469,17 +473,17 @@ class OneVideoPlayerPanel extends JPanel {
                         if (backGround == null || !saveBackGround) {
                             ImageIO.write(image, "jpg", file);
                         } else {
-                            BufferedImage connectedImage = MainVideoCreator.connectImage(image, backGround, CameraPanel.getOpacity());
+                            BufferedImage connectedImage = ServiceCamera.connectImage(image, backGround, Storage.getOpacitySetting());
                             ImageIO.write(connectedImage, "jpg", file);
                         }
                     }
-                    MainFrame.showInformMassage(MainFrame.getBundle().getString("saveoneframenumber") + i, Color.DARK_GRAY);
+                    MainFrame.showInformMassage(Storage.getBundle().getString("saveoneframenumber") + i, Color.DARK_GRAY);
                 } catch (Exception xe) {
-                    MainFrame.showInformMassage(MainFrame.getBundle().getString("cannotsaveinform"), new Color(171, 40, 33));
+                    MainFrame.showInformMassage(Storage.getBundle().getString("cannotsaveinform"), new Color(171, 40, 33));
                     xe.printStackTrace();
                 }
             } else {
-                MainFrame.showInformMassage(MainFrame.getBundle().getString("cannotsaveinform"), new Color(171, 40, 33));
+                MainFrame.showInformMassage(Storage.getBundle().getString("cannotsaveinform"), new Color(171, 40, 33));
             }
         });
         thread.start();
@@ -798,7 +802,7 @@ class OneVideoPlayerPanel extends JPanel {
      * @param currentFrameLabelText - current frame number
      */
     private void setCurrentFrameNumber(int currentFrameLabelText) {
-        currentFrameLabel.setText(MainFrame.getBundle().getString("framenumberlabel") + currentFrameLabelText);
+        currentFrameLabel.setText(Storage.getBundle().getString("framenumberlabel") + currentFrameLabelText);
     }
 
     boolean isBlockHaveVideo() {
@@ -819,7 +823,7 @@ class OneVideoPlayerPanel extends JPanel {
         public void paint(Graphics g, JComponent c) {
             super.paint(g, c);
             if (bufferedImage != null) {
-                BufferedImage image = CameraPanel.changeOpacity(CameraPanel.processImage(bufferedImage, videoPanel.getWidth(), videoPanel.getHeight()));
+                BufferedImage image = ServiceCamera.changeOpacity(CameraPanel.processImage(bufferedImage, videoPanel.getWidth(), videoPanel.getHeight()));
                 if (image != null) {
                     int x = 0;
                     int imageWidth = image.getWidth();

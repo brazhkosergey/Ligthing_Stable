@@ -1,220 +1,25 @@
-package entity;
+package entity.Camera;
 
 import com.xuggle.mediatool.IMediaWriter;
 import com.xuggle.mediatool.ToolFactory;
 import com.xuggle.xuggler.ICodec;
-import entity.sound.SoundSaver;
+import entity.Storage.Storage;
+import org.apache.log4j.Logger;
 import ui.camera.CameraPanel;
 import ui.main.MainFrame;
-import org.apache.log4j.Logger;
 
 import javax.imageio.ImageIO;
-import javax.sound.sampled.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-/**
- * class for start/stop save bytes from cameras, creating video files and save it to disk
- */
-public class MainVideoCreator {
-    private static Logger log = Logger.getLogger(MainVideoCreator.class);
-    /**
-     * date for saving time, when lightning was
-     */
-    private static Date date;
-    /**
-     * this boolean mark saving video now
-     */
-    private static boolean saveVideoEnable;
-    /**
-     * Thread run the starting video from cameras
-     */
-    private static Thread startSaveVideoForAllCreatorsThread;
-    /**
-     * Thread start work when have one more lightning during saving video, mark it,
-     * and block marking lightnings more then one for one second.
-     */
-    private static Thread continueSaveVideoThread;
-    /**
-     * int to show on inform panel, how many seconds already saved
-     */
-    private static int secondVideoAlreadySave = 1;
+public class ServiceCamera {
+    private static Logger log = Logger.getLogger("file");
 
-    private static boolean showInformMessage = false;
-
-    private static boolean informFrameNewVideo = false;
-
-    /**
-     * @param programingLightCatch - program or sensor catch lightning
-     */
-    public static void startCatchVideo(boolean programingLightCatch) {
-        boolean anyCameraEnable = false;
-
-        Map<Integer, CameraPanel> cameras = MainFrame.getCameras();
-        for (Integer integer : cameras.keySet()) {
-            CameraPanel cameraPanel = cameras.get(integer);
-            anyCameraEnable = cameraPanel.getVideoCatcher().isCatchVideo();
-            if (anyCameraEnable) {
-                break;
-            }
-        }
-
-        if (anyCameraEnable) {
-            SoundSaver soundSaver = MainFrame.getMainFrame().getSoundSaver();
-            if (soundSaver != null) {
-                soundSaver.startSaveAudio();
-            }
-
-            String event;
-            if (programingLightCatch) {
-                event = ". Сработка - програмная.";
-            } else {
-                event = ". Сработка - аппаратная.";
-            }
-
-            if (!isSaveVideoEnable()) {
-                date = new Date(System.currentTimeMillis());
-                log.info("Событие " + date.toString() + event + ". Сохраняем секунд - " + MainFrame.getSecondsToSave());
-                startSaveVideoForAllCreatorsThread = new Thread(() -> {
-                    setSaveVideo();
-                    while (saveVideoEnable) {
-                        MainFrame.showSecondsAlreadySaved(MainFrame.getBundle().getString("savedword") +
-                                (secondVideoAlreadySave++) + MainFrame.getBundle().getString("seconds"));
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    secondVideoAlreadySave = 1;
-                    startSaveVideoForAllCreatorsThread = null;
-                });
-                startSaveVideoForAllCreatorsThread.start();
-            } else {
-                log.info("Еще одна сработка, продолжаем событие " + date.toString() + event);
-                secondVideoAlreadySave = 1;
-            }
-
-            if (continueSaveVideoThread == null) {
-                continueSaveVideoThread = new Thread(() -> {
-
-
-
-
-                    for (Integer creator : MainFrame.videoSaversMap.keySet()) {
-                        MainFrame.videoSaversMap.get(creator).startSaveVideo(programingLightCatch, date);
-                    }
-
-
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    continueSaveVideoThread = null;
-                });
-                continueSaveVideoThread.start();
-            } else {
-                log.info("С прошлой сработки не прошло 2 секунды.");
-            }
-        }
-    }
-
-    /**
-     * stop catch bytes from cameras
-     */
-    public static void stopCatchVideo(boolean programCatchLightning) {
-        SoundSaver soundSaver = MainFrame.getMainFrame().getSoundSaver();
-        if (soundSaver != null) {
-            soundSaver.stopSaveAudio();
-        }
-
-        if (!showInformMessage) {
-            showInformMessage = programCatchLightning;
-        }
-
-        if (showInformMessage) {
-            MainFrame.showSecondsAlreadySaved(MainFrame.getBundle().getString("endofsavinglabel"));
-            if (!informFrameNewVideo) {
-                new entity.NewVideoInformFrame();
-                informFrameNewVideo = true;
-            }
-        } else {
-            MainFrame.showSecondsAlreadySaved(" ");
-        }
-
-        saveVideoEnable = false;
-    }
-
-    public static void setInformFrameNewVideo(boolean informFrameNewVideo) {
-        MainVideoCreator.informFrameNewVideo = informFrameNewVideo;
-    }
-
-    public static void setShowInformMessage(boolean showInformMessage) {
-        MainVideoCreator.showInformMessage = showInformMessage;
-    }
-
-    /**
-     * @param map -map with bytes from rtp packets from audio module and time, when it was saved to RAM
-     */
-    public static void saveAudioBytes(Map<Long, byte[]> map) {
-        int size = 0;
-        List<Long> longList = new ArrayList<>();
-
-        for (Long l : map.keySet()) {
-            longList.add(l);
-        }
-
-        Collections.sort(longList);
-        for (Long integer : map.keySet()) {
-            byte[] bytes = map.get(integer);
-            size = size + bytes.length;
-        }
-
-        ByteArrayOutputStream temporaryStream = new ByteArrayOutputStream(35535);
-        for (Long l : longList) {
-            byte[] bytes = map.get(l);
-            try {
-                temporaryStream.write(bytes);
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-        }
-
-        ByteArrayInputStream interleavedStream = new ByteArrayInputStream(temporaryStream.toByteArray());
-        final AudioFormat audioFormat = new AudioFormat(
-                AudioFormat.Encoding.ULAW,
-                8000f, // sample rate - you didn't specify, 44.1k is typical
-                8, // how many bits per sample, i.e. per value in your byte array
-                1,       // you want two channels (stereo)
-                1,      // number of bytes per frame (frame == a sample for each channel)
-                8000f,  // frame rate
-                true);  // byte order
-
-        final int numberOfFrames = size;
-        File audioFile = new File(MainFrame.getPath() + "\\bytes\\" + date.getTime() + ".wav");
-        final AudioInputStream audioStream = new AudioInputStream(interleavedStream, audioFormat, numberOfFrames);
-
-        try {
-            if (audioFile.createNewFile()) {
-                AudioSystem.write(audioStream, AudioFileFormat.Type.WAVE, audioFile);
-            }
-        } catch (IOException e1) {
-            e1.printStackTrace();
-            log.error(e1.getLocalizedMessage());
-        }
-    }
-
-    /**
-     * encoding and saving video file to from bytes
-     *
-     * @param folderWithTemporaryFiles - link to folder with bytes
-     */
     public static void encodeVideoXuggle(File folderWithTemporaryFiles) {
         String name = folderWithTemporaryFiles.getName();
         String[] split = name.split("-");
@@ -225,10 +30,10 @@ public class MainVideoCreator {
         dateFormat.applyPattern("dd MMMM yyyy,HH-mm-ss");
         String dateString = dateFormat.format(date);
 
-        String audioPath = MainFrame.getPath() + "\\bytes\\" + dateLong + ".wav";
+        String audioPath = Storage.getPath() + "\\bytes\\" + dateLong + ".wav";
         File audioFile = new File(audioPath);
         if (audioFile.exists()) {
-            File newAudioFile = new File(MainFrame.getPath() + "\\" + dateString + ".wav");
+            File newAudioFile = new File(Storage.getPath() + "\\" + dateString + ".wav");
             try {
                 if (newAudioFile.createNewFile()) {
                     log.info("Сохраняем аудиофайл " + newAudioFile.getAbsolutePath());
@@ -264,9 +69,8 @@ public class MainVideoCreator {
         int totalFPS = Integer.parseInt(totalFpsString);
 
 
-        String path = MainFrame.getPath() + "\\" + dateString + ", group -" + numberOfGroupCameraString + ".mp4";
+        String path = Storage.getPath() + "\\" + dateString + ", group -" + numberOfGroupCameraString + ".mp4";
         log.info("Сохраняем видеофайл " + path);
-        float opacity = 0f;
         BufferedImage imageToConnect = null;
         boolean connectImage = false;
 
@@ -276,7 +80,6 @@ public class MainVideoCreator {
         if (imageFile.exists()) {
             try {
                 imageToConnect = ImageIO.read(new FileInputStream(imageFile));
-                opacity = CameraPanel.getOpacity();
                 connectImage = true;
                 log.info("Накладываем изображение на файл " + path);
             } catch (IOException e) {
@@ -356,29 +159,28 @@ public class MainVideoCreator {
 
                                     try {
                                         if (connectImage) {
-                                            BufferedImage bufferedImage = connectImage(image, imageToConnect, opacity);
+                                            BufferedImage bufferedImage = connectImage(image, imageToConnect, Storage.getOpacitySetting());
                                             writer.encodeVideo(0, bufferedImage, nextFrameTime, TimeUnit.MILLISECONDS);
                                         } else {
                                             writer.encodeVideo(0, image, nextFrameTime,
                                                     TimeUnit.MILLISECONDS);
                                         }
                                     } catch (Exception e) {
-
                                         count--;
                                         countImageNotSaved++;
-                                        System.out.println("Размер потока - " + heightStream + " : " + weightStream);
-                                        System.out.println("Размер ИЗОБРАЖЕНИЯ - " + image.getHeight() + " : " + image.getWidth());
-                                        System.out.println("Изображение другого размера ");
-                                        System.out.println("Сохранено - " + count);
-                                        System.out.println("НЕ СОХРАНЕНО " + countImageNotSaved);
+//                                        System.out.println("Размер потока - " + heightStream + " : " + weightStream);
+//                                        System.out.println("Размер ИЗОБРАЖЕНИЯ - " + image.getHeight() + " : " + image.getWidth());
+//                                        System.out.println("Изображение другого размера ");
+//                                        System.out.println("Сохранено - " + count);
+//                                        System.out.println("НЕ СОХРАНЕНО " + countImageNotSaved);
                                     }
 
                                     image = null;
                                     if (count % 2 == 0) {
-                                        MainFrame.showInformMassage(MainFrame.getBundle().getString("saveframenumber") +
+                                        MainFrame.showInformMassage(Storage.getBundle().getString("saveframenumber") +
                                                 count++, new Color(23, 114, 26));
                                     } else {
-                                        MainFrame.showInformMassage(MainFrame.getBundle().getString("saveframenumber") +
+                                        MainFrame.showInformMassage(Storage.getBundle().getString("saveframenumber") +
                                                 count++, new Color(181, 31, 27));
                                     }
                                     nextFrameTime += frameRate;
@@ -395,7 +197,7 @@ public class MainVideoCreator {
 
                 writer.flush();
                 writer.close();
-                MainFrame.showInformMassage(MainFrame.getBundle().getString("encodingdone") + count, new Color(23, 114, 26));
+                MainFrame.showInformMassage(Storage.getBundle().getString("encodingdone") + count, new Color(23, 114, 26));
 
                 Date videoLenght = new Date(nextFrameTime);
                 dateFormat.applyPattern("mm:ss");
@@ -414,14 +216,18 @@ public class MainVideoCreator {
         }
     }
 
-    /**
-     * * encoding and saving part of video file to disk from bytes
-     *
-     * @param pathToFileToSave  - path to file, to save data to
-     * @param filesListToEncode - links for files with bytes from camera
-     * @param totalFPS          - FPS for video file
-     * @param backgroundImage   - image for connecting background for video (if exist)
-     */
+    public static BufferedImage connectImage(BufferedImage sourceImage, BufferedImage imageToConnect, float opacity) {
+        BufferedImage image = new BufferedImage(sourceImage.getWidth(), sourceImage.getHeight(), sourceImage.getType());
+        Graphics2D graphics = image.createGraphics();
+        graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC, 1.0f));
+        graphics.drawImage(sourceImage, 0, 0, sourceImage.getWidth(), sourceImage.getHeight(), null);
+        graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
+        graphics.drawImage(imageToConnect, 0, 0, imageToConnect.getWidth(), imageToConnect.getHeight(), null);
+        graphics.dispose();
+        return image;
+    }
+
+
     public static void savePartOfVideoFile(String pathToFileToSave, List<File> filesListToEncode, int totalFPS, BufferedImage backgroundImage) {
         File videoFile = new File(pathToFileToSave);
         if (videoFile.exists()) {
@@ -431,7 +237,7 @@ public class MainVideoCreator {
         float opacity = 0;
         if (backgroundImage != null) {
             connectImage = true;
-            opacity = CameraPanel.getOpacity();
+            opacity = Storage.getOpacitySetting();
         }
 
         try {
@@ -501,10 +307,10 @@ public class MainVideoCreator {
 
 
                                     if (count % 2 == 0) {
-                                        MainFrame.showInformMassage(MainFrame.getBundle().getString("saveframenumber") +
+                                        MainFrame.showInformMassage(Storage.getBundle().getString("saveframenumber") +
                                                 count++, new Color(23, 114, 26));
                                     } else {
-                                        MainFrame.showInformMassage(MainFrame.getBundle().getString("saveframenumber") +
+                                        MainFrame.showInformMassage(Storage.getBundle().getString("saveframenumber") +
                                                 count++, new Color(181, 31, 27));
                                     }
                                     nextFrameTime += frameRate;
@@ -521,7 +327,7 @@ public class MainVideoCreator {
 
                 writer.flush();
                 writer.close();
-                MainFrame.showInformMassage(MainFrame.getBundle().getString("encodingdone") + count, new Color(23, 114, 26));
+                MainFrame.showInformMassage(Storage.getBundle().getString("encodingdone") + count, new Color(23, 114, 26));
 
                 log.info("Видеофайл сохранен - " + pathToFileToSave +
                         ". Сохранено кадров - " + count +
@@ -536,30 +342,12 @@ public class MainVideoCreator {
         }
     }
 
-    /**
-     * connecting image
-     *
-     * @param sourceImage    - source image
-     * @param imageToConnect - image to connect
-     * @param opacity        - opacity of image to connect
-     * @return - image, which was created from two images
-     */
-    public static BufferedImage connectImage(BufferedImage sourceImage, BufferedImage imageToConnect, float opacity) {
-        BufferedImage image = new BufferedImage(sourceImage.getWidth(), sourceImage.getHeight(), sourceImage.getType());
-        Graphics2D graphics = image.createGraphics();
-        graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC, 1.0f));
-        graphics.drawImage(sourceImage, 0, 0, sourceImage.getWidth(), sourceImage.getHeight(), null);
-        graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
-        graphics.drawImage(imageToConnect, 0, 0, imageToConnect.getWidth(), imageToConnect.getHeight(), null);
-        graphics.dispose();
-        return image;
-    }
-
-    public static boolean isSaveVideoEnable() {
-        return saveVideoEnable;
-    }
-
-    private static void setSaveVideo() {
-        MainVideoCreator.saveVideoEnable = true;
+    public static BufferedImage changeOpacity(BufferedImage originalImage) {
+        BufferedImage resizedImage = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = resizedImage.createGraphics();
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, Storage.getOpacitySetting()));
+        g.drawImage(originalImage, 0, 0, originalImage.getWidth(), originalImage.getHeight(), null);
+        g.dispose();
+        return resizedImage;
     }
 }

@@ -1,5 +1,6 @@
 package ui.setting;
 
+import entity.Storage.Storage;
 import ui.main.MainFrame;
 
 import javax.swing.*;
@@ -22,7 +23,7 @@ public class BackgroundImagePanel extends JPanel {
         this.bufferedImage = bufferedImage;
         this.groupNumber = groupNumber;
 
-        sourcePoints = MainFrame.linePoints.get(groupNumber);
+        sourcePoints = Storage.getLinePoints().get(groupNumber);
         if (sourcePoints == null) {
             sourcePoints = new int[15][];
             int heightPanel = bufferedImage.getHeight();
@@ -82,7 +83,7 @@ public class BackgroundImagePanel extends JPanel {
         }
 
         if (savePoints) {
-            MainFrame.addLinePoint(groupNumber, linePointsToSave,true);
+            Storage.addLinePoint(groupNumber, linePointsToSave,true);
             savePoints = false;
         }
     }

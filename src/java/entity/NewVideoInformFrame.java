@@ -1,10 +1,9 @@
 package entity;
 
-import ui.main.MainFrame;
+import entity.Storage.Storage;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Locale;
 
 public class NewVideoInformFrame extends JFrame {
 
@@ -27,11 +26,11 @@ public class NewVideoInformFrame extends JFrame {
         okButton.setPreferredSize(new Dimension(90, 30));
         okButton.addActionListener((e) -> {
             this.dispose();
-            MainVideoCreator.setInformFrameNewVideo(false);
+            VideoCreator.restartNewVideoFrame();
         });
 
         JLabel label = new JLabel("Test");
-        label.setText(MainFrame.getBundle().getString("endofsaving"));
+        label.setText(Storage.getBundle().getString("endofsaving"));
         label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setHorizontalTextPosition(SwingConstants.CENTER);
         label.setFont(new Font(null, Font.BOLD, 16));

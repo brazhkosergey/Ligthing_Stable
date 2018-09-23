@@ -1,6 +1,7 @@
 package ui.video;
 
-import entity.MainVideoCreator;
+import entity.Storage.Storage;
+import entity.VideoCreator;
 import ui.main.MainFrame;
 
 import javax.swing.*;
@@ -114,7 +115,7 @@ public class VideoPlayer extends JPanel {
      * @param dateToShow                     - date, to show on pane;
      * @param videoNumberInList              - number to show on panel
      */
-    VideoPlayer(Map<Integer, File> foldersWithTemporaryVideoFiles, String dateToShow, int videoNumberInList) {
+    VideoPlayer(Map<Integer,File> foldersWithTemporaryVideoFiles, String dateToShow, int videoNumberInList) {
         this.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
         this.setLayout(new BorderLayout());
         centralPane = new JPanel(new BorderLayout());
@@ -130,71 +131,75 @@ public class VideoPlayer extends JPanel {
 
         for (int j = 1; j < 5; j++) {
             File folder = foldersWithTemporaryVideoFiles.get(j);
+
             if (folder != null) {
                 String name = folder.getName();
-                String[] split = name.split("-");
-                String[] fpsSplit = split[1].split("\\.");
-                int i = fpsSplit[0].indexOf(")");
-                String totalFpsString = fpsSplit[0].substring(2, i);
-                int totalFPS = Integer.parseInt(totalFpsString);
+                if(name.length()>5){
 
-                if (FPS < totalFPS) {
-                    FPS = totalFPS;
-                    totalCountFrames = 0;
-                    File[] files = folder.listFiles();
-                    if (files != null) {
-                        for (File file : files) {
-                            try {
-                                String fileName = file.getName();
-                                String[] fileNameSplit = fileName.split("\\.");
-                                String[] lastSplit = fileNameSplit[0].split("-");
-                                String countFramesString = lastSplit[1];
-                                int countFrames = Integer.parseInt(countFramesString);
-                                totalCountFrames += countFrames;
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                    System.out.println("Имя файла - "+name);
+
+                    int i = name.indexOf(")");
+                    String totalFpsString = name.substring(2, i);
+                    int totalFPS = Integer.parseInt(totalFpsString);
+
+                    if (FPS < totalFPS) {
+                        FPS = totalFPS;
+                        totalCountFrames = 0;
+                        File[] files = folder.listFiles();
+                        if (files != null) {
+                            for (File file : files) {
+                                try {
+                                    String fileName = file.getName();
+                                    String[] fileNameSplit = fileName.split("\\.");
+                                    String[] lastSplit = fileNameSplit[0].split("-");
+                                    String countFramesString = lastSplit[1];
+                                    int countFrames = Integer.parseInt(countFramesString);
+                                    totalCountFrames += countFrames;
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
-                    }
 
-                    eventFrameNumberMap.clear();
-                    eventFrameNumberList.clear();
-                    int first = name.indexOf("[");
-                    int second = name.indexOf("]");
-                    String substring = name.substring(first + 1, second);
-                    String[] eventsSplit = substring.split(",");
-                    for (String aSplit : eventsSplit) {
-                        boolean contains = aSplit.contains("(");
-                        if (contains) {
-                            String s = aSplit.substring(1, aSplit.length() - 1);
-                            try {
-                                int i1 = Integer.parseInt(s);
-                                eventFrameNumberMap.put(i1, contains);
-                                eventFrameNumberList.add(i1);
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
-                        } else {
-                            try {
-                                int i1 = Integer.parseInt(aSplit);
-                                eventFrameNumberMap.put(i1, contains);
-                                eventFrameNumberList.add(i1);
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
+                        eventFrameNumberMap.clear();
+                        eventFrameNumberList.clear();
+                        int first = name.indexOf("[");
+                        int second = name.indexOf("]");
+                        String substring = name.substring(first + 1, second);
+                        String[] eventsSplit = substring.split(",");
+                        for (String aSplit : eventsSplit) {
+                            boolean contains = aSplit.contains("(");
+                            if (contains) {
+                                String s = aSplit.substring(1, aSplit.length() - 1);
+                                try {
+                                    int i1 = Integer.parseInt(s);
+                                    eventFrameNumberMap.put(i1, contains);
+                                    eventFrameNumberList.add(i1);
+                                } catch (Exception ex) {
+                                    ex.printStackTrace();
+                                }
+                            } else {
+                                try {
+                                    int i1 = Integer.parseInt(aSplit);
+                                    eventFrameNumberMap.put(i1, contains);
+                                    eventFrameNumberList.add(i1);
+                                } catch (Exception ex) {
+                                    ex.printStackTrace();
+                                }
                             }
                         }
-                    }
-                    Collections.sort(eventFrameNumberList);
+                        Collections.sort(eventFrameNumberList);
 
-                    tempEventsMapPartSize = new HashMap<>();
-                    int lastFrame = 0;
-                    for (int k = 0; k < eventFrameNumberList.size(); k++) {
-                        Integer integer = eventFrameNumberList.get(k);
-                        tempEventsMapPartSize.put(k, (integer - lastFrame));
-                        lastFrame = integer;
+                        tempEventsMapPartSize = new HashMap<>();
+                        int lastFrame = 0;
+                        for (int k = 0; k < eventFrameNumberList.size(); k++) {
+                            Integer integer = eventFrameNumberList.get(k);
+                            tempEventsMapPartSize.put(k, (integer - lastFrame));
+                            lastFrame = integer;
 
-                        if (k == eventFrameNumberList.size() - 1) {
-                            tempEventsMapPartSize.put(k + 1, (totalCountFrames - lastFrame));
+                            if (k == eventFrameNumberList.size() - 1) {
+                                tempEventsMapPartSize.put(k + 1, (totalCountFrames - lastFrame));
+                            }
                         }
                     }
                 }
@@ -406,7 +411,7 @@ public class VideoPlayer extends JPanel {
         setSliderPosition(0);
         Thread stopPlayingWhileRecordingThread = new Thread(() -> {
             while (VideoPlayer.isShowVideoPlayer()) {
-                if (MainVideoCreator.isSaveVideoEnable()) {
+                if (VideoCreator.isSaveVideoEnable()) {
                     stop();
                 } else {
                     try {
@@ -728,6 +733,6 @@ public class VideoPlayer extends JPanel {
     }
 
     private void setCurrentFrameLabelText(int currentFrameLabelText) {
-        currentFrameLabel.setText(MainFrame.getBundle().getString("framenumberlabel") + currentFrameLabelText);
+        currentFrameLabel.setText(Storage.getBundle().getString("framenumberlabel") + currentFrameLabelText);
     }
 }

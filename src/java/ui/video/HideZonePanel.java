@@ -1,6 +1,7 @@
 package ui.video;
 
 import entity.HideZoneArea;
+import org.apache.log4j.Logger;
 import ui.setting.BackgroundSettingListener;
 
 import javax.swing.*;
@@ -17,10 +18,8 @@ public class HideZonePanel extends JPanel {
     private Map<String, HideZoneArea> hideZoneAreaMap;
     private String hideZoneName;
 
-    private boolean addListener;
-
-
     public HideZonePanel(String hideZoneName) {
+
         this.hideZoneName = hideZoneName;
         hideZoneAreaMap = new HashMap<>();
 

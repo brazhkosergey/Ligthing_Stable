@@ -87,7 +87,7 @@ C  0x0000000002837f74
 Java frames: (J=compiled Java code, j=interpreted, Vv=VM code)
 j  io.humble.video.VideoJNI.Muxer_write(JLio/humble/video/Muxer;JLio/humble/video/MediaPacket;Z)Z+0
 j  io.humble.video.Muxer.write(Lio/humble/video/MediaPacket;Z)Z+11
-J 1673% C2 entity.MainVideoCreator.encodeVideoHumble(Ljava/lang/Integer;Ljava/io/File;)V (624 bytes) @ 0x0000000002debc2c [0x0000000002deb380+0x8ac]
+J 1673% C2 entity.VideoCreator.encodeVideoHumble(Ljava/lang/Integer;Ljava/io/File;)V (624 bytes) @ 0x0000000002debc2c [0x0000000002deb380+0x8ac]
 j  ui.video.VideoFilesPanel.lambda$null$1(Ljava/lang/Integer;Ljava/io/File;)V+2
 j  ui.video.VideoFilesPanel$$Lambda$30.run()V+8
 j  java.lang.Thread.run()V+11
@@ -283,18 +283,18 @@ Dynamic libraries:
 0x00007ff9eb2e0000 - 0x00007ff9eb2fa000 	C:\WINDOWS\SYSTEM32\dhcpcsvc.DLL
 0x00000000602a0000 - 0x00000000602d1000 	C:\Program Files\Java\jdk1.8.0_144\jre\bin\jpeg.dll
 0x00000000601f0000 - 0x0000000060292000 	C:\Program Files\Java\jdk1.8.0_144\jre\bin\mlib_image.dll
-0x0000000066600000 - 0x000000006db9b000 	C:\Users\Сергей\AppData\Local\Temp\humble7984713619159889428.dll
+0x0000000066600000 - 0x000000006db9b000 	C:\Users\пїЅпїЅпїЅпїЅпїЅпїЅ\AppData\Local\Temp\humble7984713619159889428.dll
 0x00007ff9ec480000 - 0x00007ff9ec629000 	C:\WINDOWS\SYSTEM32\dbghelp.dll
 
 VM Arguments:
 jvm_args: -Xmx8048m -Xms8048m -javaagent:C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2017.2.2\lib\idea_rt.jar=52546:C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2017.2.2\bin -Dfile.encoding=UTF-8 
-java_command: Main
-java_class_path (initial): C:\Program Files\Java\jdk1.8.0_144\jre\lib\charsets.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\deploy.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\ext\access-bridge-64.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\ext\cldrdata.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\ext\dnsns.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\ext\jaccess.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\ext\jfxrt.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\ext\localedata.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\ext\nashorn.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\ext\sunec.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\ext\sunjce_provider.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\ext\sunmscapi.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\ext\sunpkcs11.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\ext\zipfs.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\javaws.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\jce.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\jfr.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\jfxswt.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\jsse.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\management-agent.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\plugin.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\resources.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\rt.jar;C:\Users\Сергей\Java\Молния Проект\IpCamera\target\classes;C:\Users\Сергей\.m2\repository\org\jcodec\jcodec\0.2.1\jcodec-0.2.1.jar;C:\Users\Сергей\.m2\repository\com\google\code\findbugs\jsr305\3.0.2\jsr305-3.0.2.jar;C:\Users\Сергей\.m2\repository\org\jcodec\jcodec-javase\0.2.1\jcodec-javase-0.2.1.jar;C:\Users\Сергей\.m2\repository\javax\media\jmf\2.1.1e\jmf-2.1.1e.jar;C:\Users\Сергей\.m2\repository\javax\xml\bind\jaxb-api\2.2.11\jaxb-api-2.2.11.jar;C:\Users\Сергей\.m2\repository\org\slf4j\slf4j-log4j12\1.7.22\slf4j-log4j12-1.7.22.jar;C:\Users\Сергей\.m2\repository\org\slf4j\slf4j-api\1.7.22\slf4j-api-1.7.22.jar;C:\Users\Сергей\.m2\repositor
+java_command: App
+java_class_path (initial): C:\Program Files\Java\jdk1.8.0_144\jre\lib\charsets.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\deploy.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\ext\access-bridge-64.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\ext\cldrdata.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\ext\dnsns.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\ext\jaccess.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\ext\jfxrt.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\ext\localedata.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\ext\nashorn.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\ext\sunec.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\ext\sunjce_provider.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\ext\sunmscapi.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\ext\sunpkcs11.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\ext\zipfs.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\javaws.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\jce.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\jfr.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\jfxswt.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\jsse.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\management-agent.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\plugin.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\resources.jar;C:\Program Files\Java\jdk1.8.0_144\jre\lib\rt.jar;C:\Users\пїЅпїЅпїЅпїЅпїЅпїЅ\Java\пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ\IpCamera\target\classes;C:\Users\пїЅпїЅпїЅпїЅпїЅпїЅ\.m2\repository\org\jcodec\jcodec\0.2.1\jcodec-0.2.1.jar;C:\Users\пїЅпїЅпїЅпїЅпїЅпїЅ\.m2\repository\com\google\code\findbugs\jsr305\3.0.2\jsr305-3.0.2.jar;C:\Users\пїЅпїЅпїЅпїЅпїЅпїЅ\.m2\repository\org\jcodec\jcodec-javase\0.2.1\jcodec-javase-0.2.1.jar;C:\Users\пїЅпїЅпїЅпїЅпїЅпїЅ\.m2\repository\javax\media\jmf\2.1.1e\jmf-2.1.1e.jar;C:\Users\пїЅпїЅпїЅпїЅпїЅпїЅ\.m2\repository\javax\xml\bind\jaxb-api\2.2.11\jaxb-api-2.2.11.jar;C:\Users\пїЅпїЅпїЅпїЅпїЅпїЅ\.m2\repository\org\slf4j\slf4j-log4j12\1.7.22\slf4j-log4j12-1.7.22.jar;C:\Users\пїЅпїЅпїЅпїЅпїЅпїЅ\.m2\repository\org\slf4j\slf4j-api\1.7.22\slf4j-api-1.7.22.jar;C:\Users\пїЅпїЅпїЅпїЅпїЅпїЅ\.m2\repositor
 Launcher Type: SUN_STANDARD
 
 Environment Variables:
-PATH=C:\ProgramData\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files\Git\cmd;C:\Users\Сергей\AppData\Local\Microsoft\WindowsApps;C:\Program Files\Java\jdk1.8.0_144;
-USERNAME=Сергей
+PATH=C:\ProgramData\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files\Git\cmd;C:\Users\пїЅпїЅпїЅпїЅпїЅпїЅ\AppData\Local\Microsoft\WindowsApps;C:\Program Files\Java\jdk1.8.0_144;
+USERNAME=пїЅпїЅпїЅпїЅпїЅпїЅ
 OS=Windows_NT
 PROCESSOR_IDENTIFIER=Intel64 Family 6 Model 69 Stepping 1, GenuineIntel
 

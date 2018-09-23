@@ -1,5 +1,6 @@
 package ui.video;
 
+import entity.Storage.Storage;
 import ui.main.MainFrame;
 
 import javax.swing.*;
@@ -15,7 +16,7 @@ import java.util.List;
  */
 public class VideoFilesPanel extends JPanel {
 
-    static VideoPlayer currentPlayer;
+    private static VideoPlayer currentPlayer;
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat();
     private static VideoFilesPanel videoFilesPanel;
@@ -66,30 +67,29 @@ public class VideoFilesPanel extends JPanel {
         mapOfFiles.clear();
         listOfFilesNames.clear();
 
-        File file = new File(MainFrame.getPath() + "\\bytes\\");
+        File file = new File(Storage.getPath() + "\\bytes\\");
         File[] files = file.listFiles();
         String fileName;
 
         if (files != null) {
             for (File fileFromFolder : files) {
-                fileName = fileFromFolder.getName();
-                if (fileName.contains(".tmp")) {
-                    String[] split = fileName.split("-");
-                    long dataLong = Long.parseLong(split[0]);
-                    String[] splitInteger = split[1].split("\\.");
-                    int cameraGroupNumber = Integer.parseInt(splitInteger[0].substring(0, 1));
-
-                    if (!listOfFilesNames.contains(dataLong)) {
-                        listOfFilesNames.add(dataLong);
+                try {
+                    fileName = fileFromFolder.getName();
+                    long dataLong = Long.parseLong(fileName);
+                    listOfFilesNames.add(dataLong);
+                    File[] bytesFromOneCamera = fileFromFolder.listFiles();
+                    if (bytesFromOneCamera != null) {
+                        Map<Integer, File> map = new HashMap<>();
+                        for (File oneFolder : bytesFromOneCamera) {
+                            int cameraGroupNumber = Integer.parseInt(oneFolder.getName().substring(0, 1));
+                            if (!oneFolder.getName().contains(".jpg")) {
+                                map.put(cameraGroupNumber, oneFolder);
+                                System.out.println(cameraGroupNumber + " = " + oneFolder.getName());
+                            }
+                        }
+                        mapOfFiles.put(dataLong, map);
                     }
-
-                    if (mapOfFiles.containsKey(dataLong)) {
-                        mapOfFiles.get(dataLong).put(cameraGroupNumber, fileFromFolder);
-                    } else {
-                        Map<Integer, File> files1 = new HashMap<>();
-                        files1.put(cameraGroupNumber, fileFromFolder);
-                        mapOfFiles.put(dataLong, files1);
-                    }
+                } catch (Exception ignored) {
                 }
             }
         }
@@ -110,24 +110,31 @@ public class VideoFilesPanel extends JPanel {
         for (int i = listOfFilesNames.size() - 1; i >= 0; i--) {
             Long dataLong = listOfFilesNames.get(i);
             Date date = new Date(dataLong);
-            Map<Integer, File> filesVideoBytesMap = mapOfFiles.get(dataLong);
+
+            Map<Integer, File> fileWithVideos = mapOfFiles.get(dataLong);
 
             boolean greenColor = false;
             int videoSize = 0;
-            for (Integer integer : filesVideoBytesMap.keySet()) {
-                File file1 = filesVideoBytesMap.get(integer);
+            for (int cameraGroup = 1; cameraGroup < 5; cameraGroup++) {
+                File files1 = fileWithVideos.get(cameraGroup);
+                if (files1 != null) {
+                    String name = files1.getName();
 
-                String name = file1.getName();
-                int first = name.indexOf("[");
-                int second = name.indexOf("]");
-                String substring = name.substring(first + 1, second);
-                greenColor = substring.contains("(");
+                    System.out.println("121 - " + name);
 
-                videoSize = file1.listFiles().length;
-                break;
+                    int first = name.indexOf("[");
+                    int second = name.indexOf("]");
+                    String substring = name.substring(first + 1, second);
+                    greenColor = substring.contains("(");
+                    //todo сюда же добавить парсинг в имени файла попадания в мертвую зону
+
+
+                    videoSize = files1.listFiles().length;
+                    break;
+                }
             }
 
-            int countFiles = filesVideoBytesMap.size();
+            int countFiles = fileWithVideos.size();
             numberLabel = new JLabel(String.valueOf(i + 1));
             numberLabel.setPreferredSize(new Dimension(40, 30));
             numberLabel.setFont(new Font(null, Font.BOLD, 15));
@@ -140,10 +147,10 @@ public class VideoFilesPanel extends JPanel {
             timeVideoLabel.setFont(new Font(null, Font.BOLD, 15));
             timeVideoLabel.setForeground(new Color(46, 139, 87));
 
-            countFilesLabel = new JLabel(MainFrame.getBundle().getString("filesword") + countFiles);
+            countFilesLabel = new JLabel(Storage.getBundle().getString("filesword") + countFiles);
             countFilesLabel.setPreferredSize(new Dimension(60, 30));
 
-            countTimeLabel = new JLabel(videoSize + " " + MainFrame.getBundle().getString("seconds"));
+            countTimeLabel = new JLabel(videoSize + " " + Storage.getBundle().getString("seconds"));
             countTimeLabel.setPreferredSize(new Dimension(150, 30));
 
             showVideoButton = new JButton(String.valueOf((char) 9658));//PLAY
@@ -151,23 +158,21 @@ public class VideoFilesPanel extends JPanel {
             int finalI = i + 1;
             showVideoButton.addActionListener((ActionEvent e) -> {
                 VideoPlayer.setShowVideoPlayer(true);
-                currentPlayer = new VideoPlayer(filesVideoBytesMap, dateFormat.format(new Date(dataLong)), finalI);
+                currentPlayer = new VideoPlayer(fileWithVideos, dateFormat.format(new Date(dataLong)), finalI);
                 MainFrame.setCentralPanel(currentPlayer);
             });
-
-
 
             hideZoneButton = new JButton("<html>&#128065</html>");
             hideZoneButton.setFont(new Font(null, Font.BOLD, 17));
             hideZoneButton.setFocusable(false);
-            hideZoneButton.addActionListener((pf)->{
+            hideZoneButton.addActionListener((pf) -> {
                 MainFrame.setCentralPanel(new HideZoneMainPanel(false));
             });
 
             deleteButton = new JButton("<html>&#10006</html>");
             deleteButton.setFont(new Font(null, Font.BOLD, 17));
             deleteButton.addActionListener((e) -> {
-                new DelFrame(filesVideoBytesMap, date);
+                new DelFrame(fileWithVideos, date);
             });
 
             mainVideoPanel = new JPanel(new FlowLayout());
@@ -249,32 +254,31 @@ public class VideoFilesPanel extends JPanel {
             delButton.addActionListener((e) -> {
                 delButton.setVisible(false);
                 Thread thread = new Thread(() -> {
-                    for (Integer integer : filesVideoBytesMap.keySet()) {
-                        File folderToDel = filesVideoBytesMap.get(integer);
-                        String absolutePathToImage = folderToDel.getAbsolutePath().replace(".tmp", ".jpg");
-                        File imageFile = new File(absolutePathToImage);
-                        if (imageFile.exists()) {
-                            imageFile.delete();
-                        }
 
-                        String name = folderToDel.getName();
-                        String[] split = name.split("-");
-                        long dateLong = Long.parseLong(split[0]);
-
-                        String audioPath = MainFrame.getPath() + "\\bytes\\" + dateLong + ".wav";
-                        File audioFile = new File(audioPath);
-                        if (audioFile.exists()) {
-                            audioFile.delete();
+                    for (Integer groupNumber : filesVideoBytesMap.keySet()) {
+                        File files = filesVideoBytesMap.get(groupNumber);
+                        for (File file : files.listFiles()) {
+                            file.delete();
                         }
-
-                        File[] filesToDel = folderToDel.listFiles();
-                        if (filesToDel != null) {
-                            for (File f : filesToDel) {
-                                f.delete();
-                            }
-                        }
-                        folderToDel.delete();
+                        files.delete();
+                        files.getParentFile().delete();
                     }
+
+
+//                    String absolutePathToImage = folderToDel.getAbsolutePath().replace(".tmp", ".jpg");
+//                    File imageFile = new File(absolutePathToImage);
+//                    if (imageFile.exists()) {
+//                        imageFile.delete();
+//                    }
+
+//                    String audioPath = Storage.getPath() + "\\bytes\\" + files.getN + ".wav";
+
+//                    long dateLong = Long.parseLong(filesVideoBytesMap.getName());
+
+//                    File audioFile = new File(audioPath);
+//                    if (audioFile.exists()) {
+//                        audioFile.delete();
+//                    }
                     showVideos();
                     okLabel.setVisible(true);
                     try {
@@ -290,15 +294,22 @@ public class VideoFilesPanel extends JPanel {
             JPanel buttonPanel = new JPanel(new FlowLayout());
             buttonPanel.setBorder(BorderFactory.createEtchedBorder());
             buttonPanel.setBackground(Color.LIGHT_GRAY);
-            buttonPanel.setPreferredSize(new Dimension(300, 100));
-            buttonPanel.add(Box.createRigidArea(new Dimension(250, 10)));
+            buttonPanel.setPreferredSize(new
+
+                    Dimension(300, 100));
+            buttonPanel.add(Box.createRigidArea(new
+
+                    Dimension(250, 10)));
             buttonPanel.add(delButton);
             buttonPanel.add(okLabel);
-            this.add(buttonPanel);
+            this.
+
+                    add(buttonPanel);
         }
+
     }
 
-    public static VideoPlayer getCurrentPlayer() {
+    static VideoPlayer getCurrentPlayer() {
         return currentPlayer;
     }
 }

@@ -5,22 +5,26 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-public class Main {
-    private static Logger log = Logger.getLogger(Main.class);
+public class App {
+    private static Logger log = Logger.getLogger("file");
+
     public static void main(String[] args) {
         long maxMemory = Runtime.getRuntime().maxMemory() / (1024 * 1024);
+
         log.info("Выделенная память для приложения - " + maxMemory);
+
         System.out.println("Выделенная память для приложения - " + maxMemory);
 //        if (maxMemory < 25000) {
 //            log.info("Памяти не достаточно, перегружаем приложени, с указанием большего количества памяти.");
 //            System.out.println("Памяти не достаточно, перегружаем приложени, с указанием большего количества памяти.");
 //            String currentPath = null;
 //            try {
-//                currentPath = Main.class
+//                currentPath = App.class
 //                        .getProtectionDomain()
 //                        .getCodeSource().getLocation()
-//                        .toURI().getPath()
-//                        .replace('/', File.separator.charAt(0)).substring(1);
+//                        .toURI().getPath();
+////                        .replace('/', File.separator.charAt(0)).substring(1);
+////                        .replace('\\', File.separator.charAt(0)).substring(1);
 //            } catch (URISyntaxException e) {
 //                e.printStackTrace();
 //            }
@@ -37,12 +41,15 @@ public class Main {
         System.out.println("Памяти достаточно.");
         try {
             MainFrame.getMainFrame();
-
         } catch (Exception e) {
             log.info(e.getLocalizedMessage());
         } catch (Error error) {
             log.error(error.getLocalizedMessage());
         }
 
+    }
+
+    public static Logger getLog() {
+        return log;
     }
 }

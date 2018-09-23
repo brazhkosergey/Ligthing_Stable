@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
+import entity.Camera.CameraGroup;
+import entity.Storage.Storage;
 import ui.setting.CameraAddressSetting;
 import ui.main.MainFrame;
 
@@ -28,7 +30,8 @@ public class AddressSaver {
     /**
      * all data will save in array
      */
-    private String[] arr = new String[24];
+//    private String[] arr = new String[24];
+    private String[][] camerasIdentificationInformation;
 
     /**
      * audio module address
@@ -77,10 +80,22 @@ public class AddressSaver {
         camerasPosition[1] = new int[]{90, 140};
         camerasPosition[2] = new int[]{30, 140};
         camerasPosition[3] = new int[]{180, 150};
+
+        camerasIdentificationInformation = new String[8][];
+        for (int i = 0; i < 8; i++) {
+            camerasIdentificationInformation[i] = new String[3];
+        }
+
         PASS = "PASS";
     }
 
+    public String[][] getCamerasIdentificationInformation() {
+        return camerasIdentificationInformation;
+    }
 
+    public void saveAudioAddress(String audioAddress) {
+        this.audioAddress = audioAddress;
+    }
 
     /**
      * save data from camera setting
@@ -90,17 +105,11 @@ public class AddressSaver {
      * @param username       - username
      * @param password       - password
      */
+
     public void saveCameraData(int numberOfCamera, String ipAddress, String username, String password) {
-        if (numberOfCamera == 0) {
-            audioAddress = ipAddress;
-        } else {
-            int ipAddressInt = numberOfCamera - 1;
-            int userNameInt = numberOfCamera + 7;
-            int passwordInt = numberOfCamera + 15;
-            arr[ipAddressInt] = ipAddress;
-            arr[userNameInt] = username;
-            arr[passwordInt] = password;
-        }
+        camerasIdentificationInformation[numberOfCamera][0] = ipAddress;
+        camerasIdentificationInformation[numberOfCamera][1] = username;
+        camerasIdentificationInformation[numberOfCamera][2] = password;
         savePasswordSaverToFile();
     }
 
@@ -149,16 +158,6 @@ public class AddressSaver {
     }
 
     /**
-     * remove all data from saver
-     */
-    public void cleanSaver() {
-        for (int i = 0; i < arr.length; i++) {
-            arr[i] = "";
-            audioAddress = null;
-        }
-    }
-
-    /**
      * save data to file
      */
     private void savePasswordSaverToFile() {
@@ -204,22 +203,6 @@ public class AddressSaver {
                 e.printStackTrace();
             }
         }
-
-        for (int i = 1; i < 5; i++) {
-            File imageFile = new File("C:\\LIGHTNING_STABLE\\buff\\" + i + ".jpg");
-            if (imageFile.exists()) {
-                BufferedImage bufferedImage = null;
-                try {
-                    bufferedImage = ImageIO.read(imageFile);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-                if (bufferedImage != null) {
-                    ui.main.MainFrame.addBackgroundForBlock(bufferedImage, i);
-                }
-            }
-        }
-
         if (passwordSaver != null) {
             return passwordSaver;
         } else {
@@ -228,38 +211,17 @@ public class AddressSaver {
         }
     }
 
+
     /**
      * set all data about common setting and camera setting to fields in each panels
      */
 
     public void setPasswordsToFields() {
-        Map<Integer, JTextField> textFieldsIpAddressMap = ui.setting.CameraAddressSetting.getCameraAddressSetting().getTextFieldsIpAddressMap();
-        for (Integer integer : textFieldsIpAddressMap.keySet()) {
-            if (integer != null) {
-                textFieldsIpAddressMap.get(integer).setText(arr[integer - 1]);
-            } else {
-                textFieldsIpAddressMap.get(integer).setText(audioAddress);
-            }
-        }
-
-        Map<Integer, JTextField> textFieldsUsernameMap = CameraAddressSetting.getCameraAddressSetting().getTextFieldsUsernameMap();
-        for (Integer integer : textFieldsUsernameMap.keySet()) {
-            if (integer != null) {
-                textFieldsUsernameMap.get(integer).setText(arr[integer + 7]);
-            }
-        }
-
-        Map<Integer, JTextField> textFieldsPasswordMap = CameraAddressSetting.getCameraAddressSetting().getTextFieldsPasswordMap();
-        for (Integer integer : textFieldsPasswordMap.keySet()) {
-            if (integer != null) {
-                textFieldsPasswordMap.get(integer).setText(arr[integer + 15]);
-            }
-        }
-
-
-        for (Integer integer : MainFrame.imagesForBlock.keySet()) {
-            if (integer != null) {
-                CameraAddressSetting.getCameraAddressSetting().setHaveImage(integer);
+        CameraAddressSetting.getCameraAddressSetting().setAddressToTextFields(camerasIdentificationInformation);
+        CameraAddressSetting.getCameraAddressSetting().setAddressAudioTextField(audioAddress);
+        for (CameraGroup cameraGroup : Storage.getCameraGroups()) {
+            if (cameraGroup.getBackGroundImage() != null) {
+                CameraAddressSetting.getCameraAddressSetting().setHaveImage(cameraGroup.getGroupNumber());
             }
         }
     }
@@ -268,32 +230,30 @@ public class AddressSaver {
      * set all setting to program
      */
     public void setSetting() {
-        MainFrame.setProgramLightCatchEnable(programLightCatchEnable);
-        MainFrame.setPercentDiffWhite(changeWhitePercent);
-        MainFrame.getMainFrame().setColorLightNumber(lightSensitivity);
-        MainFrame.setOpacitySetting(opacity);
-        MainFrame.setCountSecondsToSaveVideo(timeToSave);
+        Storage.setProgramLightCatchEnable(programLightCatchEnable);
+        Storage.setPercentDiffWhite(changeWhitePercent);
+        Storage.setColorLightNumber(lightSensitivity);
+        Storage.setOpacitySetting(opacity);
+        Storage.setSecondsToSave(timeToSave);
 
-        MainFrame.addLinePoint(1, firstGroup,false);
-        MainFrame.addLinePoint(2, secondGroup,false);
-        MainFrame.addLinePoint(3, thirdGroup,false);
-        MainFrame.addLinePoint(4, fourthGroup,false);
-        MainFrame.setCamerasPosition(camerasPosition);
+        Storage.addLinePoint(1, firstGroup, false);
+        Storage.addLinePoint(2, secondGroup, false);
+        Storage.addLinePoint(3, thirdGroup, false);
+        Storage.addLinePoint(4, fourthGroup, false);
+        Storage.setCamerasPosition(camerasPosition);
         if (path != null) {
-            MainFrame.setPath(path);
+            Storage.setPath(path);
         }
-        MainFrame.setPort(port);
-        /*
-      password to enter setting, will be changed manual
-     */ /**
-         * password to enter setting, will be changed manual
-         * */
-//        String password = "PASS";
-        MainFrame.setPassword(PASS);
+        Storage.setPort(port);
+        Storage.setPassword(PASS);
     }
 
     public void setCamerasPosition(int[][] camerasPosition) {
         this.camerasPosition = camerasPosition;
         savePasswordSaverToFile();
+    }
+
+    public String getAudioAddress() {
+        return audioAddress;
     }
 }

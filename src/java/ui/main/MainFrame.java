@@ -1,12 +1,11 @@
 package ui.main;
 
-import entity.AddressSaver;
-import entity.MainVideoCreator;
+import entity.Camera.Camera;
+import entity.Camera.CameraGroup;
+import entity.VideoCreator;
+import entity.Storage.Storage;
 import ui.camera.CameraPanel;
-import ui.camera.VideoBytesSaver;
-import ui.setting.BackgroundImagePanel;
 import ui.video.VideoPlayer;
-import entity.sound.SoundSaver;
 import ui.setting.CameraAddressSetting;
 import ui.setting.Setting;
 import ui.video.VideoFilesPanel;
@@ -16,19 +15,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.List;
 
 /**
- * Main frame
+ * App frame
  */
 public class MainFrame extends JFrame {
-    private static String password;
-
-    private static Logger log = Logger.getLogger(MainFrame.class);
+    private static Logger log = Logger.getLogger("file");
 
     /**
      * TEST MODE PANELS
@@ -68,7 +63,7 @@ public class MainFrame extends JFrame {
     /**
      * SOUTH PANEL
      */
-    private JLabel eventServerPortLabel;
+    private static JLabel eventServerPortLabel;
     private static JLabel countSecondsToSaveVideo;
     private static JLabel opacityLabel;
     private static JLabel showImagesLabel;
@@ -76,110 +71,116 @@ public class MainFrame extends JFrame {
     private static JLabel changeWhiteLabel;
     private static JLabel informLabel;
 
-    /**
-     * cameras panel list, numbers (1-8)
-     */
-    private static Map<Integer, CameraPanel> cameras;
-    /**
-     * addresses for cameras
-     */
-    public static Map<Integer, List<String>> camerasAddress;
-    /**
-     * camera blocks (4)
-     */
-    private static Map<Integer, JPanel> cameraBlock;
-    /**
-     * backgrounds for each block
-     */
-    public static Map<Integer, BufferedImage> imagesForBlock;
-    /**
-     * video savers for each block
-     */
-    public static Map<Integer, VideoBytesSaver> videoSaversMap;
 
-
-    public static Map<Integer, int[][]> linePoints;
-    public static Map<Integer, List<int[]>> linesForHideZoneParsing;
-
-    public static int[][] camerasPosition;
-
-    /**
-     * address saver to save and restore setting data
-     */
-    public static AddressSaver addressSaver;
-    /**
-     * opacity of background
-     */
-    private static int opacitySetting;
-    /**
-     * seconds to save before and after lightning
-     */
-    private static int secondsToSave = 30;
-
-    /**
-     * used for scanning frames for count of white pixels to catch lightning
-     */
-    private static int percentDiffWhite = 5;
-
-    /**
-     * the darkest color number, which will be set as "WHITE"
-     * Color color= new Color(colorLightNumber,colorLightNumber,colorLightNumber);
-     * program will search on frame pixels more light then this color
-     */
-    private static int colorLightNumber = 180;
-
-    /**
-     * set with RGB numbers of color, which will bet "WHITE"
-     */
-    private Set<Integer> colorRGBNumberSet;
-    /**
-     * enable/disable scanning frames to catch lightning
-     */
-    private static boolean programLightCatchEnable;
-    /**
-     * port for server socket, for waiting request from sensor about lightning
-     */
-    private static int port;
-
-    /**
-     * path to folder, for saved bytes, during saving video
-     * can be changed in setting
-     */
-    private static String path = "C:\\LIGHTNING_STABLE\\";
-
-    /**
-     * default path for temporary files, log files and address saver files
-     * can not be changed
-     */
-    private static String defaultPath = "C:\\LIGHTNING_STABLE\\";
-
-    /**
-     * class to save audio fro audio module
-     */
-    private SoundSaver soundSaver;
-
-    /**
-     * mark that some camera is full size mode
-     */
     private static boolean fullSize = false;
+    private static Map<Integer, CameraPanel> cameraPanelsMap;
+    private static Map<Integer, JPanel> cameraBlock;
 
-
-    private static ResourceBundle bundle;
-    /**
-     * show the percent of frames from ip camera, witch will be showed on camera panel
-     */
-    private static int showFramesPercent = 15;
+//    /**
+//     * cameraPanelsMap panel list, numbers (1-8)
+//     */
+//    private static Map<Integer, CameraPanel> cameraPanelsMap;
+//    /**
+//     * addresses for cameraPanelsMap
+//     */
+//    public static Map<Integer, List<String>> camerasAddress;
+//    /**
+//     * camera blocks (4)
+//     */
+//    private static Map<Integer, JPanel> cameraBlock;
+//    /**
+//     * backgrounds for each block
+//     */
+//    public static Map<Integer, BufferedImage> imagesForBlock;
+//    /**
+//     * video savers for each block
+//     */
+//    public static Map<Integer, VideoBytesSaver> videoSaversMap;
+//
+//    public static Map<Integer, int[][]> linePoints;
+//    public static Map<Integer, List<int[]>> linesForHideZoneParsing;
+//
+//    public static int[][] camerasPosition;
+//
+//    /**
+//     * address saver to save and restore setting data
+//     */
+//    public static AddressSaver addressSaver;
+//    /**
+//     * opacity of background
+//     */
+//    private static int opacitySetting;
+//    /**
+//     * seconds to save before and after lightning
+//     */
+//    private static int secondsToSave = 30;
+//
+//    /**
+//     * used for scanning frames for count of white pixels to catch lightning
+//     */
+//    private static int percentDiffWhite = 5;
+//
+//    /**
+//     * the darkest color number, which will be set as "WHITE"
+//     * Color color= new Color(colorLightNumber,colorLightNumber,colorLightNumber);
+//     * program will search on frame pixels more light then this color
+//     */
+//    private static int colorLightNumber = 180;
+//
+//    /**
+//     * set with RGB numbers of color, which will bet "WHITE"
+//     */
+//    private Set<Integer> colorRGBNumberSet;
+//    /**
+//     * enable/disable scanning frames to catch lightning
+//     */
+//    private static boolean programLightCatchEnable;
+//    /**
+//     * port for server socket, for waiting request from sensor about lightning
+//     */
+//    private static int port;
+//
+//    /**
+//     * path to folder, for saved bytes, during saving video
+//     * can be changed in setting
+//     */
+//    private static String path = "C:\\LIGHTNING_STABLE\\";
+//
+//    /**
+//     * default path for temporary files, log files and address saver files
+//     * can not be changed
+//     */
+//    private static String defaultPath = "C:\\LIGHTNING_STABLE\\";
+//
+//    /**
+//     * class to save audio fro audio module
+//     */
+//    private SoundSaver soundSaver;
+//
+//    /**
+//     * mark that some camera is full size mode
+//     */
+//    private static boolean fullSize = false;
+//
+//
+//    private static ResourceBundle bundle;
+//    /**
+//     * show the percent of frames from ip camera, witch will be showed on camera panel
+//     */
+//    private static int showFramesPercent = 15;
 
     private MainFrame() {
         super("LIGHTNING STABLE");
-        imagesForBlock = new HashMap<>();
-        cameras = new HashMap<>();
+        cameraPanelsMap = new HashMap<>();
         cameraBlock = new HashMap<>();
-        camerasAddress = new HashMap<>();
-        videoSaversMap = new HashMap<>();
-        colorRGBNumberSet = new HashSet<>();
-        linePoints = new HashMap<>();
-        linesForHideZoneParsing = new HashMap<>();
+//        imagesForBlock = new HashMap<>();
+//        cameraPanelsMap = new HashMap<>();
+//        cameraBlock = new HashMap<>();
+//        camerasAddress = new HashMap<>();
+//        videoSaversMap = new HashMap<>();
+//        colorRGBNumberSet = new HashSet<>();
+//        linePoints = new HashMap<>();
+//        linesForHideZoneParsing = new HashMap<>();
 
         this.getContentPane().setLayout(new BorderLayout());
         this.setMinimumSize(new Dimension(1150, 700));
@@ -221,53 +222,52 @@ public class MainFrame extends JFrame {
         pack();
     }
 
-    public static void addLinePoint(int groupNumber, int[][] list, boolean edit) {
-        linePoints.put(groupNumber, list);
-        if (edit) {
-            addressSaver.saveLinePoints(groupNumber, list);
-        }
-
-        if (list != null) {
-            linesForHideZoneParsing.put(groupNumber, getLineForParsing(list));
-        }
-    }
-
-    private static List<int[]> getLineForParsing(int[][] linePoints) {
-
-        List<int[]> listToReturn = new LinkedList<>();
-
-        double[][] pointsToDrawLine;
-        double[] onePointToDrawLine = new double[2];
-
-        pointsToDrawLine = new double[4][];
-        for (int i = 1; i < 5; i++) {
-            pointsToDrawLine[i - 1] = new double[2];
-        }
-
-        for (int i = 0; i < linePoints.length; i++) {
-            if (linePoints.length > i + 3) {
-                for (int j = 0; j < 4; j++) {
-                    int pointNumber = i + j;
-                    pointsToDrawLine[j][0] = linePoints[pointNumber][0];
-                    pointsToDrawLine[j][1] = linePoints[pointNumber][1];
-                }
-
-                for (double t = 0; t < 1; t += 0.001) {
-                    BackgroundImagePanel.eval(onePointToDrawLine, pointsToDrawLine, t);
-                    listToReturn.add(new int[]{(int) onePointToDrawLine[0], (int) onePointToDrawLine[1]});
-                }
-            }
-        }
-        return listToReturn;
-    }
+//    public static void addLinePoint(int groupNumber, int[][] list, boolean edit) {
+//        linePoints.put(groupNumber, list);
+//        if (edit) {
+//            addressSaver.saveLinePoints(groupNumber, list);
+//        }
+//
+//        if (list != null) {
+//            linesForHideZoneParsing.put(groupNumber, getLineForParsing(list));
+//        }
+//    }
+//
+//    private static List<int[]> getLineForParsing(int[][] linePoints) {
+//
+//        List<int[]> listToReturn = new LinkedList<>();
+//
+//        double[][] pointsToDrawLine;
+//        double[] onePointToDrawLine = new double[2];
+//
+//        pointsToDrawLine = new double[4][];
+//        for (int i = 1; i < 5; i++) {
+//            pointsToDrawLine[i - 1] = new double[2];
+//        }
+//
+//        for (int i = 0; i < linePoints.length; i++) {
+//            if (linePoints.length > i + 3) {
+//                for (int j = 0; j < 4; j++) {
+//                    int pointNumber = i + j;
+//                    pointsToDrawLine[j][0] = linePoints[pointNumber][0];
+//                    pointsToDrawLine[j][1] = linePoints[pointNumber][1];
+//                }
+//
+//                for (double t = 0; t < 1; t += 0.001) {
+//                    BackgroundImagePanel.eval(onePointToDrawLine, pointsToDrawLine, t);
+//                    listToReturn.add(new int[]{(int) onePointToDrawLine[0], (int) onePointToDrawLine[1]});
+//                }
+//            }
+//        }
+//        return listToReturn;
+//    }
 
 
     /**
      * starting application after choosing language
      */
     private void startApplication() {
-        bundle = ResourceBundle.getBundle("Labels");
-        mainLabel = new JLabel(bundle.getString("mainpage"));
+        mainLabel = new JLabel(Storage.getBundle().getString("mainpage"));
         northPanel = new JPanel(new FlowLayout());
         northPanel.setBackground(Color.LIGHT_GRAY);
         northPanel.setPreferredSize(new Dimension(1110, 54));
@@ -291,37 +291,35 @@ public class MainFrame extends JFrame {
         informLabel.setPreferredSize(new Dimension(270, 30));
         informLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        opacityLabel = new JLabel(bundle.getString("opacitycount") + "30%");
+        opacityLabel = new JLabel(Storage.getBundle().getString("opacitycount") + "30%");
         opacityLabel.setHorizontalAlignment(SwingConstants.CENTER);
         opacityLabel.setPreferredSize(new Dimension(150, 30));
 
-        showImagesLabel = new JLabel(bundle.getString("showframescountlabel") + showFramesPercent);
+        showImagesLabel = new JLabel(Storage.getBundle().getString("showframescountlabel") + Storage.getShowFramesPercent());
         showImagesLabel.setHorizontalAlignment(SwingConstants.CENTER);
         showImagesLabel.setPreferredSize(new Dimension(150, 30));
 
-        countSecondsToSaveVideo = new JLabel(bundle.getString("savesecondcount") + secondsToSave + bundle.getString("seconds"));
+        countSecondsToSaveVideo = new JLabel(Storage.getBundle().getString("savesecondcount") + Storage.getSecondsToSave() + Storage.getBundle().getString("seconds"));
         countSecondsToSaveVideo.setHorizontalAlignment(SwingConstants.CENTER);
         countSecondsToSaveVideo.setPreferredSize(new Dimension(120, 30));
 
-        photosensitivityLabel = new JLabel(bundle.getString("photosensitivity") + colorLightNumber);
+        photosensitivityLabel = new JLabel(Storage.getBundle().getString("photosensitivity") + Storage.getColorLightNumber());
 
         photosensitivityLabel.setHorizontalAlignment(SwingConstants.CENTER);
         photosensitivityLabel.setPreferredSize(new Dimension(180, 30));
-        changeWhiteLabel = new JLabel(bundle.getString("lightening") + percentDiffWhite + "%");
+        changeWhiteLabel = new JLabel(Storage.getBundle().getString("lightening") + Storage.getPercentDiffWhite() + "%");
         changeWhiteLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         eventServerPortLabel = new JLabel();
         eventServerPortLabel.setHorizontalAlignment(SwingConstants.CENTER);
         eventServerPortLabel.setPreferredSize(new Dimension(100, 30));
-//        ===============================================================
-        addressSaver = AddressSaver.restorePasswords();
+
         buildMainWindow();
-        addressSaver.setPasswordsToFields();
-        addressSaver.setSetting();
-        cameraAddressSetting.saveAddressToMap();
+        Storage.getAddressSaver().setPasswordsToFields();
+        Storage.getAddressSaver().setSetting();
         setting = Setting.getSetting();
 
-        startAllCameras();
+        Storage.startAllCameras();
 
         Thread memoryUpdateThread = new Thread(() -> {
             int playInt = 0;
@@ -330,7 +328,7 @@ public class MainFrame extends JFrame {
             boolean startRec = true;
 
             while (true) {
-                if (MainVideoCreator.isSaveVideoEnable()) {
+                if (VideoCreator.isSaveVideoEnable()) {
                     if (startRec) {
                         startRec = false;
                     }
@@ -383,28 +381,27 @@ public class MainFrame extends JFrame {
                 }
             }
         });
-        memoryUpdateThread.setName("Memory Update Main Thread");
+        memoryUpdateThread.setName("Memory Update App Thread");
         memoryUpdateThread.start();
 
         /*
       Thread set the socket server to wait request from sensor
-     */ /**
-         * Thread set the socket server to wait request from sensor
-         */Thread alarmThread = new Thread(() -> {
+     */
+        Thread alarmThread = new Thread(() -> {
             ServerSocket ss = null;
             try {
-                ss = new ServerSocket(port);
+                ss = new ServerSocket(Storage.getPort());
             } catch (IOException ignored) {
             }
 
             while (true) {
                 try {
                     audioPacketCount.setForeground(new Color(29, 142, 27));
-                    setAlarmServerLabelColor(port, new Color(29, 142, 27));
-                    log.info("Ждем сигнал сработки на порт - " + port);
+                    setAlarmServerLabelColor(new Color(29, 142, 27));
+                    log.info("Ждем сигнал сработки на порт - " + Storage.getPort());
                     Socket socket = ss.accept();
-                    log.info("Получили сигнал сработки на порт " + port);
-                    MainVideoCreator.startCatchVideo(false);
+                    log.info("Получили сигнал сработки на порт " + Storage.getPort());
+                    VideoCreator.startCatchVideo(false);
                     socket.close();
                 } catch (Exception e) {
                     log.error(e.getLocalizedMessage());
@@ -413,7 +410,7 @@ public class MainFrame extends JFrame {
                     } catch (InterruptedException e1) {
                         e1.printStackTrace();
                     }
-                    setAlarmServerLabelColor(port, Color.red);
+                    setAlarmServerLabelColor(Color.red);
                     audioPacketCount.setForeground(Color.red);
                 }
             }
@@ -422,14 +419,14 @@ public class MainFrame extends JFrame {
         alarmThread.start();
 
 
-        File fileAddressSaver = new File(defaultPath + "\\data\\");
+        File fileAddressSaver = new File(Storage.getDefaultPath() + "\\data\\");
         fileAddressSaver.mkdirs();
 
-        File fileBuffBytes = new File(path + "\\bytes\\");
+        File fileBuffBytes = new File(Storage.getPath() + "\\bytes\\");
         fileBuffBytes.mkdirs();
 
         for (int i = 1; i < 5; i++) {
-            File folder = new File(defaultPath + "\\buff\\" + i + "\\");
+            File folder = new File(Storage.getDefaultPath() + "\\buff\\" + i + "\\");
             folder.mkdirs();
             File[] files = folder.listFiles();
             for (int j = 0; j < files.length; j++) {
@@ -437,7 +434,7 @@ public class MainFrame extends JFrame {
             }
         }
 
-        File pathFolder = new File(path);
+        File pathFolder = new File(Storage.getPath());
         pathFolder.mkdirs();
     }
 
@@ -449,13 +446,13 @@ public class MainFrame extends JFrame {
 
     private void buildNorthPanel() {
         audioPacketCount = new JLabel("AUDIO");
-        JButton mainWindowButton = new JButton(bundle.getString("mainpage"));
+        JButton mainWindowButton = new JButton(Storage.getBundle().getString("mainpage"));
         mainWindowButton.setPreferredSize(new Dimension(120, 30));
         mainWindowButton.addActionListener((e) -> {
             VideoPlayer.setShowVideoPlayer(false);
             if (fullSize) {
-                for (Integer cameraNumber : cameras.keySet()) {
-                    CameraPanel cameraPanel = cameras.get(cameraNumber);
+                for (Integer cameraNumber : cameraPanelsMap.keySet()) {
+                    CameraPanel cameraPanel = cameraPanelsMap.get(cameraNumber);
                     if (cameraPanel.isFullSizeEnable()) {
                         cameraPanel.setFullSizeEnable(false);
                         int blockNumber = (cameraNumber + 1) / 2;
@@ -477,34 +474,34 @@ public class MainFrame extends JFrame {
                 fullSize = false;
             }
             setCentralPanel(allCameraPanel);
-            mainLabel.setText(bundle.getString("mainpage"));
+            mainLabel.setText(Storage.getBundle().getString("mainpage"));
         });
 
-        JButton cameraButton = new JButton(bundle.getString("camerassettingpage"));
+        JButton cameraButton = new JButton(Storage.getBundle().getString("camerassettingpage"));
         cameraButton.setPreferredSize(new Dimension(120, 30));
         cameraButton.addActionListener((e) -> {
             VideoPlayer.setShowVideoPlayer(false);
             setCentralPanel(cameraAddressSetting);
-            mainLabel.setText(bundle.getString("camerassettingpage"));
+            mainLabel.setText(Storage.getBundle().getString("camerassettingpage"));
         });
 
-        JButton videoButton = new JButton(bundle.getString("videospage"));
+        JButton videoButton = new JButton(Storage.getBundle().getString("videospage"));
         videoButton.setPreferredSize(new Dimension(120, 30));
         videoButton.addActionListener((e) -> {
             MainFrame.showSecondsAlreadySaved("");
-            MainVideoCreator.setShowInformMessage(false);
+            VideoCreator.setShowInformMessage(false);
             showVideoFilesPanel();
         });
 
-        JButton settingButton = new JButton(bundle.getString("settingpage"));
+        JButton settingButton = new JButton(Storage.getBundle().getString("settingpage"));
         settingButton.setPreferredSize(new Dimension(120, 30));
         settingButton.addActionListener((e) -> {
             VideoPlayer.setShowVideoPlayer(false);
             setting.saveButton.setForeground(Color.BLACK);
-            setting.saveButton.setText(bundle.getString("savebutton"));
+            setting.saveButton.setText(Storage.getBundle().getString("savebutton"));
             setting.reSetPassword();
             setCentralPanel(setting);
-            mainLabel.setText(bundle.getString("settingpage"));
+            mainLabel.setText(Storage.getBundle().getString("settingpage"));
         });
 
         mainLabel.setFont(new Font(null, Font.BOLD, 15));
@@ -525,13 +522,13 @@ public class MainFrame extends JFrame {
         startEventButton = new JButton("REC");
         startEventButton.setVisible(false);
         startEventButton.addActionListener((e -> {
-            MainVideoCreator.startCatchVideo(false);
+            VideoCreator.startCatchVideo(false);
         }));
 
         startButtonProgrammingCatch = new JButton("REC PR");
         startButtonProgrammingCatch.setVisible(false);
         startButtonProgrammingCatch.addActionListener((e -> {
-            MainVideoCreator.startCatchVideo(true);
+            VideoCreator.startCatchVideo(true);
         }));
 
         northPanel.add(audioPacketCount);
@@ -556,91 +553,54 @@ public class MainFrame extends JFrame {
         allCameraPanel = new JPanel();
         allCameraPanel.setLayout(gridLayout);
 
-        for (int i = 1; i < 5; i++) {
+        CameraGroup[] cameraGroups = Storage.getCameraGroups();
+        for (int groupNumber = 0; groupNumber < 4; groupNumber++) {
             JPanel blockPanel;
-            VideoBytesSaver videoBytesSaver = new VideoBytesSaver(i);
-            videoBytesSaver.setBackGroundImage(imagesForBlock.get(i));
-            videoSaversMap.put(i, videoBytesSaver);
-            CameraPanel cameraOne = new CameraPanel(videoBytesSaver, (i * 2 - 1));
-            cameraOne.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if (e.getClickCount() == 2) {
-                        if (fullSize) {
-                            for (Integer cameraNumber : cameras.keySet()) {
-                                CameraPanel cameraPanel = cameras.get(cameraNumber);
-                                if (cameraPanel.isFullSizeEnable()) {
-                                    cameraPanel.setFullSizeEnable(false);
-                                    int blockNumber = (cameraNumber + 1) / 2;
-                                    JPanel blockPanel = cameraBlock.get(blockNumber);
-                                    if (cameraNumber % 2 == 0) {
-                                        blockPanel.remove(cameraPanel);
-                                        blockPanel.add(cameraPanel);
-                                    } else {
-                                        Component firstCamera = blockPanel.getComponent(0);
-                                        blockPanel.removeAll();
-                                        blockPanel.add(cameraPanel);
-                                        blockPanel.add(firstCamera);
-                                        blockPanel.validate();
-                                    }
-                                }
-                            }
-                            setCentralPanel(allCameraPanel);
-                            fullSize = false;
-                            mainLabel.setText(bundle.getString("mainpage"));
-                        } else {
-                            cameraOne.setFullSizeEnable(true);
-                            setCentralPanel(cameraOne);
-                            fullSize = true;
-                        }
-                    }
-                }
-            });
-            cameras.put(i * 2 - 1, cameraOne);
-
-            CameraPanel cameraTwo = new CameraPanel(videoBytesSaver, (i * 2));
-            cameraTwo.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if (e.getClickCount() == 2) {
-                        if (fullSize) {
-                            for (Integer cameraNumber : cameras.keySet()) {
-                                CameraPanel cameraPanel = cameras.get(cameraNumber);
-                                if (cameraPanel.isFullSizeEnable()) {
-                                    cameraPanel.setFullSizeEnable(false);
-                                    int blockNumber = (cameraNumber + 1) / 2;
-                                    JPanel blockPanel = cameraBlock.get(blockNumber);
-                                    if (cameraNumber % 2 == 0) {
-                                        blockPanel.remove(cameraPanel);
-                                        blockPanel.add(cameraPanel);
-                                    } else {
-                                        Component firstCamera = blockPanel.getComponent(0);
-                                        blockPanel.removeAll();
-                                        blockPanel.add(cameraPanel);
-                                        blockPanel.add(firstCamera);
-                                        blockPanel.validate();
-                                    }
-                                }
-                            }
-                            setCentralPanel(allCameraPanel);
-                            fullSize = false;
-                            mainLabel.setText(bundle.getString("mainpage"));
-                        } else {
-                            cameraTwo.setFullSizeEnable(true);
-                            setCentralPanel(cameraTwo);
-                            fullSize = true;
-                        }
-                    }
-                }
-            });
-            cameras.put(i * 2, cameraTwo);
-            blockPanel = new JPanel();
-            GridLayout gridLayout1 = new GridLayout(1, 2);
-            blockPanel.setLayout(gridLayout1);
-            blockPanel.add(cameraOne);
-            blockPanel.add(cameraTwo);
+            blockPanel = new JPanel(new GridLayout(1, 2));
             blockPanel.setBorder(BorderFactory.createEtchedBorder());
-            cameraBlock.put(i, blockPanel);
+
+            for (int cameraNumber = 0; cameraNumber < 2; cameraNumber++) {
+                Camera camera = cameraGroups[groupNumber].getCameras()[cameraNumber];
+                CameraPanel cameraPanel = new CameraPanel(camera);
+                cameraPanelsMap.put(camera.getNumber(), cameraPanel);
+                cameraPanel.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        if (e.getClickCount() == 2) {
+                            if (fullSize) {
+                                for (Integer cameraNumber : cameraPanelsMap.keySet()) {
+                                    CameraPanel cameraPanel = cameraPanelsMap.get(cameraNumber);
+                                    if (cameraPanel.isFullSizeEnable()) {
+                                        cameraPanel.setFullSizeEnable(false);
+                                        int blockNumber = (cameraNumber + 1) / 2;
+                                        JPanel blockPanel = cameraBlock.get(blockNumber);
+                                        if (cameraNumber % 2 == 0) {
+                                            blockPanel.remove(cameraPanel);
+                                            blockPanel.add(cameraPanel);
+                                        } else {
+                                            Component firstCamera = blockPanel.getComponent(0);
+                                            blockPanel.removeAll();
+                                            blockPanel.add(cameraPanel);
+                                            blockPanel.add(firstCamera);
+                                            blockPanel.validate();
+                                        }
+                                    }
+                                }
+                                setCentralPanel(allCameraPanel);
+                                fullSize = false;
+                                mainLabel.setText(Storage.getBundle().getString("mainpage"));
+                            } else {
+                                cameraPanel.setFullSizeEnable(true);
+                                setCentralPanel(cameraPanel);
+                                fullSize = true;
+                            }
+                        }
+                    }
+                });
+                blockPanel.add(cameraPanel);
+            }
+
+            cameraBlock.put(groupNumber+1, blockPanel);
             allCameraPanel.add(blockPanel);
         }
         centralPanel.add(allCameraPanel);
@@ -668,7 +628,7 @@ public class MainFrame extends JFrame {
         VideoPlayer.setShowVideoPlayer(false);
         videoFilesPanel.showVideos();
         setCentralPanel(videoFilesPanel);
-        mainLabel.setText(bundle.getString("videospage"));
+        mainLabel.setText(Storage.getBundle().getString("videospage"));
     }
 
     public static void showInformMassage(String massage, Color color) {
@@ -682,64 +642,10 @@ public class MainFrame extends JFrame {
         recordSecondsLabel.repaint();
     }
 
-    public static void removeBackgroundForBlock(int number) {
-        imagesForBlock.remove(number);
-        CameraPanel cameraPanel = cameras.get(number * 2 - 1);
-        cameraPanel.repaintCameraWindow();
-        CameraPanel cameraPanel1 = cameras.get(number * 2);
-        cameraPanel1.repaintCameraWindow();
-    }
-
-    public static void addBackgroundForBlock(BufferedImage image, int numberGroup) {
-        imagesForBlock.put(numberGroup, image);
-    }
-
     /**
      * start/restart to read data from camera stream
-     * used each time when will be changed ip address or cameras, and when program start
+     * used each time when will be changed ip address or cameraPanelsMap, and when program start
      */
-    public void startAllCameras() {
-        for (Integer addressNumber : camerasAddress.keySet()) {
-            if (addressNumber == null) {
-                continue;
-            }
-            List<String> list = camerasAddress.get(addressNumber);
-            if (list != null) {
-                log.info("Камера - " + addressNumber + " будет запущена.");
-                URL url = null;
-                try {
-                    url = new URL(list.get(0));
-                    Authenticator.setDefault(new Authenticator() {
-                        protected PasswordAuthentication getPasswordAuthentication() {
-                            return new PasswordAuthentication(list.get(1), list.get(2).toCharArray());
-                        }
-                    });
-                } catch (MalformedURLException ex) {
-                    ex.printStackTrace();
-                }
-                cameras.get(addressNumber).getVideoCatcher().startCatchVideo(url);
-            } else {
-                log.info("Камера - " + addressNumber + " НЕ будет запущена.");
-                cameras.get(addressNumber).getVideoCatcher().stopCatchVideo();
-            }
-        }
-
-        if (soundSaver == null) {
-            Thread gh = new Thread(() -> {
-                List<String> list = camerasAddress.get(null);
-                if (list != null && list.size() != 0) {
-                    String string = list.get(0);
-                    soundSaver = new SoundSaver(string);
-                    soundSaver.SETUP();
-                    soundSaver.PLAY();
-                }
-            });
-            gh.start();
-        } else {
-            soundSaver.TEARDOWN();
-            soundSaver = null;
-        }
-    }
 
     public static MainFrame getMainFrame() {
         if (mainFrame != null) {
@@ -750,92 +656,32 @@ public class MainFrame extends JFrame {
         }
     }
 
-    public static void setOpacitySetting(int opacity) {
-        MainFrame.opacitySetting = opacity;
-        opacityLabel.setText(bundle.getString("opacitycount") + opacity + "%");
+    public static void setOpacitySettingToFrame(int opacity) {
+        opacityLabel.setText(Storage.getBundle().getString("opacitycount") + opacity + "%");
         opacityLabel.repaint();
-        Float f = (float) opacity / 100;
-        CameraPanel.setOpacity(f);
-
-        for (Integer integer : imagesForBlock.keySet()) {
-            CameraPanel cameraPanel = cameras.get(integer);
-            if (cameraPanel.getVideoCatcher().isCatchVideo()) {
-                cameraPanel.showCopyImage();
-            }
-        }
     }
 
-    public static int getOpacitySetting() {
-        return opacitySetting;
-    }
-
-    public static void setCountSecondsToSaveVideo(int countSave) {
-        secondsToSave = countSave;
-        countSecondsToSaveVideo.setText(bundle.getString("savesecondcount") + secondsToSave + bundle.getString("seconds"));
+    public static void setSecondsToSaveToFrame(int countSave) {
+        countSecondsToSaveVideo.setText(Storage.getBundle().getString("savesecondcount") + countSave + Storage.getBundle().getString("seconds"));
         countSecondsToSaveVideo.repaint();
     }
 
-    public static int getPercentDiffWhite() {
-        return percentDiffWhite;
-    }
-
-    public static void setPercentDiffWhite(int percentDiffWhite) {
-        MainFrame.percentDiffWhite = percentDiffWhite;
-        changeWhiteLabel.setText(bundle.getString("lightening") + percentDiffWhite + "%");
+    public static void setPercentDiffWhiteToFrame(int percentDiffWhite) {
+        changeWhiteLabel.setText((Storage.getBundle().getString("lightening") + percentDiffWhite + "%"));
         changeWhiteLabel.repaint();
     }
 
-    private void setAlarmServerLabelColor(int port, Color color) {
-        eventServerPortLabel.setText(bundle.getString("portstring") + port);
+    private void setAlarmServerLabelColor(Color color) {
         eventServerPortLabel.setForeground(color);
         eventServerPortLabel.repaint();
     }
 
-    public SoundSaver getSoundSaver() {
-        return soundSaver;
-    }
-
-    public static int getColorLightNumber() {
-        return colorLightNumber;
-    }
-
-    public void setColorLightNumber(int colorLightNumber) {
-        MainFrame.colorLightNumber = colorLightNumber;
-        photosensitivityLabel.setText(bundle.getString("photosensitivity") + colorLightNumber);
+    public static void setColorLightNumberToFrame(int colorLightNumber) {
+        photosensitivityLabel.setText(Storage.getBundle().getString("photosensitivity") + colorLightNumber);
         photosensitivityLabel.repaint();
-
-        Thread thread = new Thread(() -> {
-            setColorNumbersSet(colorLightNumber, colorRGBNumberSet);
-        });
-        thread.start();
     }
 
-    private void setColorNumbersSet(int number, Set<Integer> set) {
-        set.clear();
-        for (int i = number; i < 250; i++) {
-            for (int k = number; k < 250; k++) {
-                for (int g = number; g < 250; g++) {//238
-                    if (i == 238 & k == 238 & g == 238) {
-                        continue;
-                    }
-                    Color color = new Color(i, k, g);
-                    int rgb = color.getRGB();
-                    set.add(rgb);
-                }
-            }
-        }
-    }
-
-    public Set<Integer> getColorRGBNumberSet() {
-        return colorRGBNumberSet;
-    }
-
-    public static boolean isProgramLightCatchEnable() {
-        return programLightCatchEnable;
-    }
-
-    public static void setProgramLightCatchEnable(boolean programLightCatchEnable) {
-        MainFrame.programLightCatchEnable = programLightCatchEnable;
+    public static void setProgramLightCatchEnableToFrame(boolean programLightCatchEnable) {
         if (programLightCatchEnable) {
             photosensitivityLabel.setForeground(new Color(32, 175, 33));
             changeWhiteLabel.setForeground(new Color(32, 175, 33));
@@ -848,24 +694,8 @@ public class MainFrame extends JFrame {
         changeWhiteLabel.repaint();
     }
 
-    public static int getSecondsToSave() {
-        return secondsToSave;
-    }
-
-    public static void setPort(int port) {
-        MainFrame.port = port;
-    }
-
-    public static void setPath(String path) {
-        MainFrame.path = path;
-    }
-
-    public static int getPort() {
-        return port;
-    }
-
-    public static String getPath() {
-        return path;
+    public static void setPortToFrame(int port) {
+        eventServerPortLabel.setText(Storage.getBundle().getString("portstring") + port);
     }
 
     public static void setTestMode(boolean testMode) {
@@ -876,43 +706,9 @@ public class MainFrame extends JFrame {
         startButtonProgrammingCatch.setVisible(testMode);
     }
 
-    public static String getDefaultPath() {
-        return defaultPath;
-    }
-
-    public static String getPassword() {
-        return password;
-    }
-
-    public static void setPassword(String password) {
-        MainFrame.password = password;
-    }
-
-    public static int getShowFramesPercent() {
-        return showFramesPercent;
-    }
-
-    public static ResourceBundle getBundle() {
-        return bundle;
-    }
-
-    public static void setShowFramesPercent(int showFramesPercent) {
-        MainFrame.showFramesPercent = showFramesPercent;
-        showImagesLabel.setText(bundle.getString("showframescountlabel") + showFramesPercent);
+    public static void setShowFramesPercentToFrame(int showFramesPercent) {
+        showImagesLabel.setText(Storage.getBundle().getString("showframescountlabel") + showFramesPercent);
         showImagesLabel.repaint();
-    }
-
-    public static Map<Integer, CameraPanel> getCameras() {
-        return cameras;
-    }
-
-    public static void setCamerasPosition(int[][] camerasPosition) {
-        MainFrame.camerasPosition = camerasPosition;
-        addressSaver.setCamerasPosition(camerasPosition);
-    }
-
-    public static int[][] getCamerasPosition() {
-        return camerasPosition;
     }
 }
 

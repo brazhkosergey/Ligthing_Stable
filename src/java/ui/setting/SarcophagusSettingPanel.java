@@ -1,5 +1,6 @@
 package ui.setting;
 
+import entity.Storage.Storage;
 import ui.main.MainFrame;
 
 import javax.swing.*;
@@ -265,7 +266,7 @@ public class SarcophagusSettingPanel extends JPanel {
         centerPanel.setBorder(BorderFactory.createEtchedBorder());
 
         JLabel sarcophagusLabel = new JLabel();
-        sarcophagusLabel.setText(MainFrame.getBundle().getString("sarcophagus"));
+        sarcophagusLabel.setText(Storage.getBundle().getString("sarcophagus"));
         sarcophagusLabel.setHorizontalAlignment(SwingConstants.CENTER);
         sarcophagusLabel.setVerticalAlignment(SwingConstants.CENTER);
         sarcophagusLabel.setFont(commonFont);
@@ -288,7 +289,7 @@ public class SarcophagusSettingPanel extends JPanel {
 
             position[3][0]=Integer.parseInt(fourthCameraLeftRightTextField.getText());
             position[3][1]=Integer.parseInt(fourthCameraUpDownTextField.getText());
-            MainFrame.setCamerasPosition(position);
+            Storage.setCamerasPosition(position);
             saveButton.setForeground(new Color(47, 123, 21));
         });
 
