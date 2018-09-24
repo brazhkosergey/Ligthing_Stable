@@ -68,9 +68,7 @@ public class BackgroundImagePanel extends JPanel {
         g.setColor(Color.RED);
 
         for (int i = 0; i < sourcePoints.length; i++) {
-
             g.fillOval(sourcePoints[i][0], sourcePoints[i][1] - 5, 10, 10);
-
             if (savePoints) {
                 int x = sourcePoints[i][0];
                 int y = sourcePoints[i][1];
@@ -78,7 +76,6 @@ public class BackgroundImagePanel extends JPanel {
                 savePoint[0] = x;
                 savePoint[1] = y;
                 linePointsToSave[i] = savePoint;
-//                        linePointsToSave[(int) (i * 100 + t * 100)] = point;
             }
         }
 

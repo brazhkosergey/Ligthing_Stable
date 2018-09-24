@@ -18,6 +18,7 @@ import java.awt.event.MouseEvent;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.List;
 
 /**
  * App frame
@@ -76,111 +77,10 @@ public class MainFrame extends JFrame {
     private static Map<Integer, CameraPanel> cameraPanelsMap;
     private static Map<Integer, JPanel> cameraBlock;
 
-//    /**
-//     * cameraPanelsMap panel list, numbers (1-8)
-//     */
-//    private static Map<Integer, CameraPanel> cameraPanelsMap;
-//    /**
-//     * addresses for cameraPanelsMap
-//     */
-//    public static Map<Integer, List<String>> camerasAddress;
-//    /**
-//     * camera blocks (4)
-//     */
-//    private static Map<Integer, JPanel> cameraBlock;
-//    /**
-//     * backgrounds for each block
-//     */
-//    public static Map<Integer, BufferedImage> imagesForBlock;
-//    /**
-//     * video savers for each block
-//     */
-//    public static Map<Integer, VideoBytesSaver> videoSaversMap;
-//
-//    public static Map<Integer, int[][]> linePoints;
-//    public static Map<Integer, List<int[]>> linesForHideZoneParsing;
-//
-//    public static int[][] camerasPosition;
-//
-//    /**
-//     * address saver to save and restore setting data
-//     */
-//    public static AddressSaver addressSaver;
-//    /**
-//     * opacity of background
-//     */
-//    private static int opacitySetting;
-//    /**
-//     * seconds to save before and after lightning
-//     */
-//    private static int secondsToSave = 30;
-//
-//    /**
-//     * used for scanning frames for count of white pixels to catch lightning
-//     */
-//    private static int percentDiffWhite = 5;
-//
-//    /**
-//     * the darkest color number, which will be set as "WHITE"
-//     * Color color= new Color(colorLightNumber,colorLightNumber,colorLightNumber);
-//     * program will search on frame pixels more light then this color
-//     */
-//    private static int colorLightNumber = 180;
-//
-//    /**
-//     * set with RGB numbers of color, which will bet "WHITE"
-//     */
-//    private Set<Integer> colorRGBNumberSet;
-//    /**
-//     * enable/disable scanning frames to catch lightning
-//     */
-//    private static boolean programLightCatchEnable;
-//    /**
-//     * port for server socket, for waiting request from sensor about lightning
-//     */
-//    private static int port;
-//
-//    /**
-//     * path to folder, for saved bytes, during saving video
-//     * can be changed in setting
-//     */
-//    private static String path = "C:\\LIGHTNING_STABLE\\";
-//
-//    /**
-//     * default path for temporary files, log files and address saver files
-//     * can not be changed
-//     */
-//    private static String defaultPath = "C:\\LIGHTNING_STABLE\\";
-//
-//    /**
-//     * class to save audio fro audio module
-//     */
-//    private SoundSaver soundSaver;
-//
-//    /**
-//     * mark that some camera is full size mode
-//     */
-//    private static boolean fullSize = false;
-//
-//
-//    private static ResourceBundle bundle;
-//    /**
-//     * show the percent of frames from ip camera, witch will be showed on camera panel
-//     */
-//    private static int showFramesPercent = 15;
-
     private MainFrame() {
         super("LIGHTNING STABLE");
         cameraPanelsMap = new HashMap<>();
         cameraBlock = new HashMap<>();
-//        imagesForBlock = new HashMap<>();
-//        cameraPanelsMap = new HashMap<>();
-//        cameraBlock = new HashMap<>();
-//        camerasAddress = new HashMap<>();
-//        videoSaversMap = new HashMap<>();
-//        colorRGBNumberSet = new HashSet<>();
-//        linePoints = new HashMap<>();
-//        linesForHideZoneParsing = new HashMap<>();
 
         this.getContentPane().setLayout(new BorderLayout());
         this.setMinimumSize(new Dimension(1150, 700));
@@ -418,24 +318,26 @@ public class MainFrame extends JFrame {
         alarmThread.setName("Alarm Thread");
         alarmThread.start();
 
+        List<File> folders = new ArrayList<>();
 
+        File imageHideZoneSaveFolder = new File(Storage.getDefaultPath() + "\\hideZoneImages\\");
         File fileAddressSaver = new File(Storage.getDefaultPath() + "\\data\\");
-        fileAddressSaver.mkdirs();
-
         File fileBuffBytes = new File(Storage.getPath() + "\\bytes\\");
-        fileBuffBytes.mkdirs();
-
+        File pathFolder = new File(Storage.getPath());
         for (int i = 1; i < 5; i++) {
             File folder = new File(Storage.getDefaultPath() + "\\buff\\" + i + "\\");
-            folder.mkdirs();
-            File[] files = folder.listFiles();
-            for (int j = 0; j < files.length; j++) {
-                files[j].delete();
+            folders.add(folder);
+        }
+        folders.add(imageHideZoneSaveFolder);
+        folders.add(fileAddressSaver);
+        folders.add(fileBuffBytes);
+        folders.add(pathFolder);
+
+        for (File file : folders) {
+            if (!file.exists()) {
+                file.mkdirs();
             }
         }
-
-        File pathFolder = new File(Storage.getPath());
-        pathFolder.mkdirs();
     }
 
     private void buildMainWindow() {

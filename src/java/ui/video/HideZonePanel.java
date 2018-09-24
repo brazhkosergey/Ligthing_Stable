@@ -16,10 +16,14 @@ import java.util.Map;
 public class HideZonePanel extends JPanel {
 
     private Map<String, HideZoneArea> hideZoneAreaMap;
-    private String hideZoneName;
+    private String[] hideZoneDetectedNames;
+
 
     public HideZonePanel(String hideZoneName) {
-        this.hideZoneName = hideZoneName;
+        if (hideZoneName != null) {
+            hideZoneDetectedNames = hideZoneName.split(",");
+        }
+
         hideZoneAreaMap = new HashMap<>();
     }
 
@@ -28,7 +32,9 @@ public class HideZonePanel extends JPanel {
         super.paint(g);
         int panelWidth = this.getWidth();
         int panelHeight = this.getHeight();
-        if (hideZoneName != null && hideZoneName.length() > 1) {
+
+
+        if (hideZoneDetectedNames != null) {
             Graphics2D graphics2D = (Graphics2D) g;
             int hideZoneWidth = 160;
             int hideZoneHeight = 90;
@@ -120,21 +126,24 @@ public class HideZonePanel extends JPanel {
             int yOfProtectedZone = y1OfPicture + (34 * pictureHeight / 86);
             int heightOfProtectedZone = 28 * pictureHeight / 86;
 
-            HideZoneArea hideZoneArea = hideZoneAreaMap.get(hideZoneName);
-            if (hideZoneArea != null) {
-                graphics2D.setColor(new Color(255, 211, 45, 200));
 
-                int getYOfZone = hideZoneArea.getyOfZone();
-                int heightOfZone = hideZoneArea.getHeightOfZone();
+            for (String hideZoneName : hideZoneDetectedNames) {
+                HideZoneArea hideZoneArea = hideZoneAreaMap.get(hideZoneName);
+                if (hideZoneArea != null) {
+                    graphics2D.setColor(new Color(255, 211, 45, 200));
 
-                graphics2D.fillRect(x1OfPicture + hideZoneArea.getxOfZone(), y1OfPicture + getYOfZone, hideZoneArea.getWidthOfZone(), heightOfZone);
+                    int getYOfZone = hideZoneArea.getyOfZone();
+                    int heightOfZone = hideZoneArea.getHeightOfZone();
 
-                if (hideZoneName.contains("f") ||
-                        hideZoneName.contains("e") ||
-                        hideZoneName.contains("d")) {
-                    graphics2D.fillOval(x1OfPicture + pictureWidth - circleDiameter,
-                            y1OfPicture + pictureHeight / 2 - circleDiameter / 2,
-                            circleDiameter, circleDiameter);
+                    graphics2D.fillRect(x1OfPicture + hideZoneArea.getxOfZone(), y1OfPicture + getYOfZone, hideZoneArea.getWidthOfZone(), heightOfZone);
+
+                    if (hideZoneName.contains("f") ||
+                            hideZoneName.contains("e") ||
+                            hideZoneName.contains("d")) {
+                        graphics2D.fillOval(x1OfPicture + pictureWidth - circleDiameter,
+                                y1OfPicture + pictureHeight / 2 - circleDiameter / 2,
+                                circleDiameter, circleDiameter);
+                    }
                 }
             }
 

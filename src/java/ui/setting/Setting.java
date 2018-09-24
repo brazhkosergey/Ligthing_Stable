@@ -24,6 +24,9 @@ public class Setting extends JPanel {
     private JTextField defaultPort;
     private JTextField defaultFolder;
 
+    private JSlider hideZoneIdentificationAccuracyCountOfFramesToAnaliseSlider;
+    private JSlider hideZoneIdentificationAccuracyComparePixelsSlider;
+
     public JButton saveButton;
     private JTextField timeTextField;
     private JCheckBox programCatchEnableCheckBox;
@@ -34,6 +37,7 @@ public class Setting extends JPanel {
     private JTextField passwordTextField;
 
     private SarcophagusSettingPanel sarcophagusSettingPanel;
+
 
     private Setting() {
         this.setPreferredSize(new Dimension(1120, 540));
@@ -265,7 +269,10 @@ public class Setting extends JPanel {
 //                    MainFrame.setPath(path);
 //                }
 
-                Storage.getAddressSaver().saveSetting(countSecondsToSaveVideo, programCatchEnableCheckBox.isSelected(), changeWhitePercent, lightSensitivity, opacity, port, path);
+
+                Storage.getAddressSaver().saveSetting(countSecondsToSaveVideo, programCatchEnableCheckBox.isSelected(),
+                        changeWhitePercent, lightSensitivity, opacity, port, path, hideZoneIdentificationAccuracyCountOfFramesToAnaliseSlider.getValue(),
+                        hideZoneIdentificationAccuracyComparePixelsSlider.getValue());
                 log.info("Настройки изменены. Время сохранения: " + countSecondsToSaveVideo +
                         ", Фиксируем програмные сработки: " + programCatchEnableCheckBox.isSelected() +
                         ", процент вспышки на изображении: " + changeWhitePercent +
@@ -418,31 +425,67 @@ public class Setting extends JPanel {
 
 
         JPanel cameraPositionSetting = new JPanel();
-        cameraPositionSetting.setPreferredSize(new Dimension(375, 173));
+        cameraPositionSetting.setPreferredSize(new Dimension(375, 40));
         cameraPositionSetting.setBorder(BorderFactory.createEtchedBorder());
 
         JLabel setCameraPositionLabel = new JLabel(Storage.getBundle().getString("setCameraPositionLabel"));
-        setCameraPositionLabel.setFont(new Font(null, Font.BOLD, 20));
-        setCameraPositionLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        setCameraPositionLabel.setPreferredSize(new Dimension(350, 40));
-
+        setCameraPositionLabel.setFont(new Font(null, Font.BOLD, 13));
+        setCameraPositionLabel.setPreferredSize(new Dimension(257, 25));
 
         JButton setCameraPositionButton = new JButton(Storage.getBundle().getString("editButton"));
-        setCameraPositionButton.setPreferredSize(new Dimension(150, 70));
-        setCameraPositionButton.setFont(new Font(null, Font.BOLD, 20));
         setCameraPositionButton.addActionListener((as) -> {
             this.removeAll();
             this.add(sarcophagusSettingPanel);
             this.revalidate();
             this.repaint();
         });
-
-
         cameraPositionSetting.add(setCameraPositionLabel);
         cameraPositionSetting.add(setCameraPositionButton);
-
-
         hideZoneSettingPanel.add(cameraPositionSetting);
+
+        JPanel hideZoneAccuracyPanel = new JPanel(new FlowLayout());
+        hideZoneAccuracyPanel.setBorder(BorderFactory.createEtchedBorder());
+        hideZoneAccuracyPanel.setPreferredSize(new Dimension(375, 130));
+
+        JLabel hideZoneIdentificationAccuracyCountOfFramesToAnaliseLabel = new JLabel(Storage.getBundle().getString("hideZoneIdentificationAccuracyCountOfFramesToAnaliseLabel") +
+                " " + Storage.getAddressSaver().getHideZoneIdentificationAccuracyCountOfFramesToAnalise());
+        hideZoneIdentificationAccuracyCountOfFramesToAnaliseLabel.setPreferredSize(new Dimension(370, 25));
+
+        hideZoneIdentificationAccuracyCountOfFramesToAnaliseSlider = new JSlider();
+        hideZoneIdentificationAccuracyCountOfFramesToAnaliseSlider.setPreferredSize(new Dimension(370, 28));
+        hideZoneIdentificationAccuracyCountOfFramesToAnaliseSlider.setMinorTickSpacing(1);
+        hideZoneIdentificationAccuracyCountOfFramesToAnaliseSlider.setPaintTicks(true);
+        hideZoneIdentificationAccuracyCountOfFramesToAnaliseSlider.setMinimum(1);
+        hideZoneIdentificationAccuracyCountOfFramesToAnaliseSlider.setMaximum(5);
+        hideZoneIdentificationAccuracyCountOfFramesToAnaliseSlider.setValue(Storage.getAddressSaver().getHideZoneIdentificationAccuracyCountOfFramesToAnalise());
+        hideZoneIdentificationAccuracyCountOfFramesToAnaliseSlider.addChangeListener((g) -> {
+            hideZoneIdentificationAccuracyCountOfFramesToAnaliseLabel.setText(Storage.getBundle().getString("hideZoneIdentificationAccuracyCountOfFramesToAnaliseLabel") +
+                    " " + hideZoneIdentificationAccuracyCountOfFramesToAnaliseSlider.getValue());
+        });
+
+        JLabel hideZoneIdentificationAccuracyComparePixelsLabel = new JLabel(Storage.getBundle().getString("hideZoneIdentificationAccuracyComparePixelsLabel") +
+                " " + Storage.getAddressSaver().getHideZoneIdentificationAccuracyComparePixels());
+        hideZoneIdentificationAccuracyComparePixelsLabel.setPreferredSize(new Dimension(370, 25));
+
+        hideZoneIdentificationAccuracyComparePixelsSlider = new JSlider();
+        hideZoneIdentificationAccuracyComparePixelsSlider.setPreferredSize(new Dimension(370, 28));
+        hideZoneIdentificationAccuracyComparePixelsSlider.setMinorTickSpacing(1);
+        hideZoneIdentificationAccuracyComparePixelsSlider.setPaintTicks(true);
+        hideZoneIdentificationAccuracyComparePixelsSlider.setMinimum(5);
+        hideZoneIdentificationAccuracyComparePixelsSlider.setMaximum(30);
+        hideZoneIdentificationAccuracyComparePixelsSlider.setValue(Storage.getAddressSaver().getHideZoneIdentificationAccuracyComparePixels());
+        hideZoneIdentificationAccuracyComparePixelsSlider.addChangeListener((g) -> {
+            hideZoneIdentificationAccuracyComparePixelsLabel.setText(Storage.getBundle().getString("hideZoneIdentificationAccuracyComparePixelsLabel") +
+                    " " + hideZoneIdentificationAccuracyComparePixelsSlider.getValue());
+        });
+
+        hideZoneAccuracyPanel.add(hideZoneIdentificationAccuracyCountOfFramesToAnaliseLabel);
+        hideZoneAccuracyPanel.add(hideZoneIdentificationAccuracyCountOfFramesToAnaliseSlider);
+        hideZoneAccuracyPanel.add(hideZoneIdentificationAccuracyComparePixelsLabel);
+        hideZoneAccuracyPanel.add(hideZoneIdentificationAccuracyComparePixelsSlider);
+
+
+        hideZoneSettingPanel.add(hideZoneAccuracyPanel);
     }
 
     /**

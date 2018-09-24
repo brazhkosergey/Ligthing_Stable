@@ -23,9 +23,11 @@ public class App {
 //                        .getProtectionDomain()
 //                        .getCodeSource().getLocation()
 //                        .toURI().getPath();
+////                        .toURI().getPath()
 ////                        .replace('/', File.separator.charAt(0)).substring(1);
 ////                        .replace('\\', File.separator.charAt(0)).substring(1);
-//            } catch (URISyntaxException e) {
+//                System.out.println("Памяти не достаточно, перегружаем приложени, с указанием большего количества памяти. "+currentPath);
+//            } catch (Exception e) {
 //                e.printStackTrace();
 //            }
 //

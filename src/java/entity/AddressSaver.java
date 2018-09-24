@@ -67,7 +67,8 @@ public class AddressSaver {
     private int[][] thirdGroup;
     private int[][] fourthGroup;
     private int[][] camerasPosition;
-    private double[][] camerasViewAnglesTangences;
+    private double[][] camerasViewAnglesTangens;
+
     private int hideZoneIdentificationAccuracyCountOfFramesToAnalise;
     private int hideZoneIdentificationAccuracyComparePixels;
 
@@ -78,9 +79,9 @@ public class AddressSaver {
         camerasPosition[2] = new int[]{180, 150};
         camerasPosition[3] = new int[]{30, 140};
 
-        camerasViewAnglesTangences = new double[4][];
+        camerasViewAnglesTangens = new double[4][];
         for (int i = 0; i < camerasPosition.length; i++) {
-            camerasViewAnglesTangences[i] = new double[]{(double) camerasPosition[i][0] / camerasPosition[i][1],
+            camerasViewAnglesTangens[i] = new double[]{(double) camerasPosition[i][0] / camerasPosition[i][1],
                     (double) (camerasPosition[i][0] + 160) / camerasPosition[i][1]};
         }
 
@@ -88,6 +89,7 @@ public class AddressSaver {
         for (int i = 0; i < 8; i++) {
             camerasIdentificationInformation[i] = new String[3];
         }
+
         hideZoneIdentificationAccuracyCountOfFramesToAnalise = 1;
         hideZoneIdentificationAccuracyComparePixels = 5;
         PASS = "PASS";
@@ -134,7 +136,8 @@ public class AddressSaver {
      */
 
     public void saveSetting(int timeToSave, boolean programLightCatchEnable, int changeWhitePercent,
-                            int lightSensitivity, int opacity, int port, String path) {
+                            int lightSensitivity, int opacity, int port, String path, int hideZoneIdentificationAccuracyCountOfFramesToAnalise
+            , int hideZoneIdentificationAccuracyComparePixels) {
         this.changeWhitePercent = changeWhitePercent;
         this.lightSensitivity = lightSensitivity;
         this.opacity = opacity;
@@ -142,7 +145,8 @@ public class AddressSaver {
         this.programLightCatchEnable = programLightCatchEnable;
         this.port = port;
         this.path = path;
-
+        this.hideZoneIdentificationAccuracyCountOfFramesToAnalise = hideZoneIdentificationAccuracyCountOfFramesToAnalise;
+        this.hideZoneIdentificationAccuracyComparePixels = hideZoneIdentificationAccuracyComparePixels;
         savePasswordSaverToFile();
     }
 
@@ -229,7 +233,7 @@ public class AddressSaver {
         CameraAddressSetting.getCameraAddressSetting().setAddressAudioTextField(audioAddress);
         for (CameraGroup cameraGroup : Storage.getCameraGroups()) {
             if (cameraGroup.getBackGroundImage() != null) {
-                CameraAddressSetting.getCameraAddressSetting().setHaveImage(cameraGroup.getGroupNumber());
+                CameraAddressSetting.getCameraAddressSetting().setHaveImage(cameraGroup.getGroupNumber() - 1);
             }
         }
     }
@@ -243,12 +247,14 @@ public class AddressSaver {
         Storage.setColorLightNumber(lightSensitivity);
         Storage.setOpacitySetting(opacity);
         Storage.setSecondsToSave(timeToSave);
-
-        Storage.addLinePoint(1, firstGroup, false);
-        Storage.addLinePoint(2, secondGroup, false);
-        Storage.addLinePoint(3, thirdGroup, false);
-        Storage.addLinePoint(4, fourthGroup, false);
-
+        Thread addLinePointThread = new Thread(() -> {
+            Storage.addLinePoint(1, firstGroup, false);
+            Storage.addLinePoint(2, secondGroup, false);
+            Storage.addLinePoint(3, thirdGroup, false);
+            Storage.addLinePoint(4, fourthGroup, false);
+        });
+        addLinePointThread.setPriority(Thread.MIN_PRIORITY);
+        addLinePointThread.start();
         if (path != null) {
             Storage.setPath(path);
         }
@@ -259,8 +265,8 @@ public class AddressSaver {
     public void setCamerasPosition(int[][] camerasPosition) {
         this.camerasPosition = camerasPosition;
         for (int i = 0; i < camerasPosition.length; i++) {
-            camerasViewAnglesTangences[i][0] = (double) camerasPosition[i][0] / camerasPosition[i][1];
-            camerasViewAnglesTangences[i][1] = (double) (camerasPosition[i][0] + 160) / camerasPosition[i][1];
+            camerasViewAnglesTangens[i][0] = (double) camerasPosition[i][0] / camerasPosition[i][1];
+            camerasViewAnglesTangens[i][1] = (double) (camerasPosition[i][0] + 160) / camerasPosition[i][1];
         }
         savePasswordSaverToFile();
     }
@@ -277,7 +283,7 @@ public class AddressSaver {
         return hideZoneIdentificationAccuracyComparePixels;
     }
 
-    public double[][] getCamerasViewAnglesTangences() {
-        return camerasViewAnglesTangences;
+    public double[][] getCamerasViewAnglesTangens() {
+        return camerasViewAnglesTangens;
     }
 }

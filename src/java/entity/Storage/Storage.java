@@ -27,8 +27,6 @@ public class Storage {
     private static Map<Integer, List<int[]>> linesForHideZoneParsing;
     private static Map<Integer, List<Double>> pixelsSizesForHideZoneParsing;
 
-    private static int[][] camerasPosition;
-
     private static AddressSaver addressSaver;
 
     private static int opacitySetting = 30;
@@ -123,11 +121,10 @@ public class Storage {
         if (list != null) {
             linesForHideZoneParsing.put(groupNumber, getLineForParsing(list));
         }
-
     }
 
 //    private List<Double> getPixelsSizesForHideZoneParsing(int groupNumber, List<int[]> linesForHideZoneParsing) {
-//        double[] groupNumberViewAnglesTangences = Storage.getAddressSaver().getCamerasViewAnglesTangences()[groupNumber - 1];
+//        double[] groupNumberViewAnglesTangences = Storage.getAddressSaver().getCamerasViewAnglesTangens()[groupNumber - 1];
 //        double angleMin = Math.atan(groupNumberViewAnglesTangences[0]);
 //        double angleMax = Math.atan(groupNumberViewAnglesTangences[1]);
 //        double angleIncrement = angleMax - angleMin;

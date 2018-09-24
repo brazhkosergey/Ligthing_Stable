@@ -115,7 +115,7 @@ public class VideoPlayer extends JPanel {
      * @param dateToShow            - date, to show on pane;
      * @param videoNumberInList     - number to show on panel
      */
-    VideoPlayer(Map<Integer, File> foldersWithVideoFiles, String dateToShow, int videoNumberInList) {
+    VideoPlayer(Map<Integer, File> foldersWithVideoFiles, String dateToShow, Date date, int videoNumberInList) {
         this.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
         this.setLayout(new BorderLayout());
         centralPane = new JPanel(new BorderLayout());
@@ -129,17 +129,29 @@ public class VideoPlayer extends JPanel {
         eventFrameNumberList = new ArrayList<>();
         oneVideoPlayerPanelsList = new ArrayList<>();
 
-        String hideZoneName = null;
+        String hideZoneNameFromFolder = null;
         boolean hideZoneDetected = false;
 
         for (int j = 1; j < 5; j++) {
             File folder = foldersWithVideoFiles.get(j);
             if (folder != null) {
                 String name = folder.getName();
-                if (hideZoneName == null && folder.getParentFile().getName().contains("{")) {
-                    hideZoneName = folder.getParentFile().getName().split("\\{")[1];
-                    hideZoneName = hideZoneName.substring(0, hideZoneName.length() - 1);
-                    hideZoneDetected = hideZoneName.length() > 1;
+                if (hideZoneNameFromFolder == null && folder.getParentFile().getName().contains("{")) {
+                    hideZoneNameFromFolder = folder.getParentFile().getName().split("\\{")[1];
+                    hideZoneNameFromFolder = hideZoneNameFromFolder.substring(0, hideZoneNameFromFolder.length() - 1);
+
+                    if (hideZoneNameFromFolder.contains(",")) {
+                        String[] split = hideZoneNameFromFolder.split(",");
+                        for (String s : split) {
+                            if (!hideZoneDetected) {
+                                hideZoneDetected = s.length() < 4;
+                            }
+                        }
+                    } else {
+                        if (!hideZoneDetected) {
+                            hideZoneDetected = hideZoneNameFromFolder.length() < 4;
+                        }
+                    }
                 }
                 int i = name.indexOf(")");
                 String totalFpsString = name.substring(2, i);
@@ -388,9 +400,9 @@ public class VideoPlayer extends JPanel {
             hideZoneButton.setForeground(new Color(3, 156, 11));
         }
 
-        String finalHideZoneName = hideZoneName;
+        String finalHideZoneName = hideZoneNameFromFolder;
         hideZoneButton.addActionListener((e) -> {
-            MainFrame.setCentralPanel(new HideZoneMainPanel(true, finalHideZoneName));
+            MainFrame.setCentralPanel(new HideZoneMainPanel(true, finalHideZoneName, date));
         });
 
         backButton.setPreferredSize(new Dimension(62, 40));

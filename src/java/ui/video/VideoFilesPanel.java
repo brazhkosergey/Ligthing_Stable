@@ -77,6 +77,8 @@ public class VideoFilesPanel extends JPanel {
                     fileName = fileFromFolder.getName();
                     if (fileName.contains("{")) {
                         fileName = fileName.split("\\{")[0];
+
+
                     }
 
                     long dataLong = Long.parseLong(fileName);
@@ -129,7 +131,19 @@ public class VideoFilesPanel extends JPanel {
                     if (folderFromOneCameraGroup.getParentFile().getName().contains("{")) {
                         hideZoneName = folderFromOneCameraGroup.getParentFile().getName().split("\\{")[1];
                         hideZoneName = hideZoneName.substring(0, hideZoneName.length() - 1);
-                        hideZoneDetected = hideZoneName.length() > 1;
+
+                        if (hideZoneName.contains(",")) {
+                            String[] split = hideZoneName.split(",");
+                            for (String s : split) {
+                                if (!hideZoneDetected) {
+                                    hideZoneDetected = s.length() < 4;
+                                }
+                            }
+                        } else {
+                            if (!hideZoneDetected) {
+                                hideZoneDetected = hideZoneName.length() < 4;
+                            }
+                        }
                     }
                     videoSize = Objects.requireNonNull(folderFromOneCameraGroup.listFiles()).length;
                     break;
@@ -160,7 +174,8 @@ public class VideoFilesPanel extends JPanel {
             int finalI = i + 1;
             showVideoButton.addActionListener((ActionEvent e) -> {
                 VideoPlayer.setShowVideoPlayer(true);
-                currentPlayer = new VideoPlayer(folderWithVideos, dateFormat.format(new Date(dataLong)), finalI);
+                Date d = new Date(dataLong);
+                currentPlayer = new VideoPlayer(folderWithVideos, dateFormat.format(d),d, finalI);
                 MainFrame.setCentralPanel(currentPlayer);
             });
 
@@ -172,7 +187,7 @@ public class VideoFilesPanel extends JPanel {
             hideZoneButton.setFocusable(false);
             String finalHideZoneName = hideZoneName;
             hideZoneButton.addActionListener((pf) -> {
-                MainFrame.setCentralPanel(new HideZoneMainPanel(false, finalHideZoneName));
+                MainFrame.setCentralPanel(new HideZoneMainPanel(false, finalHideZoneName,date));
             });
 
             deleteButton = new JButton("<html>&#10006</html>");

@@ -76,7 +76,7 @@ public class HideZoneLightingSearcher {
                 }
 
                 stringBuilder.append(zoneName);
-                if (i > 0 && i != size - 1) {
+                if (i != size - 1) {
                     stringBuilder.append(',');
                 }
             }

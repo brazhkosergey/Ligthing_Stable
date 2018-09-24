@@ -22,7 +22,8 @@ public class SarcophagusSettingPanel extends JPanel {
 
     private JTextField fourthCameraLeftRightTextField;
     private JTextField fourthCameraUpDownTextField;
-    MyKeyAdapter keyAdapter;
+
+    private MyKeyAdapter keyAdapter;
 
     private int[][] position;
 
@@ -143,7 +144,15 @@ public class SarcophagusSettingPanel extends JPanel {
         secondCameraPanel.add(secondCameraLastLabel);
         secondCameraPanel.add(secondCameraUpDownTextFieldPanel);
 
+
+        JLabel northLabel = new JLabel(Storage.getBundle().getString("north"));
+        northLabel.setFont(commonFont);
+        northLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        northLabel.setVerticalAlignment(SwingConstants.CENTER);
+
+
         northOutPanel.add(firstCameraPanel, BorderLayout.WEST);
+        northOutPanel.add(northLabel, BorderLayout.CENTER);
         northOutPanel.add(secondCameraPanel, BorderLayout.EAST);
 
 
@@ -193,17 +202,15 @@ public class SarcophagusSettingPanel extends JPanel {
         thirdCameraUpDownTextFieldPanel.add(thirdCameraUp);
         thirdCameraUpDownTextFieldPanel.add(thirdCameraUpDownTextField);
         thirdCameraUpDownTextFieldPanel.add(thirdCameraDown);
-        JLabel thirdCameraLastLabel = new JLabel("\u21D7");
+        JLabel thirdCameraLastLabel = new JLabel("\u21D6");
         thirdCameraLastLabel.setFont(commonFont);
-        thirdCameraLastLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+        thirdCameraLastLabel.setHorizontalAlignment(SwingConstants.LEFT);
         thirdCameraLastLabel.setVerticalAlignment(SwingConstants.TOP);
 
-
-        thirdCameraPanel.add(thirdCameraUpDownTextFieldPanel);
         thirdCameraPanel.add(thirdCameraLastLabel);
-        thirdCameraPanel.add(thirdCameraLabel);
+        thirdCameraPanel.add(thirdCameraUpDownTextFieldPanel);
         thirdCameraPanel.add(thirdCameraLeftRightTextFieldPanel);
-
+        thirdCameraPanel.add(thirdCameraLabel);
 //================================================================================
         JPanel fourthCameraPanel = new JPanel(new GridLayout(2, 2));
         fourthCameraPanel.setBorder(BorderFactory.createEtchedBorder());
@@ -247,20 +254,25 @@ public class SarcophagusSettingPanel extends JPanel {
         fourthCameraUpDownTextFieldPanel.add(fourthCameraUp);
         fourthCameraUpDownTextFieldPanel.add(fourthCameraUpDownTextField);
         fourthCameraUpDownTextFieldPanel.add(fourthCameraDown);
-        JLabel fourthCameraLastLabel = new JLabel("\u21D6");
+        JLabel fourthCameraLastLabel = new JLabel("\u21D7");
         fourthCameraLastLabel.setFont(commonFont);
-        fourthCameraLastLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        fourthCameraLastLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         fourthCameraLastLabel.setVerticalAlignment(SwingConstants.TOP);
 
 
-        fourthCameraPanel.add(fourthCameraLastLabel);
         fourthCameraPanel.add(fourthCameraUpDownTextFieldPanel);
-        fourthCameraPanel.add(fourthCameraLeftRightTextFieldPanel);
+        fourthCameraPanel.add(fourthCameraLastLabel);
         fourthCameraPanel.add(fourthCameraLabel);
+        fourthCameraPanel.add(fourthCameraLeftRightTextFieldPanel);
 
-        southOutPanel.add(thirdCameraPanel, BorderLayout.WEST);
-        southOutPanel.add(fourthCameraPanel, BorderLayout.EAST);
+        JLabel southLabel = new JLabel(Storage.getBundle().getString("south"));
+        southLabel.setFont(commonFont);
+        southLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        southLabel.setVerticalAlignment(SwingConstants.CENTER);
 
+        southOutPanel.add(thirdCameraPanel, BorderLayout.EAST);
+        southOutPanel.add(southLabel, BorderLayout.CENTER);
+        southOutPanel.add(fourthCameraPanel, BorderLayout.WEST);
 
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.setBorder(BorderFactory.createEtchedBorder());
@@ -278,17 +290,17 @@ public class SarcophagusSettingPanel extends JPanel {
         JButton saveButton = new JButton("<html>&#128190</html>");
         saveButton.setFont(buttonFont);
         saveButton.addActionListener((af) -> {
-            int[][] position = new int[][]{new int[2],new int[2],new int[2],new int[2]};
-            position[0][0]=Integer.parseInt(firstCameraLeftRightTextField.getText());
-            position[0][1]=Integer.parseInt(firstCameraUpDownTextField.getText());
-            position[1][0]=Integer.parseInt(secondCameraLeftRightTextField.getText());
-            position[1][1]=Integer.parseInt(secondCameraUpDownTextField.getText());
+            int[][] position = new int[][]{new int[2], new int[2], new int[2], new int[2]};
+            position[0][0] = Integer.parseInt(firstCameraLeftRightTextField.getText());
+            position[0][1] = Integer.parseInt(firstCameraUpDownTextField.getText());
+            position[1][0] = Integer.parseInt(secondCameraLeftRightTextField.getText());
+            position[1][1] = Integer.parseInt(secondCameraUpDownTextField.getText());
 
-            position[2][0]=Integer.parseInt(thirdCameraLeftRightTextField.getText());
-            position[2][1]=Integer.parseInt(thirdCameraUpDownTextField.getText());
+            position[2][0] = Integer.parseInt(thirdCameraLeftRightTextField.getText());
+            position[2][1] = Integer.parseInt(thirdCameraUpDownTextField.getText());
 
-            position[3][0]=Integer.parseInt(fourthCameraLeftRightTextField.getText());
-            position[3][1]=Integer.parseInt(fourthCameraUpDownTextField.getText());
+            position[3][0] = Integer.parseInt(fourthCameraLeftRightTextField.getText());
+            position[3][1] = Integer.parseInt(fourthCameraUpDownTextField.getText());
             Storage.getAddressSaver().setCamerasPosition(position);
             saveButton.setForeground(new Color(47, 123, 21));
         });
@@ -306,9 +318,6 @@ public class SarcophagusSettingPanel extends JPanel {
         JPanel backPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         backPanel.setPreferredSize(new Dimension(200, 40));
         backPanel.add(backButton);
-
-
-
 
         JPanel savePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         savePanel.setPreferredSize(new Dimension(200, 40));
