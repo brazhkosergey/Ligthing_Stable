@@ -1,18 +1,19 @@
 import entity.HideZoneLightingSearcher;
-import ui.setting.SarcophagusSettingPanel;
-import ui.setting.Setting;
 
-import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 
 public class Test {
 
     public static void main(String[] args) {
-        File file = new File("C:\\LIGHTNING_STABLE\\bytes\\1537688884305");
-        File fileSmall = new File("C:\\LIGHTNING_STABLE\\bytes\\1537561021388");
 
-        HideZoneLightingSearcher.addHideZoneAreaName(file);
-        HideZoneLightingSearcher.addHideZoneAreaName(fileSmall);
+        int degree= 60;
+        double radDegree = (double) degree/180*Math.PI;
+
+        System.out.println("Degree - "+ radDegree);
+        double tan = Math.tan(radDegree);
+        System.out.println("Tangens - "+tan);
+        System.out.println("Degree - "+Math.atan(tan));
+
+
     }
 }

@@ -1,9 +1,11 @@
 package ui.setting;
 
+import entity.HideZoneLightingSearcher;
 import entity.Storage.Storage;
 import org.apache.log4j.Logger;
 import ui.camera.CameraPanel;
 import ui.main.MainFrame;
+import ui.video.HideZoneMainPanel;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -11,6 +13,9 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * setting panel
@@ -471,8 +476,8 @@ public class Setting extends JPanel {
         hideZoneIdentificationAccuracyComparePixelsSlider.setPreferredSize(new Dimension(370, 28));
         hideZoneIdentificationAccuracyComparePixelsSlider.setMinorTickSpacing(1);
         hideZoneIdentificationAccuracyComparePixelsSlider.setPaintTicks(true);
-        hideZoneIdentificationAccuracyComparePixelsSlider.setMinimum(5);
-        hideZoneIdentificationAccuracyComparePixelsSlider.setMaximum(30);
+        hideZoneIdentificationAccuracyComparePixelsSlider.setMinimum(0);
+        hideZoneIdentificationAccuracyComparePixelsSlider.setMaximum(5);
         hideZoneIdentificationAccuracyComparePixelsSlider.setValue(Storage.getAddressSaver().getHideZoneIdentificationAccuracyComparePixels());
         hideZoneIdentificationAccuracyComparePixelsSlider.addChangeListener((g) -> {
             hideZoneIdentificationAccuracyComparePixelsLabel.setText(Storage.getBundle().getString("hideZoneIdentificationAccuracyComparePixelsLabel") +
@@ -483,8 +488,6 @@ public class Setting extends JPanel {
         hideZoneAccuracyPanel.add(hideZoneIdentificationAccuracyCountOfFramesToAnaliseSlider);
         hideZoneAccuracyPanel.add(hideZoneIdentificationAccuracyComparePixelsLabel);
         hideZoneAccuracyPanel.add(hideZoneIdentificationAccuracyComparePixelsSlider);
-
-
         hideZoneSettingPanel.add(hideZoneAccuracyPanel);
     }
 
@@ -492,13 +495,14 @@ public class Setting extends JPanel {
      * set password panel every time to trying open setting
      */
     public void reSetPassword() {
-        this.removeAll();
-        this.add(passwordPane, BorderLayout.NORTH);
-        this.add(allSettingPane, BorderLayout.CENTER);
-        passwordTextField.setText("");
-        allSettingPane.setVisible(false);
-        passwordPane.setVisible(true);
-        wrongPasswordLabel.setVisible(false);
+
+//        this.removeAll();
+//        this.add(passwordPane, BorderLayout.NORTH);
+//        this.add(allSettingPane, BorderLayout.CENTER);
+//        passwordTextField.setText("");
+//        allSettingPane.setVisible(false);
+//        passwordPane.setVisible(true);
+//        wrongPasswordLabel.setVisible(false);
     }
 
     private class BackgroundPreViewPanel extends JPanel {
@@ -568,6 +572,7 @@ public class Setting extends JPanel {
     private class HideZoneLineMarkerPanel extends JPanel {
         private BufferedImage background;
         private int groupNumber;
+        BackgroundImagePanel backgroundImagePanel;
 
         public HideZoneLineMarkerPanel(BufferedImage background, int groupNumber) {
             this.background = background;
@@ -577,8 +582,7 @@ public class Setting extends JPanel {
         }
 
         private void buildPanel() {
-
-            BackgroundImagePanel backgroundImagePanel = new BackgroundImagePanel(background, groupNumber);
+            backgroundImagePanel = new BackgroundImagePanel(background, groupNumber);
             backgroundImagePanel.setPreferredSize(backgroundImagePanel.getDimension());
 
             BackgroundSettingListener backgroundSettingListener = new BackgroundSettingListener(backgroundImagePanel, backgroundImagePanel.getSourcePoints());
@@ -608,6 +612,38 @@ public class Setting extends JPanel {
             });
 
 
+            JButton testButton = new JButton("TESt");
+            testButton.addActionListener((df) -> {
+                Integer numberOfLinePoint = HideZoneLightingSearcher.getNumberOfLinePoint(Storage.getLinesForHideZoneParsing().get(1),
+                        Storage.getCameraGroups()[0].getBackGroundImage());
+                HideZoneLightingSearcher.getTest(Storage.getLinesForHideZoneParsing().get(1),
+                        Storage.getCameraGroups()[0].getBackGroundImage());
+                backgroundImagePanel.setTest(HideZoneLightingSearcher.getTest(Storage.getLinesForHideZoneParsing().get(1),
+                        Storage.getCameraGroups()[0].getBackGroundImage()));
+
+
+                String s1 = HideZoneLightingSearcher.calculateHideZoneNumber(1, 48,59);
+                String s3 = HideZoneLightingSearcher.calculateHideZoneNumber(3, 42,58);
+                System.out.println( "Zone nubmer 1 - "+s1);
+                System.out.println( "Zone nubmer 3 - "+s3);
+
+                HideZoneMainPanel hideZoneMainPanel = new HideZoneMainPanel(false, s3, new Date(System.currentTimeMillis()));
+                MainFrame.setCentralPanel(hideZoneMainPanel);
+
+
+//                int numberOfFrame = 173;
+//                File folder = new File("C:\\LIGHTNING_STABLE\\bytes\\1537946599151{NO DATA,NO DATA,NO DATA,NO DATA}\\1(26)[108,173,251,286]");
+//
+//                List<BufferedImage> framesWithLightning = HideZoneLightingSearcher.getFramesWithLightning(folder, numberOfFrame, 0);
+//                System.out.println(framesWithLightning.size());
+//
+//                BufferedImage mostWhiteImage = HideZoneLightingSearcher.getMostWhiteImage(framesWithLightning);
+//                backgroundImagePanel.setBufferedImage(mostWhiteImage);
+//                this.revalidate();
+//                this.repaint();
+            });
+
+            westPanel.add(testButton, BorderLayout.CENTER);
             westPanel.add(saveButton, BorderLayout.NORTH);
             westPanel.add(backButton, BorderLayout.SOUTH);
 

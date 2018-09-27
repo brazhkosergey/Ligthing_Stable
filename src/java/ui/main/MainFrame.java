@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.List;
 
 /**
- * App frame
+ * Main frame
  */
 public class MainFrame extends JFrame {
     private static Logger log = Logger.getLogger("file");
@@ -281,7 +281,7 @@ public class MainFrame extends JFrame {
                 }
             }
         });
-        memoryUpdateThread.setName("Memory Update App Thread");
+        memoryUpdateThread.setName("Memory Update Main Thread");
         memoryUpdateThread.start();
 
         /*

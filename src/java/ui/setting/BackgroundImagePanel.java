@@ -19,6 +19,9 @@ public class BackgroundImagePanel extends JPanel {
     int lineSize = 3;
     boolean savePoints = false;
 
+    private List<int[]> test;
+
+
     public BackgroundImagePanel(BufferedImage bufferedImage, int groupNumber) {
         this.bufferedImage = bufferedImage;
         this.groupNumber = groupNumber;
@@ -40,6 +43,9 @@ public class BackgroundImagePanel extends JPanel {
         onePointToDrawLine = new double[2];
     }
 
+    public void setBufferedImage(BufferedImage bufferedImage) {
+        this.bufferedImage = bufferedImage;
+    }
 
     @Override
     public void paint(Graphics g) {
@@ -68,7 +74,7 @@ public class BackgroundImagePanel extends JPanel {
         g.setColor(Color.RED);
 
         for (int i = 0; i < sourcePoints.length; i++) {
-            g.fillOval(sourcePoints[i][0], sourcePoints[i][1] - 5, 10, 10);
+            g.fillOval(sourcePoints[i][0], sourcePoints[i][1] - 4, 6, 6);
             if (savePoints) {
                 int x = sourcePoints[i][0];
                 int y = sourcePoints[i][1];
@@ -80,9 +86,21 @@ public class BackgroundImagePanel extends JPanel {
         }
 
         if (savePoints) {
-            Storage.addLinePoint(groupNumber, linePointsToSave,true);
+            Storage.addLinePoint(groupNumber, linePointsToSave, true);
             savePoints = false;
         }
+
+        if (test != null) {
+            g.setColor(Color.blue);
+            for (int i = 0; i < test.size(); i++) {
+                g.fillOval(test.get(i)[0], test.get(i)[1], 2, 2);
+            }
+        }
+    }
+
+    public void setTest(List<int[]> test) {
+        this.test = test;
+        this.repaint();
     }
 
     public static void eval(double[] destX, double[][] coordinates, double tT) {

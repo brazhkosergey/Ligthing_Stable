@@ -153,7 +153,7 @@ public class VideoCreator {
             if (videoFiles != null) {
                 for (File file : videoFiles) {
                     if (!file.getName().contains("{")) {
-                        HideZoneLightingSearcher.addHideZoneAreaName(file);
+                        HideZoneLightingSearcher.findHideZoneAreaAndRenameFolder(file);
                     }
                 }
             }

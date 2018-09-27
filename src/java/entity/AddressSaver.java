@@ -73,6 +73,7 @@ public class AddressSaver {
     private int hideZoneIdentificationAccuracyComparePixels;
 
     private AddressSaver() {
+        lightSensitivity = 140;
         camerasPosition = new int[4][];
         camerasPosition[0] = new int[]{70, 90};
         camerasPosition[1] = new int[]{90, 140};
@@ -91,7 +92,7 @@ public class AddressSaver {
         }
 
         hideZoneIdentificationAccuracyCountOfFramesToAnalise = 1;
-        hideZoneIdentificationAccuracyComparePixels = 5;
+        hideZoneIdentificationAccuracyComparePixels = 1;
         PASS = "PASS";
     }
 

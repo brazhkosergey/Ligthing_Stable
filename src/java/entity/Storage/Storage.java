@@ -245,14 +245,13 @@ public class Storage {
         MainFrame.setColorLightNumberToFrame(colorLightNumber);
         Thread colorNumbersUpdateThread = new Thread(() -> {
             colorRGBNumberSet.clear();
-            for (int i = colorLightNumber; i < 250; i++) {
-                for (int k = colorLightNumber; k < 250; k++) {
-                    for (int g = colorLightNumber; g < 250; g++) {//238
+            for (int i = colorLightNumber; i < 256; i++) {
+                for (int k = colorLightNumber; k < 256; k++) {
+                    for (int g = colorLightNumber; g < 256; g++) {//238
                         if (i == 238 & k == 238 & g == 238) {
                             continue;
                         }
-                        Color color = new Color(i, k, g);
-                        int rgb = color.getRGB();
+                        int rgb = new Color(i, k, g).getRGB();
                         colorRGBNumberSet.add(rgb);
                     }
                 }
@@ -266,10 +265,6 @@ public class Storage {
 
     public static Set<Integer> getColorRGBNumberSet() {
         return colorRGBNumberSet;
-    }
-
-    public void setColorRGBNumberSet(Set<Integer> colorRGBNumberSet) {
-        this.colorRGBNumberSet = colorRGBNumberSet;
     }
 
     public static boolean isProgramLightCatchEnable() {

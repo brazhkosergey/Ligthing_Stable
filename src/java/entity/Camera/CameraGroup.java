@@ -92,7 +92,6 @@ public class CameraGroup {
 
     private boolean containProgramCatchLightning;
 
-
     public CameraGroup(int groupNumber) {
         this.groupNumber = groupNumber;
 
@@ -371,7 +370,6 @@ public class CameraGroup {
     public Camera[] getCameras() {
         return cameras;
     }
-
 
     void addImageBytes(long time, byte[] bytes) {
         while (dequeImagesTime.contains(time)) {
