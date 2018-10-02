@@ -18,9 +18,9 @@ public class HideZoneMainPanel extends JPanel {
 
     private String hideZoneName;
     private Date date;
-    SimpleDateFormat dateFormat;
+    private SimpleDateFormat dateFormat;
 
-    public HideZoneMainPanel(boolean player, String hideZoneName, Date date) {
+    HideZoneMainPanel(boolean player, String hideZoneName, Date date) {
         this.hideZoneName = hideZoneName;
         dateFormat = new SimpleDateFormat();
         dateFormat.applyPattern("yyyy.MM.dd HH.mm.ss");
@@ -62,10 +62,9 @@ public class HideZoneMainPanel extends JPanel {
             hideZonePanel = new HideZonePanel(null);
         }
 
-
         this.setLayout(new BorderLayout());
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(new Color(233,233,233));
+        mainPanel.setBackground(new Color(233, 233, 233));
 
 
         mainPanel.add(hideZonePanel);

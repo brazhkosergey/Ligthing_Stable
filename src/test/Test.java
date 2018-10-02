@@ -13,7 +13,6 @@ public class Test {
         double tan = Math.tan(radDegree);
         System.out.println("Tangens - "+tan);
         System.out.println("Degree - "+Math.atan(tan));
-
-
+        System.out.println(Math.toDegrees(Math.PI));
     }
 }

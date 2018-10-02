@@ -17,9 +17,10 @@ public class HideZonePanel extends JPanel {
 
     private Map<String, HideZoneArea> hideZoneAreaMap;
     private String[] hideZoneDetectedNames;
-
+    private boolean test;
 
     public HideZonePanel(String hideZoneName) {
+//        this.test = test;
         if (hideZoneName != null) {
             hideZoneDetectedNames = hideZoneName.split(",");
         }
@@ -62,18 +63,16 @@ public class HideZonePanel extends JPanel {
                 graphics2D.drawLine(x1OfPicture + x, y1OfPicture, x1OfPicture + x, y1OfPicture + pictureHeight);
             }
 
-            g.setFont(new Font(null, Font.BOLD, 15));
+            g.setFont(new Font(null, Font.BOLD, this.getHeight()/30));
+//            g.setFont(new Font(null, Font.BOLD, 15));
             char[] alphabet = new char[26];
             for (int i = 0; i < 26; i++) {
                 alphabet[i] = (char) ('a' + i);
             }
 
-
             int y;
             int numberOfLine = 0;
-
             int yOfLastZone = 0;
-
             for (int i = 86; i >= 0; i--) {
                 if ((i - 3) % 10 == 0 || i == 86 || i == 0) {
                     if (i == 0 || i == 86) {
@@ -125,7 +124,6 @@ public class HideZonePanel extends JPanel {
 
             int yOfProtectedZone = y1OfPicture + (34 * pictureHeight / 86);
             int heightOfProtectedZone = 28 * pictureHeight / 86;
-
 
             for (String hideZoneName : hideZoneDetectedNames) {
                 HideZoneArea hideZoneArea = hideZoneAreaMap.get(hideZoneName);

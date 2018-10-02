@@ -162,7 +162,6 @@ public class MainFrame extends JFrame {
 //        return listToReturn;
 //    }
 
-
     /**
      * starting application after choosing language
      */
@@ -297,7 +296,7 @@ public class MainFrame extends JFrame {
             while (true) {
                 try {
                     audioPacketCount.setForeground(new Color(29, 142, 27));
-                    setAlarmServerLabelColor(new Color(29, 142, 27));
+                    setAlarmServerLabelColor(Storage.getPort(),new Color(29, 142, 27));
                     log.info("Ждем сигнал сработки на порт - " + Storage.getPort());
                     Socket socket = ss.accept();
                     log.info("Получили сигнал сработки на порт " + Storage.getPort());
@@ -310,13 +309,62 @@ public class MainFrame extends JFrame {
                     } catch (InterruptedException e1) {
                         e1.printStackTrace();
                     }
-                    setAlarmServerLabelColor(Color.red);
+                    setAlarmServerLabelColor(Storage.getPort(),Color.red);
                     audioPacketCount.setForeground(Color.red);
                 }
             }
         });
         alarmThread.setName("Alarm Thread");
         alarmThread.start();
+
+
+        Thread additionaAlarmThread = new Thread(() -> {
+            ServerSocket ss = null;
+            BufferedReader in = null;
+            try {
+                ss = new ServerSocket(4001);
+                Socket socket = ss.accept();
+                in = new BufferedReader(
+                        new InputStreamReader(socket.getInputStream()));
+                while (true) {
+                    try {
+                        audioPacketCount.setForeground(new Color(29, 142, 27));
+                        setAlarmServerLabelColor(Storage.getPort(), new Color(29, 142, 27));
+                        log.info("Ждем сигнал сработки на порт - " + 4001);
+                        String inputLine = in.readLine();
+                        System.out.println("Входная строка " + inputLine);
+                        String[] parts = inputLine.split("\\s+");
+                        if (!parts[0].equals("flash") || parts.length <= 3 || !tryParseInt(parts[3]) || Integer.parseInt(parts[3]) != 0) {
+                            System.out.println("Не сработка");
+                            continue;
+                        }
+                        System.out.println("Cработка");
+                        VideoCreator.startCatchVideo(false);
+                    } catch (Exception e) {
+                        log.error(e.getLocalizedMessage());
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e1) {
+                            e1.printStackTrace();
+                        }
+                        setAlarmServerLabelColor(4001, Color.red);
+                        audioPacketCount.setForeground(Color.red);
+                    }
+                }
+            } catch (Exception e) {
+                log.error(e.getLocalizedMessage());
+            } finally {
+                try {
+                    in.close();
+                    ss.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        additionaAlarmThread.setName("Additional Alarm Thread");
+        additionaAlarmThread.start();
+
 
         List<File> folders = new ArrayList<>();
 
@@ -339,6 +387,18 @@ public class MainFrame extends JFrame {
             }
         }
     }
+
+
+    private boolean tryParseInt(String value) {
+        try {
+            Integer.parseInt(value);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+
 
     private void buildMainWindow() {
         buildNorthPanel();
@@ -574,10 +634,18 @@ public class MainFrame extends JFrame {
         changeWhiteLabel.repaint();
     }
 
-    private void setAlarmServerLabelColor(Color color) {
+//    private void setAlarmServerLabelColor(Color color) {
+//        eventServerPortLabel.setForeground(color);
+//        eventServerPortLabel.repaint();
+//    }
+
+
+    private void setAlarmServerLabelColor(int port, Color color) {
+        eventServerPortLabel.setText(Storage.getBundle().getString("portstring") + port);
         eventServerPortLabel.setForeground(color);
         eventServerPortLabel.repaint();
     }
+
 
     public static void setColorLightNumberToFrame(int colorLightNumber) {
         photosensitivityLabel.setText(Storage.getBundle().getString("photosensitivity") + colorLightNumber);

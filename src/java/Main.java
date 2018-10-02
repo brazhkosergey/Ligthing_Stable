@@ -16,8 +16,8 @@ public class Main {
 
         System.out.println("Выделенная память для приложения - " + maxMemory);
 
-        if (false) {
-//        if (maxMemory < 25000) {
+//        if (false) {
+        if (maxMemory < 25000) {
             log.info("Памяти не достаточно, перегружаем приложени, с указанием большего количества памяти.");
             System.out.println("Памяти не достаточно, перегружаем приложени, с указанием большего количества памяти.");
             String javaBin = "java ";

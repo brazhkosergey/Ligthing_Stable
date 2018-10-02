@@ -28,12 +28,13 @@ public class BackgroundImagePanel extends JPanel {
 
         sourcePoints = Storage.getLinePoints().get(groupNumber);
         if (sourcePoints == null) {
-            sourcePoints = new int[15][];
+            sourcePoints = new int[5][];
             int heightPanel = bufferedImage.getHeight();
             int widthPanel = bufferedImage.getWidth();
-            for (int i = 0; i < 15; i++) {
-                sourcePoints[i] = new int[]{widthPanel / 16 * i, heightPanel / 2};
+            for (int i = 0; i < 5; i++) {
+                sourcePoints[i] = new int[]{widthPanel / 6 * i, heightPanel / 2};
             }
+
         }
         pointsToDrawLine = new double[4][];
         for (int i = 1; i < 5; i++) {
@@ -54,7 +55,7 @@ public class BackgroundImagePanel extends JPanel {
         g.setColor(Color.GREEN);
 
         if (savePoints) {
-            linePointsToSave = new int[15][];
+            linePointsToSave = new int[5][];
         }
 
         for (int i = 0; i < sourcePoints.length; i++) {
@@ -64,7 +65,7 @@ public class BackgroundImagePanel extends JPanel {
                     pointsToDrawLine[j][0] = sourcePoints[pointNumber][0];
                     pointsToDrawLine[j][1] = sourcePoints[pointNumber][1];
                 }
-                for (double t = 0; t < 1; t += 0.001) {
+                for (double t = 0; t < 1; t += 0.01) {
                     eval(onePointToDrawLine, pointsToDrawLine, t);
                     g.fillRect((int) onePointToDrawLine[0], (int) onePointToDrawLine[1], lineSize, lineSize);
                 }
