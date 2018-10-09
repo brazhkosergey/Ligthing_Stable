@@ -5,6 +5,7 @@ import entity.Storage.Storage;
 import org.apache.log4j.Logger;
 import ui.camera.CameraPanel;
 import ui.main.MainFrame;
+import ui.video.HideZoneMainPanel;
 import ui.video.HideZonePanel;
 
 import javax.imageio.ImageIO;
@@ -13,6 +14,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * setting panel
@@ -40,7 +42,9 @@ public class Setting extends JPanel {
 
     private SarcophagusSettingPanel sarcophagusSettingPanel;
     private JButton testButton;
+    private JButton createTestImageButton;
     private Component testButtonRigidArea;
+
 
     private JLabel testLabel;
     private HideZonePanel hideZoneTestPanel;
@@ -230,9 +234,11 @@ public class Setting extends JPanel {
                     MainFrame.setTestMode(true);
                     testButton.setVisible(true);
                     testButtonRigidArea.setVisible(false);
+                    createTestImageButton.setVisible(true);
                 } else {
                     MainFrame.setTestMode(false);
                     testButton.setVisible(false);
+                    createTestImageButton.setVisible(false);
                     testButtonRigidArea.setVisible(true);
                 }
 
@@ -344,11 +350,6 @@ public class Setting extends JPanel {
             if (passwordString.length() > 1 && passwordString.compareTo(Storage.getPassword()) == 0) {
                 passwordPane.setVisible(false);
                 allSettingPane.setVisible(true);
-
-
-
-
-
             } else {
                 wrongPasswordLabel.setVisible(true);
             }
@@ -406,7 +407,6 @@ public class Setting extends JPanel {
             backgroundPreViewPanel.revalidate();
             backgroundPreViewPanel.repaint();
 
-
             if (testLabel != null || hideZoneTestPanel != null) {
                 if (testLabel != null) {
                     backgroundSettingPanel.remove(testLabel);
@@ -461,9 +461,10 @@ public class Setting extends JPanel {
 
         JLabel setCameraPositionLabel = new JLabel(Storage.getBundle().getString("setCameraPositionLabel"));
         setCameraPositionLabel.setFont(new Font(null, Font.BOLD, 13));
-        setCameraPositionLabel.setPreferredSize(new Dimension(187, 25));//257 = 70
+        setCameraPositionLabel.setPreferredSize(new Dimension(142, 25));//257 = 70
 
         JButton setCameraPositionButton = new JButton(Storage.getBundle().getString("editButton"));
+        setCameraPositionButton.setPreferredSize(new Dimension(94, 25));
         setCameraPositionButton.addActionListener((as) -> {
             this.removeAll();
             this.add(sarcophagusSettingPanel);
@@ -471,8 +472,8 @@ public class Setting extends JPanel {
             this.repaint();
         });
 
-        testButton = new JButton("TEST");
-        testButton.setPreferredSize(new Dimension(68, 25));
+        testButton = new JButton("T2");
+        testButton.setPreferredSize(new Dimension(55, 25));
         testButton.addActionListener((df) -> {
             String zoneNameTest = HideZoneLightingSearcher.getZoneNameTest();
             backgroundSettingPanel.remove(backgroundPreViewPanel);
@@ -483,9 +484,10 @@ public class Setting extends JPanel {
             if (testLabel != null) {
                 backgroundSettingPanel.remove(testLabel);
             }
-            if(zoneNameTest!=null){
+            if (zoneNameTest != null) {
                 if (zoneNameTest.length() < 5) {
-                    hideZoneTestPanel = new HideZonePanel(zoneNameTest);
+                    System.out.println("Test zone name is - "+zoneNameTest);
+                    hideZoneTestPanel = new HideZonePanel(zoneNameTest,false);
                     backgroundSettingPanel.add(hideZoneTestPanel,
                             BorderLayout.CENTER);
                 } else {
@@ -507,10 +509,17 @@ public class Setting extends JPanel {
             setting.revalidate();
             setting.repaint();
         });
-        testButtonRigidArea = Box.createRigidArea(new Dimension(68, 25));
+        testButtonRigidArea = Box.createRigidArea(new Dimension(115, 25));
         testButton.setVisible(false);
+        createTestImageButton = new JButton("T1");
+        createTestImageButton.setPreferredSize(new Dimension(55, 25));
+        createTestImageButton.setVisible(false);
+        createTestImageButton.addActionListener((asdf) -> {
+            MainFrame.setCentralPanel(new HideZoneMainPanel(true, "", null));
+        });
 
         cameraPositionSetting.add(setCameraPositionLabel);
+        cameraPositionSetting.add(createTestImageButton);
         cameraPositionSetting.add(testButton);
         cameraPositionSetting.add(testButtonRigidArea);
         cameraPositionSetting.add(setCameraPositionButton);
@@ -558,6 +567,7 @@ public class Setting extends JPanel {
         hideZoneAccuracyPanel.add(hideZoneIdentificationAccuracyComparePixelsSlider);
         hideZoneSettingPanel.add(hideZoneAccuracyPanel);
     }
+
     /**
      * set password panel every time to trying open setting
      */

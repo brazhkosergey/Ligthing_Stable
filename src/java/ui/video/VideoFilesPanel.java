@@ -175,7 +175,7 @@ public class VideoFilesPanel extends JPanel {
             showVideoButton.addActionListener((ActionEvent e) -> {
                 VideoPlayer.setShowVideoPlayer(true);
                 Date d = new Date(dataLong);
-                currentPlayer = new VideoPlayer(folderWithVideos, dateFormat.format(d),d, finalI);
+                currentPlayer = new VideoPlayer(folderWithVideos, dateFormat.format(d), d, finalI);
                 MainFrame.setCentralPanel(currentPlayer);
             });
 
@@ -187,7 +187,7 @@ public class VideoFilesPanel extends JPanel {
             hideZoneButton.setFocusable(false);
             String finalHideZoneName = hideZoneName;
             hideZoneButton.addActionListener((pf) -> {
-                MainFrame.setCentralPanel(new HideZoneMainPanel(false, finalHideZoneName,date));
+                MainFrame.setCentralPanel(new HideZoneMainPanel(false, finalHideZoneName, date));
             });
 
             deleteButton = new JButton("<html>&#10006</html>");
@@ -275,9 +275,23 @@ public class VideoFilesPanel extends JPanel {
             delButton.addActionListener((e) -> {
                 delButton.setVisible(false);
                 Thread thread = new Thread(() -> {
-
                     for (Integer groupNumber : filesVideoBytesMap.keySet()) {
                         File files = filesVideoBytesMap.get(groupNumber);
+
+                        String absolutePathToImage = files.getParentFile().getAbsolutePath() + "\\" + groupNumber + ".jpg";
+                        File imageFile = new File(absolutePathToImage);
+                        if (imageFile.exists()) {
+                            imageFile.delete();
+                        }
+
+                        String audioPath = files.getParentFile().getAbsolutePath() + ".wav";
+
+                        File audioFile = new File(audioPath);
+                        if (audioFile.exists()) {
+                            audioFile.delete();
+                        }
+
+
                         for (File file : files.listFiles()) {
                             file.delete();
                         }
@@ -285,21 +299,6 @@ public class VideoFilesPanel extends JPanel {
                         files.getParentFile().delete();
                     }
 
-
-//                    String absolutePathToImage = folderToDel.getAbsolutePath().replace(".tmp", ".jpg");
-//                    File imageFile = new File(absolutePathToImage);
-//                    if (imageFile.exists()) {
-//                        imageFile.delete();
-//                    }
-
-//                    String audioPath = Storage.getPath() + "\\bytes\\" + files.getN + ".wav";
-
-//                    long dateLong = Long.parseLong(filesVideoBytesMap.getName());
-
-//                    File audioFile = new File(audioPath);
-//                    if (audioFile.exists()) {
-//                        audioFile.delete();
-//                    }
                     showVideos();
                     okLabel.setVisible(true);
                     try {

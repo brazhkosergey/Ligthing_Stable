@@ -76,10 +76,10 @@ public class AddressSaver {
     private AddressSaver() {
         lightSensitivity = 140;
         camerasPosition = new int[4][];
-        camerasPosition[0] = new int[]{70, 90};
-        camerasPosition[1] = new int[]{90, 140};
-        camerasPosition[2] = new int[]{180, 150};
-        camerasPosition[3] = new int[]{30, 140};
+        camerasPosition[0] = new int[]{70, 90,91};
+        camerasPosition[1] = new int[]{90, 140,100};
+        camerasPosition[2] = new int[]{180, 150,100};
+        camerasPosition[3] = new int[]{30, 140,99};
         camerasViewAnglesTangens = new double[4][];
         distancesToSarcophagus = new double[4];
         setCamerasViewAnglesTangens();

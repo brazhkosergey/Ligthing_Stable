@@ -463,7 +463,7 @@ public class MainFrame extends JFrame {
             setting.saveButton.setForeground(Color.BLACK);
             setting.saveButton.setText(Storage.getBundle().getString("savebutton"));
             setting.reSetPassword();
-            setCentralPanel(setting);
+            setSettingPanel();
             mainLabel.setText(Storage.getBundle().getString("settingpage"));
         });
 
@@ -508,6 +508,10 @@ public class MainFrame extends JFrame {
 
         northPanel.add(recordSecondsLabel);
         northPanel.add(informPane);
+    }
+
+    public static void setSettingPanel(){
+        setCentralPanel(setting);
     }
 
     private void buildCentralPanel() {
@@ -633,12 +637,6 @@ public class MainFrame extends JFrame {
         changeWhiteLabel.setText((Storage.getBundle().getString("lightening") + percentDiffWhite + "%"));
         changeWhiteLabel.repaint();
     }
-
-//    private void setAlarmServerLabelColor(Color color) {
-//        eventServerPortLabel.setForeground(color);
-//        eventServerPortLabel.repaint();
-//    }
-
 
     private void setAlarmServerLabelColor(int port, Color color) {
         eventServerPortLabel.setText(Storage.getBundle().getString("portstring") + port);

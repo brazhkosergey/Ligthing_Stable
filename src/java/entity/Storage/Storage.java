@@ -85,7 +85,7 @@ public class Storage {
         colorRGBNumberSet = new HashSet<>();
         linePoints = new HashMap<>();
         linesForHideZoneParsing = new HashMap<>();
-        pixelsSizesForHideZoneParsingMap = new HashMap<>();
+        pixelsSizesForHideZoneParsingMap = new TreeMap<>();
         lengthOfViewArcMap = new HashMap<>();
     }
 
@@ -142,19 +142,19 @@ public class Storage {
         for (int i = 1; i < linesForHideZoneParsing.size(); i++) {
             int[] previousPoint = linesForHideZoneParsing.get(i - 1);
             int[] currentPoint = linesForHideZoneParsing.get(i);
-
             int horizontal = previousPoint[0] - currentPoint[0];
             int vertical = previousPoint[1] - currentPoint[1];
             double distanceBetweenPoints = Math.sqrt((Math.pow(horizontal, 2.0) +
                     Math.pow(vertical, 2.0)));
+
             System.out.println("Hor - " + horizontal + ". Ver - " + vertical + ". Dis - " + distanceBetweenPoints);
+
             distances[i - 1] = distanceBetweenPoints;
             totalLineLength += distanceBetweenPoints;
         }
 
         int x = linesForHideZoneParsing.get(0)[0] - linesForHideZoneParsing.get(linesForHideZoneParsing.size() - 1)[0];
         int y = linesForHideZoneParsing.get(0)[1] - linesForHideZoneParsing.get(linesForHideZoneParsing.size() - 1)[1];
-
 
         double ratio = lengthOfViewArc / totalLineLength;
         double distanceBetweenPoints = Math.sqrt((Math.pow(x, 2.0) +
@@ -168,6 +168,7 @@ public class Storage {
         System.out.println("Линия длинной - " + totalLineLength + " пикселей. По факту - " + distanceBetweenPoints +
                 ".Разница - " + (Math.abs(totalLineLength - distanceBetweenPoints)));
         System.out.println("========================================================================================");
+
         return distances;
     }
 

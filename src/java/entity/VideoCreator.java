@@ -142,26 +142,26 @@ public class VideoCreator {
         saveVideoEnable = false;
 
         Thread lookingForHideZoneLightingThread = new Thread(() -> {
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            File storageFolder = new File(Storage.getPath() + "\\bytes\\");
-            File[] videoFiles = storageFolder.listFiles();
-
-            if (videoFiles != null) {
-                for (File file : videoFiles) {
-                    if (!file.getName().contains("{")) {
-                        HideZoneLightingSearcher.findHideZoneAreaAndRenameFolder(file);
+            boolean renamed = false;
+            while (!renamed) {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                File storageFolder = new File(Storage.getPath() + "\\bytes\\");
+                File[] videoFiles = storageFolder.listFiles();
+                if (videoFiles != null) {
+                    for (File file : videoFiles) {
+                        if (!file.getName().contains("{")) {
+                            renamed = HideZoneLightingSearcher.findHideZoneAreaAndRenameFolder(file);
+                        }
                     }
                 }
             }
         });
         lookingForHideZoneLightingThread.start();
     }
-
-
 
 
     static void restartNewVideoFrame() {

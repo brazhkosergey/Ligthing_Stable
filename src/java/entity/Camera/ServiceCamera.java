@@ -21,8 +21,8 @@ public class ServiceCamera {
     private static Logger log = Logger.getLogger("file");
 
     public static void encodeVideoXuggle(File folderWithTemporaryFiles) {
-        String name = folderWithTemporaryFiles.getName();
-        String[] split = name.split("-");
+        String name = folderWithTemporaryFiles.getParentFile().getName();
+        String[] split = name.split("\\{");
         long dateLong = Long.parseLong(split[0]);
 
         Date date = new Date(dateLong);
@@ -54,28 +54,18 @@ public class ServiceCamera {
             }
         }
 
-        String[] fpsSplit = split[1].split("\\.");
-        String numberOfGroupCameraString = fpsSplit[0].substring(0, 1);
-        int integer = 0;
-
-        try {
-            integer = Integer.parseInt(numberOfGroupCameraString);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        int i = fpsSplit[0].indexOf(")");
-        String totalFpsString = fpsSplit[0].substring(2, i);
+        name = folderWithTemporaryFiles.getName();
+        String numberOfGroupCameraString = name.substring(0, 1);
+        int i = name.indexOf(")");
+        String totalFpsString = name.substring(2, i);
         int totalFPS = Integer.parseInt(totalFpsString);
-
 
         String path = Storage.getPath() + "\\" + dateString + ", group -" + numberOfGroupCameraString + ".mp4";
         log.info("Сохраняем видеофайл " + path);
         BufferedImage imageToConnect = null;
         boolean connectImage = false;
 
-
-        String absolutePathToImage = folderWithTemporaryFiles.getAbsolutePath().replace(".tmp", ".jpg");
+        String absolutePathToImage = folderWithTemporaryFiles.getParentFile().getAbsolutePath() + "\\" + numberOfGroupCameraString + ".jpg";
         File imageFile = new File(absolutePathToImage);
         if (imageFile.exists()) {
             try {

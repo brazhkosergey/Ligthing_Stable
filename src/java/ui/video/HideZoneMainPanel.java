@@ -1,5 +1,6 @@
 package ui.video;
 
+import entity.HideZoneLightingSearcher;
 import entity.Storage.Storage;
 import ui.main.MainFrame;
 
@@ -19,72 +20,99 @@ public class HideZoneMainPanel extends JPanel {
     private String hideZoneName;
     private Date date;
     private SimpleDateFormat dateFormat;
+    private HideZonePanel hideZonePanel;
 
-    HideZoneMainPanel(boolean player, String hideZoneName, Date date) {
+    public HideZoneMainPanel(boolean player, String hideZoneName, Date date) {
         this.hideZoneName = hideZoneName;
         dateFormat = new SimpleDateFormat();
         dateFormat.applyPattern("yyyy.MM.dd HH.mm.ss");
         this.date = date;
 
         JLabel infoLabel;
-        HideZonePanel hideZonePanel;
 
-        List<String> namesOfZoneWasDetected = new ArrayList<>();
-
-        if (hideZoneName.contains(",")) {
-            String[] split = hideZoneName.split(",");
-            for (String s : split) {
-                if (s.length() < 4) {
-                    namesOfZoneWasDetected.add(s);
+        if (date != null) {
+            List<String> namesOfZoneWasDetected = new ArrayList<>();
+            if (hideZoneName.contains(",")) {
+                String[] split = hideZoneName.split(",");
+                for (String s : split) {
+                    if (s.length() < 4) {
+                        namesOfZoneWasDetected.add(s);
+                    }
                 }
-            }
-        } else {
-            if (hideZoneName.length() < 4) {
-                namesOfZoneWasDetected.add(hideZoneName);
             } else {
-                namesOfZoneWasDetected = null;
-            }
-        }
-
-        if (namesOfZoneWasDetected != null && namesOfZoneWasDetected.size() > 0) {
-            StringBuilder stringBuilder = new StringBuilder();
-            for (int i = 0; i < namesOfZoneWasDetected.size(); i++) {
-                String s = namesOfZoneWasDetected.get(i);
-                stringBuilder.append(s);
-                if (i != namesOfZoneWasDetected.size() - 1) {
-                    stringBuilder.append(",");
+                if (hideZoneName.length() < 4) {
+                    namesOfZoneWasDetected.add(hideZoneName);
+                } else {
+                    namesOfZoneWasDetected = null;
                 }
             }
-            infoLabel = new JLabel(Storage.getBundle().getString("hidezonename") + stringBuilder.toString());
-            hideZonePanel = new HideZonePanel(stringBuilder.toString());
+
+            if (namesOfZoneWasDetected != null && namesOfZoneWasDetected.size() > 0) {
+                StringBuilder stringBuilder = new StringBuilder();
+                for (int i = 0; i < namesOfZoneWasDetected.size(); i++) {
+                    String s = namesOfZoneWasDetected.get(i);
+                    stringBuilder.append(s);
+                    if (i != namesOfZoneWasDetected.size() - 1) {
+                        stringBuilder.append(",");
+                    }
+                }
+                infoLabel = new JLabel(Storage.getBundle().getString("hidezonename") + stringBuilder.toString());
+                hideZonePanel = new HideZonePanel(stringBuilder.toString(), false);
+            } else {
+                infoLabel = new JLabel(Storage.getBundle().getString("nothidezonename"));
+                hideZonePanel = new HideZonePanel(null, false);
+            }
         } else {
-            infoLabel = new JLabel(Storage.getBundle().getString("nothidezonename"));
-            hideZonePanel = new HideZonePanel(null);
+            hideZonePanel = new HideZonePanel("test", true);
+            infoLabel = new JLabel("TEST MODE");
         }
 
         this.setLayout(new BorderLayout());
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(new Color(233, 233, 233));
-
-
         mainPanel.add(hideZonePanel);
-        JPanel southPanel = new JPanel(new BorderLayout());
 
+        JPanel southPanel = new JPanel(new BorderLayout());
         JButton backButton = new JButton("<html>&#11178</html>");
         backButton.setFont(new Font(null, Font.BOLD, 30));
         backButton.addActionListener((hf) -> {
-            if (player) {
-                VideoPlayer currentPlayer = VideoFilesPanel.getCurrentPlayer();
-                MainFrame.setCentralPanel(currentPlayer);
+            if (date != null) {
+                if (player) {
+                    VideoPlayer currentPlayer = VideoFilesPanel.getCurrentPlayer();
+                    MainFrame.setCentralPanel(currentPlayer);
+                } else {
+                    MainFrame.showVideoFilesPanel();
+                }
             } else {
-                MainFrame.showVideoFilesPanel();
+                System.out.println(" Ставим настрйоки ");
+                MainFrame.setSettingPanel();
             }
         });
 
         JButton saveButton = new JButton("<html>&#128190</html>");
         saveButton.setFont(new Font(null, Font.BOLD, 30));
         saveButton.addActionListener((actionEvent) -> {
-            saveImage();
+
+            if (date != null) {
+                saveImage();
+            } else {
+                String testZoneName = hideZonePanel.getTestZoneName();
+                if (testZoneName != null) {
+                    infoLabel.setText("Creating test image - " + testZoneName);
+                    Thread g = new Thread(() -> {
+                        try {
+                            Thread.sleep(1500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        HideZoneLightingSearcher.createTestImageForCameraThreeAndFour(testZoneName);
+                        infoLabel.setText("Images was created - " + testZoneName);
+                    });
+                    g.start();
+                } else {
+                    infoLabel.setText("Select hide zone");
+                }
+            }
         });
 
         infoLabel.setHorizontalAlignment(SwingConstants.CENTER);

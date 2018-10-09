@@ -8,24 +8,26 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 public class HideZonePanel extends JPanel {
-
     private Map<String, HideZoneArea> hideZoneAreaMap;
     private String[] hideZoneDetectedNames;
-    private boolean test;
+    private boolean testMode;
+    private int x1OfPicture;
+    private int y1OfPicture;
+    private String testZoneName;
 
-    public HideZonePanel(String hideZoneName) {
-//        this.test = test;
+    public HideZonePanel(String hideZoneName, boolean testMode) {
+        this.testMode = testMode;
+        if (testMode) {
+            this.addMouseListener(new MyListener(this));
+        }
         if (hideZoneName != null) {
             hideZoneDetectedNames = hideZoneName.split(",");
         }
-
-        hideZoneAreaMap = new HashMap<>();
+        hideZoneAreaMap = new TreeMap<>();
     }
 
     @Override
@@ -33,7 +35,6 @@ public class HideZonePanel extends JPanel {
         super.paint(g);
         int panelWidth = this.getWidth();
         int panelHeight = this.getHeight();
-
 
         if (hideZoneDetectedNames != null) {
             Graphics2D graphics2D = (Graphics2D) g;
@@ -49,8 +50,8 @@ public class HideZonePanel extends JPanel {
             int pictureHeight = (int) (proportions * hideZoneHeight);
             int pictureWidth = (int) (proportions * hideZoneWidth + circleDiameter);
 
-            int x1OfPicture = (panelWidth - pictureWidth) / 2;
-            int y1OfPicture = (panelHeight - pictureHeight) / 2;
+            x1OfPicture = (panelWidth - pictureWidth) / 2;
+            y1OfPicture = (panelHeight - pictureHeight) / 2;
 
             int x = 0;
             for (int i = 0; i <= 16; i++) {
@@ -63,8 +64,7 @@ public class HideZonePanel extends JPanel {
                 graphics2D.drawLine(x1OfPicture + x, y1OfPicture, x1OfPicture + x, y1OfPicture + pictureHeight);
             }
 
-            g.setFont(new Font(null, Font.BOLD, this.getHeight()/30));
-//            g.setFont(new Font(null, Font.BOLD, 15));
+            g.setFont(new Font(null, Font.BOLD, this.getHeight() / 30));
             char[] alphabet = new char[26];
             for (int i = 0; i < 26; i++) {
                 alphabet[i] = (char) ('a' + i);
@@ -125,22 +125,34 @@ public class HideZonePanel extends JPanel {
             int yOfProtectedZone = y1OfPicture + (34 * pictureHeight / 86);
             int heightOfProtectedZone = 28 * pictureHeight / 86;
 
-            for (String hideZoneName : hideZoneDetectedNames) {
-                HideZoneArea hideZoneArea = hideZoneAreaMap.get(hideZoneName);
-                if (hideZoneArea != null) {
-                    graphics2D.setColor(new Color(255, 211, 45, 200));
+            if (!testMode) {
+                for (String hideZoneName : hideZoneDetectedNames) {
+                    HideZoneArea hideZoneArea = hideZoneAreaMap.get(hideZoneName);
+                    if (hideZoneArea != null) {
+                        graphics2D.setColor(new Color(255, 211, 45, 200));
 
-                    int getYOfZone = hideZoneArea.getyOfZone();
-                    int heightOfZone = hideZoneArea.getHeightOfZone();
+                        int getYOfZone = hideZoneArea.getyOfZone();
+                        int heightOfZone = hideZoneArea.getHeightOfZone();
 
-                    graphics2D.fillRect(x1OfPicture + hideZoneArea.getxOfZone(), y1OfPicture + getYOfZone, hideZoneArea.getWidthOfZone(), heightOfZone);
+                        graphics2D.fillRect(x1OfPicture + hideZoneArea.getxOfZone(), y1OfPicture + getYOfZone, hideZoneArea.getWidthOfZone(), heightOfZone);
 
-                    if (hideZoneName.contains("f") ||
-                            hideZoneName.contains("e") ||
-                            hideZoneName.contains("d")) {
-                        graphics2D.fillOval(x1OfPicture + pictureWidth - circleDiameter,
-                                y1OfPicture + pictureHeight / 2 - circleDiameter / 2,
-                                circleDiameter, circleDiameter);
+                        if (hideZoneName.contains("f") ||
+                                hideZoneName.contains("e") ||
+                                hideZoneName.contains("d")) {
+                            graphics2D.fillOval(x1OfPicture + pictureWidth - circleDiameter,
+                                    y1OfPicture + pictureHeight / 2 - circleDiameter / 2,
+                                    circleDiameter, circleDiameter);
+                        }
+                    }
+                }
+            } else {
+                if (testZoneName != null) {
+                    HideZoneArea hideZoneArea = hideZoneAreaMap.get(testZoneName);
+                    if (hideZoneArea != null) {
+                        graphics2D.setColor(new Color(255, 211, 45, 200));
+                        int getYOfZone = hideZoneArea.getyOfZone();
+                        int heightOfZone = hideZoneArea.getHeightOfZone();
+                        graphics2D.fillRect(x1OfPicture + hideZoneArea.getxOfZone(), y1OfPicture + getYOfZone, hideZoneArea.getWidthOfZone(), heightOfZone);
                     }
                 }
             }
@@ -156,5 +168,56 @@ public class HideZonePanel extends JPanel {
             g.setFont(new Font(null, Font.BOLD, 100));
             g.drawString("\u2300", panelWidth / 2, panelHeight / 2);
         }
+    }
+
+    class MyListener implements MouseListener {
+
+        private HideZonePanel hideZonePanel;
+
+        private MyListener(HideZonePanel hideZonePanel) {
+            this.hideZonePanel = hideZonePanel;
+        }
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (e.getClickCount() > 1) {
+                int x = e.getX() - x1OfPicture;
+                int y = e.getY() - y1OfPicture;
+                for (String zoneName : hideZoneAreaMap.keySet()) {
+                    HideZoneArea hideZoneArea = hideZoneAreaMap.get(zoneName);
+                    if (x > hideZoneArea.getxOfZone() &&
+                            hideZoneArea.getxOfZone() + hideZoneArea.getWidthOfZone() > x &&
+                            hideZoneArea.getyOfZone() < y) {
+                        testZoneName = zoneName;
+                        hideZonePanel.repaint();
+                        break;
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+
+        }
+    }
+
+    public String getTestZoneName() {
+        return testZoneName;
     }
 }

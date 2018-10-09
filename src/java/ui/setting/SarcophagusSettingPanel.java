@@ -1,7 +1,6 @@
 package ui.setting;
 
 import entity.Storage.Storage;
-import ui.main.MainFrame;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,6 +21,13 @@ public class SarcophagusSettingPanel extends JPanel {
 
     private JTextField fourthCameraLeftRightTextField;
     private JTextField fourthCameraUpDownTextField;
+
+
+    private JTextField firstCameraHideZoneDistanceTextField;
+    private JTextField secondCameraHideZoneDistanceTextField;
+    private JTextField thirdCameraHideZoneDistanceTextField;
+    private JTextField fourthCameraHideZoneDistanceTextField;
+
 
     private MyKeyAdapter keyAdapter;
 
@@ -277,30 +283,87 @@ public class SarcophagusSettingPanel extends JPanel {
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.setBorder(BorderFactory.createEtchedBorder());
 
-        JLabel sarcophagusLabel = new JLabel();
-        sarcophagusLabel.setText(Storage.getBundle().getString("sarcophagus"));
-        sarcophagusLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        sarcophagusLabel.setVerticalAlignment(SwingConstants.CENTER);
-        sarcophagusLabel.setFont(commonFont);
-        centerPanel.add(sarcophagusLabel, BorderLayout.CENTER);
+        JPanel hideZoneLinePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        hideZoneLinePanel.setBorder(BorderFactory.createEtchedBorder());
+        JLabel hideZoneLabel = new JLabel(Storage.getBundle().getString("hidezoneborder"));
+        hideZoneLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        hideZoneLabel.setVerticalAlignment(SwingConstants.CENTER);
+        hideZoneLabel.setFont(commonFont);
+        hideZoneLinePanel.add(hideZoneLabel);
 
+
+        JPanel northHideZonePanel = new JPanel(new BorderLayout(2, 2));
+        JPanel firstCameraNorthHideZOnePAnel = new JPanel(new BorderLayout(2, 2));
+        firstCameraHideZoneDistanceTextField = new JTextField();
+        firstCameraHideZoneDistanceTextField.setPreferredSize(new Dimension(40, 25));
+        JLabel firstCameraDownLabel = new JLabel("\u2193");
+        firstCameraDownLabel.setFont(commonFont);
+        firstCameraDownLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        firstCameraDownLabel.setVerticalAlignment(SwingConstants.BOTTOM);
+        firstCameraNorthHideZOnePAnel.add(firstCameraHideZoneDistanceTextField, BorderLayout.WEST);
+        firstCameraNorthHideZOnePAnel.add(firstCameraDownLabel, BorderLayout.EAST);
+        JPanel secondCameraNorthHideZOnePAnel = new JPanel(new BorderLayout(2, 2));
+        secondCameraHideZoneDistanceTextField = new JTextField();
+        secondCameraHideZoneDistanceTextField.setPreferredSize(new Dimension(40, 25));
+        JLabel secondCameraDownLabel = new JLabel("\u2193");
+        secondCameraDownLabel.setFont(commonFont);
+        secondCameraDownLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        secondCameraDownLabel.setVerticalAlignment(SwingConstants.BOTTOM);
+        secondCameraNorthHideZOnePAnel.add(secondCameraHideZoneDistanceTextField, BorderLayout.EAST);
+        secondCameraNorthHideZOnePAnel.add(secondCameraDownLabel, BorderLayout.WEST);
+
+        northHideZonePanel.add(firstCameraNorthHideZOnePAnel, BorderLayout.WEST);
+        northHideZonePanel.add(secondCameraNorthHideZOnePAnel, BorderLayout.EAST);
+
+        JPanel southHideZonePanel = new JPanel(new BorderLayout(2, 2));
+        JPanel thirdCameraNorthHideZOnePAnel = new JPanel(new BorderLayout(2, 2));
+        thirdCameraHideZoneDistanceTextField = new JTextField();
+        thirdCameraHideZoneDistanceTextField.setPreferredSize(new Dimension(40, 25));
+        JLabel thirdCameraDownLabel = new JLabel("\u2191");
+        thirdCameraDownLabel.setFont(commonFont);
+        thirdCameraDownLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        thirdCameraDownLabel.setVerticalAlignment(SwingConstants.BOTTOM);
+        thirdCameraNorthHideZOnePAnel.add(thirdCameraHideZoneDistanceTextField, BorderLayout.WEST);
+        thirdCameraNorthHideZOnePAnel.add(thirdCameraDownLabel, BorderLayout.EAST);
+        JPanel fourthCameraNorthHideZOnePAnel = new JPanel(new BorderLayout(2, 2));
+        fourthCameraHideZoneDistanceTextField = new JTextField();
+        fourthCameraHideZoneDistanceTextField.setPreferredSize(new Dimension(40, 25));
+        JLabel fourthCameraDownLabel = new JLabel("\u2191");
+        fourthCameraDownLabel.setFont(commonFont);
+        fourthCameraDownLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        fourthCameraDownLabel.setVerticalAlignment(SwingConstants.BOTTOM);
+        fourthCameraNorthHideZOnePAnel.add(fourthCameraHideZoneDistanceTextField, BorderLayout.EAST);
+        fourthCameraNorthHideZOnePAnel.add(fourthCameraDownLabel, BorderLayout.WEST);
+
+        southHideZonePanel.add(thirdCameraNorthHideZOnePAnel, BorderLayout.WEST);
+        southHideZonePanel.add(fourthCameraNorthHideZOnePAnel, BorderLayout.EAST);
+
+        centerPanel.add(northHideZonePanel, BorderLayout.NORTH);
+        centerPanel.add(hideZoneLinePanel, BorderLayout.CENTER);
+        centerPanel.add(southHideZonePanel, BorderLayout.SOUTH);
 
         Font buttonFont = new Font(null, Font.BOLD, 50);
 
         JButton saveButton = new JButton("<html>&#128190</html>");
         saveButton.setFont(buttonFont);
         saveButton.addActionListener((af) -> {
-            int[][] position = new int[][]{new int[2], new int[2], new int[2], new int[2]};
+            int[][] position = new int[][]{new int[3], new int[3], new int[3], new int[3]};
             position[0][0] = Integer.parseInt(firstCameraLeftRightTextField.getText());
             position[0][1] = Integer.parseInt(firstCameraUpDownTextField.getText());
+            position[0][2] = Integer.parseInt(firstCameraHideZoneDistanceTextField.getText());
+
             position[1][0] = Integer.parseInt(secondCameraLeftRightTextField.getText());
             position[1][1] = Integer.parseInt(secondCameraUpDownTextField.getText());
+            position[1][2] = Integer.parseInt(secondCameraHideZoneDistanceTextField.getText());
 
             position[2][0] = Integer.parseInt(thirdCameraLeftRightTextField.getText());
             position[2][1] = Integer.parseInt(thirdCameraUpDownTextField.getText());
+            position[2][2] = Integer.parseInt(thirdCameraHideZoneDistanceTextField.getText());
 
             position[3][0] = Integer.parseInt(fourthCameraLeftRightTextField.getText());
             position[3][1] = Integer.parseInt(fourthCameraUpDownTextField.getText());
+            position[3][2] = Integer.parseInt(fourthCameraHideZoneDistanceTextField.getText());
+
             Storage.getAddressSaver().setCamerasPosition(position);
             saveButton.setForeground(new Color(47, 123, 21));
         });
@@ -332,6 +395,7 @@ public class SarcophagusSettingPanel extends JPanel {
     }
 
     public void setPosition(int[][] position) {
+
         firstCameraLeftRightTextField.setText(String.valueOf(position[0][0]));
         firstCameraUpDownTextField.setText(String.valueOf(position[0][1]));
 
@@ -344,6 +408,11 @@ public class SarcophagusSettingPanel extends JPanel {
         fourthCameraLeftRightTextField.setText(String.valueOf(position[3][0]));
         fourthCameraUpDownTextField.setText(String.valueOf(position[3][1]));
 
+        firstCameraHideZoneDistanceTextField.setText(String.valueOf(position[0][2]));
+        secondCameraHideZoneDistanceTextField.setText(String.valueOf(position[1][2]));
+        thirdCameraHideZoneDistanceTextField.setText(String.valueOf(position[2][2]));
+        fourthCameraHideZoneDistanceTextField.setText(String.valueOf(position[3][2]));
+
         firstCameraLeftRightTextField.addKeyListener(keyAdapter);
         firstCameraUpDownTextField.addKeyListener(keyAdapter);
         secondCameraLeftRightTextField.addKeyListener(keyAdapter);
@@ -352,6 +421,11 @@ public class SarcophagusSettingPanel extends JPanel {
         thirdCameraUpDownTextField.addKeyListener(keyAdapter);
         fourthCameraLeftRightTextField.addKeyListener(keyAdapter);
         fourthCameraUpDownTextField.addKeyListener(keyAdapter);
+
+        firstCameraHideZoneDistanceTextField.addKeyListener(keyAdapter);
+        secondCameraHideZoneDistanceTextField.addKeyListener(keyAdapter);
+        thirdCameraHideZoneDistanceTextField.addKeyListener(keyAdapter);
+        fourthCameraHideZoneDistanceTextField.addKeyListener(keyAdapter);
     }
 
 

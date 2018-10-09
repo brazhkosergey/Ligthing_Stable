@@ -1,9 +1,8 @@
 //package ui.camera;
 //
-//
-//import entity.VideoCreator;
-//import entity.Storage.Storage;
+//import entity.MainVideoCreator;
 //import org.apache.log4j.Logger;
+//import ui.main.MainFrame;
 //
 //import javax.imageio.ImageIO;
 //import java.awt.*;
@@ -18,7 +17,7 @@
 // * class to read bytes from camera
 // */
 //public class VideoCatcher {
-//    private static Logger log = Logger.getLogger("file");
+//    private static Logger log = Logger.getLogger(VideoCatcher.class);
 //
 //    /**
 //     * for counting fps from camera
@@ -40,7 +39,7 @@
 //    /**
 //     * save bytes from two or one camera to temporary files
 //     */
-//    private ui.camera.VideoBytesSaver videoBytesSaver;
+//    private VideoBytesSaver videoBytesSaver;
 //
 //    /**
 //     * camera url
@@ -97,8 +96,9 @@
 //     * @param videoBytesSaverForBoth - video creator for saving bytes from this cather camera
 //     */
 //    public VideoCatcher(CameraPanel cameraPanel, VideoBytesSaver videoBytesSaverForBoth) {
-//        setOfColorsRGBNumbers = Storage.getColorRGBNumberSet();
+//        setOfColorsRGBNumbers = MainFrame.getMainFrame().getColorRGBNumberSet();
 //        whiteDeque = new ConcurrentLinkedDeque<>();
+//        log.info("Создаем наблюдатель для камеры номер " + cameraPanel.getCameraNumber());
 //        fpsCountThread = new Thread(() -> {
 //            while (true) {
 //                if (catchVideo) {
@@ -158,7 +158,7 @@
 //                            showImage = true;
 //                        }
 //
-//                        int timeToSleep = 1000 / Storage.getShowFramesPercent();
+//                        int timeToSleep = 1000 / MainFrame.getShowFramesPercent();
 //                        int diff = timeToSleep - totalMillisecondsToShowFrame;
 //                        if (diff > 0) {
 //                            try {
@@ -169,7 +169,7 @@
 //                        }
 //                    }
 //                } else {
-//                    cameraPanel.getTitle().setTitle(Storage.getBundle().getString("cameradoesnotwork"));
+//                    cameraPanel.getTitle().setTitle(MainFrame.getBundle().getString("cameradoesnotwork"));
 //                    try {
 //                        Thread.sleep(2000);
 //                    } catch (InterruptedException e) {
@@ -183,7 +183,7 @@
 //        readBytesThread = new Thread(() -> {
 //            showImageToCameraPanelThread.start();
 //            fpsCountThread.start();
-////            log.info("Запускаем наблюдатель для камеры номер " + cameraPanel.getCameraNumber());
+//            log.info("Запускаем наблюдатель для камеры номер " + cameraPanel.getCameraNumber());
 //
 //            int x = 0;
 //            int t;
@@ -321,7 +321,7 @@
 //                if (!restart && catchVideo) {
 //                    createInputStream();
 //                } else {
-//                    cameraPanel.getTitle().setTitle(Storage.getBundle().getString("restoreconnection"));
+//                    cameraPanel.getTitle().setTitle(MainFrame.getBundle().getString("restoreconnection"));
 //                    cameraPanel.repaint();
 //                }
 //            }
@@ -339,12 +339,12 @@
 //    /**
 //     * used when program was started
 //     */
-////    public void start() {
-////        readBytesThread.setName("Save Stream Thread. Camera " + cameraPanel.getCameraNumber());
-////        showImageToCameraPanelThread.setName("Update Data Thread. Camera " + cameraPanel.getCameraNumber());
-////        fpsCountThread.setName("FPS CountThread. Camera " + cameraPanel.getCameraNumber());
-////        readBytesThread.start();
-////    }
+//    public void start() {
+//        readBytesThread.setName("Save Stream Thread. Camera " + cameraPanel.getCameraNumber());
+//        showImageToCameraPanelThread.setName("Update Data Thread. Camera " + cameraPanel.getCameraNumber());
+//        fpsCountThread.setName("FPS CountThread. Camera " + cameraPanel.getCameraNumber());
+//        readBytesThread.start();
+//    }
 //
 //
 //    /**
@@ -354,7 +354,7 @@
 //     * @return - the save frame after scanning
 //     */
 //    private BufferedImage scanCountOfWhitePixelsPercent(BufferedImage bi) {
-//        if (Storage.isProgramLightCatchEnable()) {
+//        if (MainFrame.isProgramLightCatchEnable()) {
 //            int countWhite = 0;
 //            for (int y = 0; y < bi.getHeight(); y += 2) {
 //                for (int x = 0; x < bi.getWidth(); x += 2) {
@@ -377,12 +377,12 @@
 //                        if (average != 0) {
 //                            int diffPercent = differentWhitePixelsAverage * 100 / average;
 //                            int abs = Math.abs(diffPercent);
-//                            int percentDiffWhiteFromSetting = Storage.getPercentDiffWhite();
+//                            int percentDiffWhiteFromSetting = MainFrame.getPercentDiffWhite();
 //                            if (percentWhiteDiff != percentDiffWhiteFromSetting) {
 //                                percentWhiteDiff = percentDiffWhiteFromSetting;
 //                            } else {
 //                                if (abs > percentWhiteDiff * 50) {
-//                                    VideoCreator.startCatchVideo(true);
+//                                    MainVideoCreator.startCatchVideo(true);
 //                                    whiteDeque.clear();
 //                                }
 //                            }
@@ -404,7 +404,7 @@
 //     *
 //     * @param color = color
 //     */
-//    public void setBorderColor(Color color) {
+//    void setBorderColor(Color color) {
 //        cameraPanel.getTitle().setTitleColor(color);
 //    }
 //
@@ -413,7 +413,8 @@
 //    }
 //
 //    public void stopCatchVideo() {
-//
+//        catchVideo = false;
+//        cameraPanel.stopShowVideo();
 //        url = null;
 //    }
 //

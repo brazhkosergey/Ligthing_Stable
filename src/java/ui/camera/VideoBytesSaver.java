@@ -1,9 +1,8 @@
 //package ui.camera;
 //
-//import entity.Storage.Storage;
-//import entity.VideoCreator;
-//import ui.main.MainFrame;
+//import entity.MainVideoCreator;
 //import org.apache.log4j.Logger;
+//import ui.main.MainFrame;
 //
 //import javax.imageio.ImageIO;
 //import java.awt.*;
@@ -19,8 +18,7 @@
 // * class for saving bytes from camera group (two cameras)
 // */
 //public class VideoBytesSaver {
-//
-//    private static Logger log = Logger.getLogger("file");
+//    private static Logger log = Logger.getLogger(VideoBytesSaver.class);
 //    /**
 //     * camera group number from 1 to 4
 //     */
@@ -166,7 +164,8 @@
 //                        fpsDeque.addFirst(totalFPS);
 //                        totalFPS = 0;
 //                        oneSecond = true;
-//                        secondsToSave = Storage.getSecondsToSave();
+//                        System.out.println(cameraGroupNumber + " Одна секунда - время: " + System.currentTimeMillis());
+//                        secondsToSave = MainFrame.getSecondsToSave();
 //
 //                        if (enableSaveVideo) {
 //                            stopSaveVideoInt++;
@@ -203,7 +202,7 @@
 //                        Thread saveFileThread = new Thread(() -> {
 //                            if (dequeImagesTime.size() > 0) {
 //                                int size = fpsDeque.size();
-//                                File temporaryFile = new File(Storage.getDefaultPath() + "\\buff\\" + cameraGroupNumber + "\\" + System.currentTimeMillis() + ".tmp");
+//                                File temporaryFile = new File(MainFrame.getDefaultPath() + "\\buff\\" + cameraGroupNumber + "\\" + System.currentTimeMillis() + ".tmp");
 //                                int countImagesInFile = 0;
 //                                try {
 //                                    if (temporaryFile.createNewFile()) {
@@ -226,7 +225,7 @@
 //                                                        } else {
 ////                                                            log.error(cameraGroupNumber+" Количество кадров - "+totalCountFrames);
 ////                                                            System.out.println(cameraGroupNumber+" Количество кадров - "+totalCountFrames);
-//                                                            totalCountFrames = totalCountFrames - 1;//in case when temporary stream was not converted to byte array, but was added null to collection
+//                                                            totalCountFrames = totalCountFrames-1;//in case when temporary stream was not converted to byte array, but was added null to collection
 ////                                                            log.error(cameraGroupNumber+" Потеряли кадр , байты пришли в виде НУЛЛ "+totalCountFrames);
 ////                                                            System.out.println(cameraGroupNumber+" Потеряли кадр , байты пришли в виде НУЛЛ "+totalCountFrames);
 //                                                        }
@@ -248,7 +247,7 @@
 //                                    log.error(e.getMessage());
 //                                    e.printStackTrace();
 //                                }
-//                                File file = new File(Storage.getDefaultPath() + "\\buff\\" + cameraGroupNumber + "\\"
+//                                File file = new File(MainFrame.getDefaultPath() + "\\buff\\" + cameraGroupNumber + "\\"
 //                                        + System.currentTimeMillis() + "-" + countImagesInFile + ".tmp");
 //                                if (temporaryFile.renameTo(file)) {
 //                                    fileDeque.addFirst(file);
@@ -259,7 +258,7 @@
 //                            if (enableSaveVideo) {
 //                                if (stopSaveVideoInt >= secondsToSave && totalCountFrames > 0) {
 //                                    stopSaveVideoInt = 0;
-//                                    VideoCreator.stopCatchVideo(containProgramCatchLightning);
+//                                    MainVideoCreator.stopCatchVideo(containProgramCatchLightning);
 //
 //                                    containProgramCatchLightning = false;
 //
@@ -298,10 +297,9 @@
 //                                    totalFPSForFile = (int) (d + 0.5);
 //
 //                                    String eventPercent = stringBuilder.toString();
-//                                    String path = Storage.getPath() + "\\bytes\\" + date.getTime() +
+//                                    String path = MainFrame.getPath() + "\\bytes\\" + date.getTime() +
 //                                            "-" + cameraGroupNumber + "(" + totalFPSForFile + ")"
-////                                            + eventPercent + ".tmp";
-//                                            + eventPercent;
+//                                            + eventPercent + ".tmp";
 //
 //                                    File destFolder = new File(path);
 //                                    int size = fileDeque.size();
@@ -325,19 +323,19 @@
 //                                        }
 //                                    }
 //
-////                                    BufferedImage image = MainFrame.imagesForBlock.get(cameraGroupNumber);
-////                                    if (image != null) {
-////                                        File imageFile = new File(MainFrame.getPath() + "\\bytes\\" + date.getTime() +
-////                                                "-" + cameraGroupNumber + "(" + totalFPSForFile + ")"
-////                                                + eventPercent + ".jpg");
-////                                        try {
-////                                            if (imageFile.createNewFile()) {
-////                                                ImageIO.write(image, "jpg", imageFile);
-////                                            }
-////                                        } catch (IOException e) {
-////                                            e.printStackTrace();
-////                                        }
-////                                    }
+//                                    BufferedImage image = MainFrame.imagesForBlock.get(cameraGroupNumber);
+//                                    if (image != null) {
+//                                        File imageFile = new File(MainFrame.getPath() + "\\bytes\\" + date.getTime() +
+//                                                "-" + cameraGroupNumber + "(" + totalFPSForFile + ")"
+//                                                + eventPercent + ".jpg");
+//                                        try {
+//                                            if (imageFile.createNewFile()) {
+//                                                ImageIO.write(image, "jpg", imageFile);
+//                                            }
+//                                        } catch (IOException e) {
+//                                            e.printStackTrace();
+//                                        }
+//                                    }
 //
 //                                    log.info("Сохранили файл. Группа - " + cameraGroupNumber + ". " +
 //                                            "Кадров - " + currentTotalCountImage + ". " +
@@ -347,7 +345,7 @@
 ////                                            "Кадров - " + currentTotalCountImage + ". " +
 ////                                            "Файлов в буфере " + size + ". " +
 ////                                            "Сохранили секунд " + secondsCount);
-//                                    System.out.println("Путь к файлу - " + path);
+////                                    System.out.println("Путь к файлу - " + path);
 //                                    enableSaveVideo = false;
 //                                }
 //                            } else {
@@ -386,7 +384,7 @@
 //                    }
 //                    oneSecond = false;
 //                } else {
-//                    VideoCreator.isSaveVideoEnable();
+//                    MainVideoCreator.isSaveVideoEnable();
 //                    try {
 //                        Thread.sleep(1);
 //                    } catch (InterruptedException e) {
@@ -438,6 +436,7 @@
 //
 //        if (work) {
 //            eventsFramesNumber.put(imageNumber, programEventDetection);
+////            if (dequeImagesTime.size() > 0) {
 //            if (!enableSaveVideo) {
 //                log.info("Начинаем запись. Группа " + cameraGroupNumber + ". Кадр номер - " + imageNumber + ". Время - " + System.currentTimeMillis());
 //                enableSaveVideo = true;
@@ -446,6 +445,8 @@
 //                log.info("Продлжаем запись. Группа " + cameraGroupNumber + ". Кадр номер - " + imageNumber + ". Время - " + System.currentTimeMillis());
 //                stopSaveVideoInt = 0;
 //            }
+////            }
+//            System.out.println(cameraGroupNumber + " - Начинаем сохранять, Время - " + System.currentTimeMillis() + ". Кадр номер - " + imageNumber);
 //        }
 //    }
 //

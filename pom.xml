@@ -43,7 +43,9 @@
             </plugin>
         </plugins>
     </build>
+
     <dependencies>
+
         <dependency>
             <groupId>xuggle</groupId>
             <artifactId>xuggle-xuggler</artifactId>
@@ -59,7 +61,12 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.25</version>
+            <version>1.7.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.5</version>
         </dependency>
 
         <dependency>
@@ -83,4 +90,5 @@
             <version>1.1.1</version>
         </dependency>
     </dependencies>
+
 </project>

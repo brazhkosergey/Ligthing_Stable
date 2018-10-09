@@ -2,9 +2,6 @@ import org.apache.log4j.Logger;
 import ui.main.MainFrame;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
 
 public class Main {
     private static Logger log = Logger.getLogger("file");
@@ -16,8 +13,8 @@ public class Main {
 
         System.out.println("Выделенная память для приложения - " + maxMemory);
 
-//        if (false) {
-        if (maxMemory < 25000) {
+        if (false) {
+//        if (maxMemory < 25000) {
             log.info("Памяти не достаточно, перегружаем приложени, с указанием большего количества памяти.");
             System.out.println("Памяти не достаточно, перегружаем приложени, с указанием большего количества памяти.");
             String javaBin = "java ";
