@@ -76,10 +76,10 @@ public class AddressSaver {
     private AddressSaver() {
         lightSensitivity = 140;
         camerasPosition = new int[4][];
-        camerasPosition[0] = new int[]{70, 90,91};
-        camerasPosition[1] = new int[]{90, 140,100};
-        camerasPosition[2] = new int[]{180, 150,100};
-        camerasPosition[3] = new int[]{30, 140,99};
+        camerasPosition[0] = new int[]{70, 90, 91};
+        camerasPosition[1] = new int[]{90, 140, 100};
+        camerasPosition[2] = new int[]{180, 150, 100};
+        camerasPosition[3] = new int[]{30, 140, 99};
         camerasViewAnglesTangens = new double[4][];
         distancesToSarcophagus = new double[4];
         setCamerasViewAnglesTangens();
@@ -268,25 +268,21 @@ public class AddressSaver {
         savePasswordSaverToFile();
     }
 
-    public void setCamerasViewAnglesTangens() {
-
+    private void setCamerasViewAnglesTangens() {
         for (int i = 0; i < camerasPosition.length; i++) {
             if (camerasViewAnglesTangens[i] == null) {
                 camerasViewAnglesTangens[i] = new double[2];
             }
 
-            int toHideZoneDistance = 87;
-            if (i > 1) {
-                toHideZoneDistance = 97;
-            }
-            camerasViewAnglesTangens[i][0] = (double) camerasPosition[i][0] / (camerasPosition[i][1] + toHideZoneDistance);
-            camerasViewAnglesTangens[i][1] = (double) (camerasPosition[i][0] + 160) / (camerasPosition[i][1] + toHideZoneDistance);
+            camerasViewAnglesTangens[i][0] = (double) camerasPosition[i][0] / (camerasPosition[i][1] + camerasPosition[i][2]);
+            camerasViewAnglesTangens[i][1] = (double) (camerasPosition[i][0] + 164) / (camerasPosition[i][1] + camerasPosition[i][2]);
         }
     }
 
     private void setCamerasDistanceToViewArc() {
         for (int groupNumber = 0; groupNumber < 4; groupNumber++) {
-            distancesToSarcophagus[groupNumber] = getCamerasPosition()[groupNumber][0] / Math.sin(getCamerasViewAnglesTangens()[groupNumber][0]);
+//            distancesToSarcophagus[groupNumber] = (double) getCamerasPosition()[groupNumber][0] / Math.sin(getCamerasViewAnglesTangens()[groupNumber][0]);
+            distancesToSarcophagus[groupNumber] = (double) getCamerasPosition()[groupNumber][0] / Math.sin(Math.atan(getCamerasViewAnglesTangens()[groupNumber][0]));
         }
     }
 

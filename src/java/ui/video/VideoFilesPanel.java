@@ -78,7 +78,6 @@ public class VideoFilesPanel extends JPanel {
                     if (fileName.contains("{")) {
                         fileName = fileName.split("\\{")[0];
 
-
                     }
 
                     long dataLong = Long.parseLong(fileName);
@@ -131,7 +130,6 @@ public class VideoFilesPanel extends JPanel {
                     if (folderFromOneCameraGroup.getParentFile().getName().contains("{")) {
                         hideZoneName = folderFromOneCameraGroup.getParentFile().getName().split("\\{")[1];
                         hideZoneName = hideZoneName.substring(0, hideZoneName.length() - 1);
-
                         if (hideZoneName.contains(",")) {
                             String[] split = hideZoneName.split(",");
                             for (String s : split) {
@@ -277,28 +275,22 @@ public class VideoFilesPanel extends JPanel {
                 Thread thread = new Thread(() -> {
                     for (Integer groupNumber : filesVideoBytesMap.keySet()) {
                         File files = filesVideoBytesMap.get(groupNumber);
-
                         String absolutePathToImage = files.getParentFile().getAbsolutePath() + "\\" + groupNumber + ".jpg";
                         File imageFile = new File(absolutePathToImage);
                         if (imageFile.exists()) {
                             imageFile.delete();
                         }
-
                         String audioPath = files.getParentFile().getAbsolutePath() + ".wav";
-
                         File audioFile = new File(audioPath);
                         if (audioFile.exists()) {
                             audioFile.delete();
                         }
-
-
                         for (File file : files.listFiles()) {
                             file.delete();
                         }
                         files.delete();
                         files.getParentFile().delete();
                     }
-
                     showVideos();
                     okLabel.setVisible(true);
                     try {
@@ -310,23 +302,15 @@ public class VideoFilesPanel extends JPanel {
                 });
                 thread.start();
             });
-
             JPanel buttonPanel = new JPanel(new FlowLayout());
             buttonPanel.setBorder(BorderFactory.createEtchedBorder());
             buttonPanel.setBackground(Color.LIGHT_GRAY);
-            buttonPanel.setPreferredSize(new
-
-                    Dimension(300, 100));
-            buttonPanel.add(Box.createRigidArea(new
-
-                    Dimension(250, 10)));
+            buttonPanel.setPreferredSize(new Dimension(300, 100));
+            buttonPanel.add(Box.createRigidArea(new Dimension(250, 10)));
             buttonPanel.add(delButton);
             buttonPanel.add(okLabel);
-            this.
-
-                    add(buttonPanel);
+            this.add(buttonPanel);
         }
-
     }
 
     static VideoPlayer getCurrentPlayer() {

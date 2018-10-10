@@ -125,33 +125,16 @@ public class HideZoneMainPanel extends JPanel {
     }
 
     private void saveImage() {
-        BufferedImage image = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        BufferedImage image = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
         Graphics g = image.getGraphics();
         this.paint(g);
         String pathToSave = Storage.getPath() + "\\hideZoneImages\\" + dateFormat.format(date) + " - " + hideZoneName + ".jpeg";
-        System.out.println(pathToSave);
         File fileImageToSave = new File(pathToSave);
         try {
             ImageIO.write(image, "jpeg", fileImageToSave);
+            MainFrame.showInformMassage(Storage.getBundle().getString("savedbutton"), Color.GREEN);
         } catch (IOException ex) {
+            MainFrame.showInformMassage(Storage.getBundle().getString("cannotsaveinform"), Color.RED);
         }
-//        BufferedImage imagebuf = null;
-//        try {
-////            imagebuf = new Robot().createScreenCapture(this.getBounds());
-//            imagebuf = new Robot().createScreenCapture();
-//        } catch (AWTException e) {
-//            e.printStackTrace();
-//        }
-//        String pathToSave = Storage.getPath() + "\\hideZoneImages\\" + dateFormat.format(date) + " - " + hideZoneName + ".jpeg";
-//        System.out.println(pathToSave);
-//        File fileImageToSave = new File(pathToSave);
-//        try {
-//            boolean newFile = fileImageToSave.createNewFile();
-//            if (newFile) {
-//                ImageIO.write(imagebuf, "jpeg", fileImageToSave);
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 }

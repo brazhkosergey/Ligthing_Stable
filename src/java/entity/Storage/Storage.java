@@ -132,9 +132,9 @@ public class Storage {
         double angleIncrement = angleMax - angleMin;
 
         double distanceToSarcophagusRadius = Storage.getAddressSaver().getCamerasPosition()[groupNumber - 1][0] / Math.sin(angleMin);
-        double lengthOfViewArc = distanceToSarcophagusRadius * angleIncrement;
-        lengthOfViewArcMap.put(groupNumber, lengthOfViewArc);
+        double lengthOfViewArc = distanceToSarcophagusRadius * Math.sqrt(2 - 2 * Math.cos(angleIncrement));
 
+        lengthOfViewArcMap.put(groupNumber, lengthOfViewArc);
         double[] distances = new double[linesForHideZoneParsing.size()];
         double totalLineLength = 0.0;
 
@@ -146,9 +146,6 @@ public class Storage {
             int vertical = previousPoint[1] - currentPoint[1];
             double distanceBetweenPoints = Math.sqrt((Math.pow(horizontal, 2.0) +
                     Math.pow(vertical, 2.0)));
-
-            System.out.println("Hor - " + horizontal + ". Ver - " + vertical + ". Dis - " + distanceBetweenPoints);
-
             distances[i - 1] = distanceBetweenPoints;
             totalLineLength += distanceBetweenPoints;
         }
@@ -160,13 +157,16 @@ public class Storage {
         double distanceBetweenPoints = Math.sqrt((Math.pow(x, 2.0) +
                 Math.pow(y, 2.0)));
         double d;
+
         for (int i = 0; i < distances.length; i++) {
             d = distances[i];
             distances[i] = d * ratio;
         }
 
+        System.out.println(groupNumber + " Видимая зона длинна - " + lengthOfViewArc);
+        System.out.println(groupNumber + " Угол у основания - " + Math.toDegrees(angleIncrement));
         System.out.println("Линия длинной - " + totalLineLength + " пикселей. По факту - " + distanceBetweenPoints +
-                ".Разница - " + (Math.abs(totalLineLength - distanceBetweenPoints)));
+                ".Разница - " + (totalLineLength - distanceBetweenPoints));
         System.out.println("========================================================================================");
 
         return distances;
@@ -201,7 +201,6 @@ public class Storage {
                 }
             }
         }
-
         pixelsSizesForHideZoneParsingMap.put(groupNumber, getPixelsSizesForHideZoneParsing(groupNumber, listToReturn));
         return listToReturn;
     }

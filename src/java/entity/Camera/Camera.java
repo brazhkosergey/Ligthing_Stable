@@ -186,14 +186,12 @@ public class Camera {
                                 temporaryStream.write(t);
                                 temporaryStream.write(x);
                             } else if (x == 217 && t == 255) {//конец изображения
-                                long timeOfImageReceive = System.currentTimeMillis();
                                 byte[] bytes = temporaryStream.toByteArray();
-
                                 if (showImage) {
                                     bytesForImagesToShowDeque.addFirst(bytes);
                                     showImage = false;
                                 }
-                                cameraGroup.addImageBytes(timeOfImageReceive, bytes);
+                                cameraGroup.addImageBytes(System.currentTimeMillis(), bytes);
                                 fps++;
                             }
                         }
@@ -257,7 +255,6 @@ public class Camera {
     public int getNumber() {
         return number;
     }
-
 
     private BufferedImage scanCountOfWhitePixelsPercent(BufferedImage bi) {
         if (Storage.isProgramLightCatchEnable()) {

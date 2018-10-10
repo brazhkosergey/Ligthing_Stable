@@ -159,11 +159,9 @@ public class CameraGroup {
         });
         timerThread.setName("VideoCreatorTimer Thread " + groupNumber);
         timerThread.start();
-        /*
-      Thread to save image bytes to files
-     */ /**
-         * Thread to save image bytes to files
-         */Thread saveBytesThread = new Thread(() -> {
+
+        /*Thread to save image bytes to files*/
+        Thread saveBytesThread = new Thread(() -> {
             while (true) {
                 if (oneSecond) {
                     try {
@@ -191,12 +189,7 @@ public class CameraGroup {
                                                                 e.printStackTrace();
                                                             }
                                                         } else {
-//                                                            log.error(cameraGroupNumber+" Количество кадров - "+totalCountFrames);
-//                                                            System.out.println(cameraGroupNumber+" Количество кадров - "+totalCountFrames);
-
                                                             totalCountFrames -= 1;//in case when temporary stream was not converted to byte array, but was added null to collection
-//                                                            log.error(cameraGroupNumber+" Потеряли кадр , байты пришли в виде НУЛЛ "+totalCountFrames);
-//                                                            System.out.println(cameraGroupNumber+" Потеряли кадр , байты пришли в виде НУЛЛ "+totalCountFrames);
                                                         }
                                                     }
 //                                                    else {
@@ -304,11 +297,6 @@ public class CameraGroup {
                                             "Кадров - " + currentTotalCountImage + ". " +
                                             "Файлов в буфере " + size + ". " +
                                             "Сохранили секунд " + secondsCount);
-//                                    System.out.println("Сохранили файл. Группа - " + cameraGroupNumber + ". " +
-//                                            "Кадров - " + currentTotalCountImage + ". " +
-//                                            "Файлов в буфере " + size + ". " +
-//                                            "Сохранили секунд " + secondsCount);
-//                                    System.out.println("Путь к файлу - " + path);
                                     enableSaveVideo = false;
                                 }
                             } else {
@@ -321,7 +309,7 @@ public class CameraGroup {
                                                 totalCountFrames -= remove;//отнимаем количество кадров, которое было в временном файле, который удалили.
 
                                                 if (eventsFramesNumber.size() != 0) {
-                                                    Map<Integer, Boolean> temporaryMap = new HashMap<>();
+                                                    Map<Integer, Boolean> temporaryMap = new TreeMap<>();
                                                     for (Integer integer : eventsFramesNumber.keySet()) {
                                                         temporaryMap.put(integer - remove, eventsFramesNumber.get(integer));
                                                     }
