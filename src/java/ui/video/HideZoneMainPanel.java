@@ -100,11 +100,6 @@ public class HideZoneMainPanel extends JPanel {
                 if (testZoneName != null) {
                     infoLabel.setText("Creating test image - " + testZoneName);
                     Thread g = new Thread(() -> {
-                        try {
-                            Thread.sleep(1500);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
                         HideZoneLightingSearcher.createTestImageForCameraThreeAndFour(testZoneName);
                         infoLabel.setText("Images was created - " + testZoneName);
                     });

@@ -47,6 +47,7 @@ public class SarcophagusSettingPanel extends JPanel {
         JPanel northOutPanel = new JPanel(new BorderLayout());
         JPanel firstCameraPanel = new JPanel(new GridLayout(2, 2));
         firstCameraPanel.setBorder(BorderFactory.createEtchedBorder());
+
         JLabel firstCameraLabel = new JLabel("Camera 1");
         firstCameraLabel.setPreferredSize(new Dimension(100, 100));
         firstCameraLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -71,21 +72,43 @@ public class SarcophagusSettingPanel extends JPanel {
         firstCameraLeftRightTextField.setMaximumSize(new Dimension(40, 25));
         firstCameraLeftRightTextField.setHorizontalAlignment(SwingConstants.CENTER);
 
+        JLabel h1Label = new JLabel("h1");
+        h1Label.setPreferredSize(new Dimension(40, 25));
+        h1Label.setHorizontalAlignment(SwingConstants.CENTER);
+        h1Label.setAlignmentX(CENTER_ALIGNMENT);
+
+        JPanel firstCameraLeftRightInnerTextFieldPanel = new JPanel();
+        firstCameraLeftRightInnerTextFieldPanel.setLayout(new BoxLayout(firstCameraLeftRightInnerTextFieldPanel, BoxLayout.Y_AXIS));
+        firstCameraLeftRightInnerTextFieldPanel.add(h1Label);
+        firstCameraLeftRightInnerTextFieldPanel.add(firstCameraLeftRightTextField);
+
+
         JPanel firstCameraLeftRightTextFieldPanel = new JPanel();
         firstCameraLeftRightTextFieldPanel.setLayout(new BoxLayout(firstCameraLeftRightTextFieldPanel, BoxLayout.X_AXIS));
         firstCameraLeftRightTextFieldPanel.add(firstCameraLeft);
-        firstCameraLeftRightTextFieldPanel.add(firstCameraLeftRightTextField);
+        firstCameraLeftRightTextFieldPanel.add(firstCameraLeftRightInnerTextFieldPanel);
         firstCameraLeftRightTextFieldPanel.add(firstCameraRight);
 
         firstCameraUpDownTextField = new JTextField();
         firstCameraUpDownTextField.setMaximumSize(new Dimension(40, 25));
         firstCameraUpDownTextField.setHorizontalAlignment(SwingConstants.CENTER);
 
+        JLabel v1Label = new JLabel("v1 ");
+        v1Label.setHorizontalAlignment(SwingConstants.CENTER);
+        v1Label.setAlignmentX(CENTER_ALIGNMENT);
+
+        JPanel firstCameraUpDownInnerTextFieldPanel = new JPanel();
+        firstCameraUpDownInnerTextFieldPanel.setLayout(new BoxLayout(firstCameraUpDownInnerTextFieldPanel, BoxLayout.X_AXIS));
+        firstCameraUpDownInnerTextFieldPanel.add(v1Label);
+        firstCameraUpDownInnerTextFieldPanel.add(firstCameraUpDownTextField);
+
+
         JPanel firstCameraUpDownTextFieldPanel = new JPanel();
         firstCameraUpDownTextFieldPanel.setLayout(new BoxLayout(firstCameraUpDownTextFieldPanel, BoxLayout.Y_AXIS));
         firstCameraUpDownTextFieldPanel.add(firstCameraUp);
-        firstCameraUpDownTextFieldPanel.add(firstCameraUpDownTextField);
+        firstCameraUpDownTextFieldPanel.add(firstCameraUpDownInnerTextFieldPanel);
         firstCameraUpDownTextFieldPanel.add(firstCameraDown);
+
         JLabel firstCameraLastLabel = new JLabel("\u21D8");
         firstCameraLastLabel.setFont(commonFont);
         firstCameraLastLabel.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -122,10 +145,21 @@ public class SarcophagusSettingPanel extends JPanel {
         secondCameraLeftRightTextField.setMaximumSize(new Dimension(40, 25));
         secondCameraLeftRightTextField.setHorizontalAlignment(SwingConstants.CENTER);
 
+
+        JLabel h2Label = new JLabel("h2");
+        h2Label.setPreferredSize(new Dimension(40, 25));
+        h2Label.setHorizontalAlignment(SwingConstants.CENTER);
+        h2Label.setAlignmentX(CENTER_ALIGNMENT);
+
+        JPanel secondCameraLeftRightInnerTextFieldPanel = new JPanel();
+        secondCameraLeftRightInnerTextFieldPanel.setLayout(new BoxLayout(secondCameraLeftRightInnerTextFieldPanel, BoxLayout.Y_AXIS));
+        secondCameraLeftRightInnerTextFieldPanel.add(h2Label);
+        secondCameraLeftRightInnerTextFieldPanel.add(secondCameraLeftRightTextField);
+
         JPanel secondCameraLeftRightTextFieldPanel = new JPanel();
         secondCameraLeftRightTextFieldPanel.setLayout(new BoxLayout(secondCameraLeftRightTextFieldPanel, BoxLayout.X_AXIS));
         secondCameraLeftRightTextFieldPanel.add(secondCameraLeft);
-        secondCameraLeftRightTextFieldPanel.add(secondCameraLeftRightTextField);
+        secondCameraLeftRightTextFieldPanel.add(secondCameraLeftRightInnerTextFieldPanel);
         secondCameraLeftRightTextFieldPanel.add(secondCameraRight);
 
 
@@ -133,11 +167,19 @@ public class SarcophagusSettingPanel extends JPanel {
         secondCameraUpDownTextField.setMaximumSize(new Dimension(40, 25));
         secondCameraUpDownTextField.setHorizontalAlignment(SwingConstants.CENTER);
 
+        JLabel v2Label = new JLabel("v2 ");
+        v2Label.setHorizontalAlignment(SwingConstants.CENTER);
+        v2Label.setAlignmentX(CENTER_ALIGNMENT);
+
+        JPanel secondCameraUpDownInnerTextFieldPanel = new JPanel();
+        secondCameraUpDownInnerTextFieldPanel.setLayout(new BoxLayout(secondCameraUpDownInnerTextFieldPanel, BoxLayout.X_AXIS));
+        secondCameraUpDownInnerTextFieldPanel.add(v2Label);
+        secondCameraUpDownInnerTextFieldPanel.add(secondCameraUpDownTextField);
 
         JPanel secondCameraUpDownTextFieldPanel = new JPanel();
         secondCameraUpDownTextFieldPanel.setLayout(new BoxLayout(secondCameraUpDownTextFieldPanel, BoxLayout.Y_AXIS));
         secondCameraUpDownTextFieldPanel.add(secondCameraUp);
-        secondCameraUpDownTextFieldPanel.add(secondCameraUpDownTextField);
+        secondCameraUpDownTextFieldPanel.add(secondCameraUpDownInnerTextFieldPanel);
         secondCameraUpDownTextFieldPanel.add(secondCameraDown);
         JLabel secondCameraLastLabel = new JLabel("\u21D9");
         secondCameraLastLabel.setFont(commonFont);
@@ -162,8 +204,6 @@ public class SarcophagusSettingPanel extends JPanel {
         northOutPanel.add(secondCameraPanel, BorderLayout.EAST);
 
 
-//        ========================================================================
-//        ========================================================================
         JPanel southOutPanel = new JPanel(new BorderLayout());
 
         JPanel thirdCameraPanel = new JPanel(new GridLayout(2, 2));
@@ -192,10 +232,21 @@ public class SarcophagusSettingPanel extends JPanel {
         thirdCameraLeftRightTextField.setMaximumSize(new Dimension(40, 25));
         thirdCameraLeftRightTextField.setHorizontalAlignment(SwingConstants.CENTER);
 
+
+        JLabel h3Label = new JLabel("h3");
+        h3Label.setPreferredSize(new Dimension(40, 25));
+        h3Label.setHorizontalAlignment(SwingConstants.CENTER);
+        h3Label.setAlignmentX(CENTER_ALIGNMENT);
+
+        JPanel thirdCameraLeftRightInnerTextFieldPanel = new JPanel();
+        thirdCameraLeftRightInnerTextFieldPanel.setLayout(new BoxLayout(thirdCameraLeftRightInnerTextFieldPanel, BoxLayout.Y_AXIS));
+        thirdCameraLeftRightInnerTextFieldPanel.add(h3Label);
+        thirdCameraLeftRightInnerTextFieldPanel.add(thirdCameraLeftRightTextField);
+
         JPanel thirdCameraLeftRightTextFieldPanel = new JPanel();
         thirdCameraLeftRightTextFieldPanel.setLayout(new BoxLayout(thirdCameraLeftRightTextFieldPanel, BoxLayout.X_AXIS));
         thirdCameraLeftRightTextFieldPanel.add(thirdCameraLeft);
-        thirdCameraLeftRightTextFieldPanel.add(thirdCameraLeftRightTextField);
+        thirdCameraLeftRightTextFieldPanel.add(thirdCameraLeftRightInnerTextFieldPanel);
         thirdCameraLeftRightTextFieldPanel.add(thirdCameraRight);
 
 
@@ -203,10 +254,20 @@ public class SarcophagusSettingPanel extends JPanel {
         thirdCameraUpDownTextField.setMaximumSize(new Dimension(40, 25));
         thirdCameraUpDownTextField.setHorizontalAlignment(SwingConstants.CENTER);
 
+        JLabel v3Label = new JLabel("v3 ");
+        v3Label.setHorizontalAlignment(SwingConstants.CENTER);
+        v3Label.setAlignmentX(CENTER_ALIGNMENT);
+
+        JPanel thirdCameraUpDownInnerTextFieldPanel = new JPanel();
+        thirdCameraUpDownInnerTextFieldPanel.setLayout(new BoxLayout(thirdCameraUpDownInnerTextFieldPanel, BoxLayout.X_AXIS));
+        thirdCameraUpDownInnerTextFieldPanel.add(v3Label);
+        thirdCameraUpDownInnerTextFieldPanel.add(thirdCameraUpDownTextField);
+
+
         JPanel thirdCameraUpDownTextFieldPanel = new JPanel();
         thirdCameraUpDownTextFieldPanel.setLayout(new BoxLayout(thirdCameraUpDownTextFieldPanel, BoxLayout.Y_AXIS));
         thirdCameraUpDownTextFieldPanel.add(thirdCameraUp);
-        thirdCameraUpDownTextFieldPanel.add(thirdCameraUpDownTextField);
+        thirdCameraUpDownTextFieldPanel.add(thirdCameraUpDownInnerTextFieldPanel);
         thirdCameraUpDownTextFieldPanel.add(thirdCameraDown);
         JLabel thirdCameraLastLabel = new JLabel("\u21D6");
         thirdCameraLastLabel.setFont(commonFont);
@@ -244,27 +305,44 @@ public class SarcophagusSettingPanel extends JPanel {
         fourthCameraLeftRightTextField.setMaximumSize(new Dimension(40, 25));
         fourthCameraLeftRightTextField.setHorizontalAlignment(SwingConstants.CENTER);
 
+        JLabel h4Label = new JLabel("h4");
+        h4Label.setPreferredSize(new Dimension(40, 25));
+        h4Label.setHorizontalAlignment(SwingConstants.CENTER);
+        h4Label.setAlignmentX(CENTER_ALIGNMENT);
+
+        JPanel fourthCameraLeftRightInnerTextFieldPanel = new JPanel();
+        fourthCameraLeftRightInnerTextFieldPanel.setLayout(new BoxLayout(fourthCameraLeftRightInnerTextFieldPanel, BoxLayout.Y_AXIS));
+        fourthCameraLeftRightInnerTextFieldPanel.add(h4Label);
+        fourthCameraLeftRightInnerTextFieldPanel.add(fourthCameraLeftRightTextField);
+
         JPanel fourthCameraLeftRightTextFieldPanel = new JPanel();
         fourthCameraLeftRightTextFieldPanel.setLayout(new BoxLayout(fourthCameraLeftRightTextFieldPanel, BoxLayout.X_AXIS));
         fourthCameraLeftRightTextFieldPanel.add(fourthCameraLeft);
-        fourthCameraLeftRightTextFieldPanel.add(fourthCameraLeftRightTextField);
+        fourthCameraLeftRightTextFieldPanel.add(fourthCameraLeftRightInnerTextFieldPanel);
         fourthCameraLeftRightTextFieldPanel.add(fourthCameraRight);
-
 
         fourthCameraUpDownTextField = new JTextField();
         fourthCameraUpDownTextField.setMaximumSize(new Dimension(40, 25));
         fourthCameraUpDownTextField.setHorizontalAlignment(SwingConstants.CENTER);
 
+        JLabel v4Label = new JLabel("v4 ");
+        v4Label.setHorizontalAlignment(SwingConstants.CENTER);
+        v4Label.setAlignmentX(CENTER_ALIGNMENT);
+
+        JPanel fourthCameraUpDownInnerTextFieldPanel = new JPanel();
+        fourthCameraUpDownInnerTextFieldPanel.setLayout(new BoxLayout(fourthCameraUpDownInnerTextFieldPanel, BoxLayout.X_AXIS));
+        fourthCameraUpDownInnerTextFieldPanel.add(v4Label);
+        fourthCameraUpDownInnerTextFieldPanel.add(fourthCameraUpDownTextField);
+
         JPanel fourthCameraUpDownTextFieldPanel = new JPanel();
         fourthCameraUpDownTextFieldPanel.setLayout(new BoxLayout(fourthCameraUpDownTextFieldPanel, BoxLayout.Y_AXIS));
         fourthCameraUpDownTextFieldPanel.add(fourthCameraUp);
-        fourthCameraUpDownTextFieldPanel.add(fourthCameraUpDownTextField);
+        fourthCameraUpDownTextFieldPanel.add(fourthCameraUpDownInnerTextFieldPanel);
         fourthCameraUpDownTextFieldPanel.add(fourthCameraDown);
         JLabel fourthCameraLastLabel = new JLabel("\u21D7");
         fourthCameraLastLabel.setFont(commonFont);
         fourthCameraLastLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         fourthCameraLastLabel.setVerticalAlignment(SwingConstants.TOP);
-
 
         fourthCameraPanel.add(fourthCameraUpDownTextFieldPanel);
         fourthCameraPanel.add(fourthCameraLastLabel);
@@ -302,6 +380,9 @@ public class SarcophagusSettingPanel extends JPanel {
         firstCameraDownLabel.setVerticalAlignment(SwingConstants.BOTTOM);
         firstCameraNorthHideZOnePAnel.add(firstCameraHideZoneDistanceTextField, BorderLayout.WEST);
         firstCameraNorthHideZOnePAnel.add(firstCameraDownLabel, BorderLayout.EAST);
+        firstCameraNorthHideZOnePAnel.add(new JLabel("d1"));
+
+
         JPanel secondCameraNorthHideZOnePAnel = new JPanel(new BorderLayout(2, 2));
         secondCameraHideZoneDistanceTextField = new JTextField();
         secondCameraHideZoneDistanceTextField.setPreferredSize(new Dimension(40, 25));
@@ -311,6 +392,8 @@ public class SarcophagusSettingPanel extends JPanel {
         secondCameraDownLabel.setVerticalAlignment(SwingConstants.BOTTOM);
         secondCameraNorthHideZOnePAnel.add(secondCameraHideZoneDistanceTextField, BorderLayout.EAST);
         secondCameraNorthHideZOnePAnel.add(secondCameraDownLabel, BorderLayout.WEST);
+        secondCameraNorthHideZOnePAnel.add(new JLabel("d2"));
+
 
         northHideZonePanel.add(firstCameraNorthHideZOnePAnel, BorderLayout.WEST);
         northHideZonePanel.add(secondCameraNorthHideZOnePAnel, BorderLayout.EAST);
@@ -323,8 +406,10 @@ public class SarcophagusSettingPanel extends JPanel {
         thirdCameraDownLabel.setFont(commonFont);
         thirdCameraDownLabel.setHorizontalAlignment(SwingConstants.CENTER);
         thirdCameraDownLabel.setVerticalAlignment(SwingConstants.BOTTOM);
-        thirdCameraNorthHideZOnePAnel.add(thirdCameraHideZoneDistanceTextField, BorderLayout.WEST);
-        thirdCameraNorthHideZOnePAnel.add(thirdCameraDownLabel, BorderLayout.EAST);
+        thirdCameraNorthHideZOnePAnel.add(thirdCameraHideZoneDistanceTextField, BorderLayout.EAST);
+        thirdCameraNorthHideZOnePAnel.add(thirdCameraDownLabel, BorderLayout.WEST);
+        thirdCameraNorthHideZOnePAnel.add(new JLabel("d3"), BorderLayout.CENTER);
+
         JPanel fourthCameraNorthHideZOnePAnel = new JPanel(new BorderLayout(2, 2));
         fourthCameraHideZoneDistanceTextField = new JTextField();
         fourthCameraHideZoneDistanceTextField.setPreferredSize(new Dimension(40, 25));
@@ -332,11 +417,12 @@ public class SarcophagusSettingPanel extends JPanel {
         fourthCameraDownLabel.setFont(commonFont);
         fourthCameraDownLabel.setHorizontalAlignment(SwingConstants.CENTER);
         fourthCameraDownLabel.setVerticalAlignment(SwingConstants.BOTTOM);
-        fourthCameraNorthHideZOnePAnel.add(fourthCameraHideZoneDistanceTextField, BorderLayout.EAST);
-        fourthCameraNorthHideZOnePAnel.add(fourthCameraDownLabel, BorderLayout.WEST);
+        fourthCameraNorthHideZOnePAnel.add(fourthCameraHideZoneDistanceTextField, BorderLayout.WEST);
+        fourthCameraNorthHideZOnePAnel.add(fourthCameraDownLabel, BorderLayout.EAST);
+        fourthCameraNorthHideZOnePAnel.add(new JLabel("d4"));
 
-        southHideZonePanel.add(thirdCameraNorthHideZOnePAnel, BorderLayout.WEST);
-        southHideZonePanel.add(fourthCameraNorthHideZOnePAnel, BorderLayout.EAST);
+        southHideZonePanel.add(thirdCameraNorthHideZOnePAnel, BorderLayout.EAST);
+        southHideZonePanel.add(fourthCameraNorthHideZOnePAnel, BorderLayout.WEST);
 
         centerPanel.add(northHideZonePanel, BorderLayout.NORTH);
         centerPanel.add(hideZoneLinePanel, BorderLayout.CENTER);
@@ -394,7 +480,7 @@ public class SarcophagusSettingPanel extends JPanel {
         mainPanel.add(savePanel, BorderLayout.EAST);
     }
 
-    public void setPosition(int[][] position) {
+    private void setPosition(int[][] position) {
 
         firstCameraLeftRightTextField.setText(String.valueOf(position[0][0]));
         firstCameraUpDownTextField.setText(String.valueOf(position[0][1]));

@@ -486,8 +486,8 @@ public class Setting extends JPanel {
             }
             if (zoneNameTest != null) {
                 if (zoneNameTest.length() < 5) {
-                    System.out.println("Test zone name is - "+zoneNameTest);
-                    hideZoneTestPanel = new HideZonePanel(zoneNameTest,false);
+                    System.out.println("Test zone name is - " + zoneNameTest);
+                    hideZoneTestPanel = new HideZonePanel(zoneNameTest, false);
                     backgroundSettingPanel.add(hideZoneTestPanel,
                             BorderLayout.CENTER);
                 } else {
@@ -511,6 +511,7 @@ public class Setting extends JPanel {
         });
         testButtonRigidArea = Box.createRigidArea(new Dimension(115, 25));
         testButton.setVisible(false);
+
         createTestImageButton = new JButton("T1");
         createTestImageButton.setPreferredSize(new Dimension(55, 25));
         createTestImageButton.setVisible(false);

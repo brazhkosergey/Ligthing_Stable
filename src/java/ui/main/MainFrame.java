@@ -296,7 +296,7 @@ public class MainFrame extends JFrame {
             while (true) {
                 try {
                     audioPacketCount.setForeground(new Color(29, 142, 27));
-                    setAlarmServerLabelColor(Storage.getPort(),new Color(29, 142, 27));
+                    setAlarmServerLabelColor(Storage.getPort(), new Color(29, 142, 27));
                     log.info("Ждем сигнал сработки на порт - " + Storage.getPort());
                     Socket socket = ss.accept();
                     log.info("Получили сигнал сработки на порт " + Storage.getPort());
@@ -309,7 +309,7 @@ public class MainFrame extends JFrame {
                     } catch (InterruptedException e1) {
                         e1.printStackTrace();
                     }
-                    setAlarmServerLabelColor(Storage.getPort(),Color.red);
+                    setAlarmServerLabelColor(Storage.getPort(), Color.red);
                     audioPacketCount.setForeground(Color.red);
                 }
             }
@@ -397,7 +397,6 @@ public class MainFrame extends JFrame {
             return false;
         }
     }
-
 
 
     private void buildMainWindow() {
@@ -510,7 +509,7 @@ public class MainFrame extends JFrame {
         northPanel.add(informPane);
     }
 
-    public static void setSettingPanel(){
+    public static void setSettingPanel() {
         setCentralPanel(setting);
     }
 
@@ -566,7 +565,6 @@ public class MainFrame extends JFrame {
                 });
                 blockPanel.add(cameraPanel);
             }
-
             cameraBlock.put(groupNumber + 1, blockPanel);
             allCameraPanel.add(blockPanel);
         }
