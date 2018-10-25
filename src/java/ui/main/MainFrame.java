@@ -4,6 +4,7 @@ import entity.Camera.Camera;
 import entity.Camera.CameraGroup;
 import entity.VideoCreator;
 import entity.Storage.Storage;
+import javafx.scene.layout.Border;
 import ui.camera.CameraPanel;
 import ui.video.VideoPlayer;
 import ui.setting.CameraAddressSetting;
@@ -12,6 +13,7 @@ import ui.video.VideoFilesPanel;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -252,7 +254,6 @@ public class MainFrame extends JFrame {
                 if (writeLogs > 60) {
                     Runtime.getRuntime().gc();
                     long usedMemory = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576;
-                    log.info("Используем памяти " + usedMemory + " mb");
                     writeLogs = 0;
                 } else {
                     writeLogs++;
@@ -332,7 +333,6 @@ public class MainFrame extends JFrame {
                         setAlarmServerLabelColor(Storage.getPort(), new Color(29, 142, 27));
                         log.info("Ждем сигнал сработки на порт - " + 4001);
                         String inputLine = in.readLine();
-                        System.out.println("Входная строка " + inputLine);
                         String[] parts = inputLine.split("\\s+");
                         if (!parts[0].equals("flash") || parts.length <= 3 || !tryParseInt(parts[3]) || Integer.parseInt(parts[3]) != 0) {
                             System.out.println("Не сработка");
@@ -367,7 +367,6 @@ public class MainFrame extends JFrame {
 
 
         List<File> folders = new ArrayList<>();
-
         File imageHideZoneSaveFolder = new File(Storage.getDefaultPath() + "\\hideZoneImages\\");
         File fileAddressSaver = new File(Storage.getDefaultPath() + "\\data\\");
         File fileBuffBytes = new File(Storage.getPath() + "\\bytes\\");
@@ -388,7 +387,6 @@ public class MainFrame extends JFrame {
         }
     }
 
-
     private boolean tryParseInt(String value) {
         try {
             Integer.parseInt(value);
@@ -397,7 +395,6 @@ public class MainFrame extends JFrame {
             return false;
         }
     }
-
 
     private void buildMainWindow() {
         buildNorthPanel();
@@ -515,15 +512,103 @@ public class MainFrame extends JFrame {
 
     private void buildCentralPanel() {
         centralPanel.setLayout(new BorderLayout());
-        GridLayout gridLayout = new GridLayout(2, 2, 2, 2);
-        allCameraPanel = new JPanel();
-        allCameraPanel.setLayout(gridLayout);
-
+        allCameraPanel = new JPanel(new GridLayout(2, 2, 2, 2));
         CameraGroup[] cameraGroups = Storage.getCameraGroups();
+//        ===============================================================
+//        allCameraPanel = new JPanel(new BorderLayout());
+//
+//        for (int rowNumber = 0; rowNumber < 2; rowNumber++) {
+//            String rowPosition=null;
+//            switch (rowNumber) {
+//                case 0:
+//                    rowPosition = BorderLayout.WEST;
+//                    break;
+//                case 1:
+//                    rowPosition = BorderLayout.EAST;
+//                    break;
+//            }
+//
+////            JPanel rowPanel = new JPanel(new BorderLayout(2, 2));
+//            JPanel rowPanel = new JPanel(new GridLayout(2,1));
+//            for (int columnNumber = 0; columnNumber < 2; columnNumber++) {
+//                int groupNumber = 2 * rowNumber + columnNumber + 1;
+//                JPanel blockPanel = new JPanel(new GridLayout(1, 2));
+//                TitledBorder border = new TitledBorder(Storage.getBundle().getString("cameragroup") + " " + groupNumber);
+//                border.setTitleColor(Color.DARK_GRAY);
+//                border.setTitleJustification(TitledBorder.CENTER);
+//                blockPanel.setBorder(border);
+//
+//                for (int cameraNumber = 0; cameraNumber < 2; cameraNumber++) {
+//                    Camera camera = cameraGroups[groupNumber - 1].getCameras()[cameraNumber];
+//                    CameraPanel cameraPanel = new CameraPanel(camera);
+//                    cameraPanelsMap.put(camera.getNumber(), cameraPanel);
+//                    cameraPanel.addMouseListener(new MouseAdapter() {
+//                        @Override
+//                        public void mouseClicked(MouseEvent e) {
+//                            if (e.getClickCount() == 2) {
+//                                if (fullSize) {
+//                                    for (Integer cameraNumber : cameraPanelsMap.keySet()) {
+//                                        CameraPanel cameraPanel = cameraPanelsMap.get(cameraNumber);
+//                                        if (cameraPanel.isFullSizeEnable()) {
+//                                            cameraPanel.setFullSizeEnable(false);
+//                                            int blockNumber = (cameraNumber + 1) / 2;
+//                                            JPanel blockPanel = cameraBlock.get(blockNumber);
+//                                            if (cameraNumber % 2 == 0) {
+//                                                blockPanel.remove(cameraPanel);
+//                                                blockPanel.add(cameraPanel);
+//                                            } else {
+//                                                Component firstCamera = blockPanel.getComponent(0);
+//                                                blockPanel.removeAll();
+//                                                blockPanel.add(cameraPanel);
+//                                                blockPanel.add(firstCamera);
+//                                                blockPanel.validate();
+//                                            }
+//                                        }
+//                                    }
+//                                    setCentralPanel(allCameraPanel);
+//                                    fullSize = false;
+//                                    mainLabel.setText(Storage.getBundle().getString("mainpage"));
+//                                } else {
+//                                    cameraPanel.setFullSizeEnable(true);
+//                                    setCentralPanel(cameraPanel);
+//                                    fullSize = true;
+//                                }
+//                            }
+//                        }
+//                    });
+//                    blockPanel.add(cameraPanel);
+//                }
+//
+//                String columnPosition;
+//                if (groupNumber < 2 || groupNumber > 3) {
+//                    columnPosition = BorderLayout.NORTH;
+//                }else {
+//                    columnPosition = BorderLayout.SOUTH;
+//                }
+//                rowPanel.add(blockPanel);
+//                cameraBlock.put(groupNumber, blockPanel);
+//            }
+//            allCameraPanel.add(rowPanel,rowPosition);
+//        }
+//
+//        JPanel central= new JPanel();
+//        central.setPreferredSize(new Dimension(100,100));
+//        central.setBorder(BorderFactory.createEtchedBorder());
+//        allCameraPanel.add(central,BorderLayout.CENTER);
+//        =====================================================
+
         for (int groupNumber = 0; groupNumber < 4; groupNumber++) {
-            JPanel blockPanel;
-            blockPanel = new JPanel(new GridLayout(1, 2));
-            blockPanel.setBorder(BorderFactory.createEtchedBorder());
+            if (groupNumber == 2 && cameraBlock.size() == 2) {
+                groupNumber = 3;
+            }
+            if (cameraBlock.size() == 4) {
+                continue;
+            }
+            JPanel blockPanel = new JPanel(new GridLayout(1, 2));
+            TitledBorder border = new TitledBorder(Storage.getBundle().getString("cameragroup") + " " + (groupNumber + 1));
+            border.setTitleColor(Color.DARK_GRAY);
+            border.setTitleJustification(TitledBorder.CENTER);
+            blockPanel.setBorder(border);
 
             for (int cameraNumber = 0; cameraNumber < 2; cameraNumber++) {
                 Camera camera = cameraGroups[groupNumber].getCameras()[cameraNumber];
@@ -566,6 +651,9 @@ public class MainFrame extends JFrame {
                 blockPanel.add(cameraPanel);
             }
             cameraBlock.put(groupNumber + 1, blockPanel);
+            if (groupNumber == 3) {
+                groupNumber = 1;
+            }
             allCameraPanel.add(blockPanel);
         }
         centralPanel.add(allCameraPanel);

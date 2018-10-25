@@ -29,7 +29,6 @@ public class HideZoneMainPanel extends JPanel {
         this.date = date;
 
         JLabel infoLabel;
-
         if (date != null) {
             List<String> namesOfZoneWasDetected = new ArrayList<>();
             if (hideZoneName.contains(",")) {
@@ -73,8 +72,8 @@ public class HideZoneMainPanel extends JPanel {
         mainPanel.add(hideZonePanel);
 
         JPanel southPanel = new JPanel(new BorderLayout());
-        JButton backButton = new JButton("<html>&#11178</html>");
-        backButton.setFont(new Font(null, Font.BOLD, 30));
+        JButton backButton = new JButton(Storage.getBundle().getString("backbutton"));
+        backButton.setFont(new Font(null, Font.BOLD, 15));
         backButton.addActionListener((hf) -> {
             if (date != null) {
                 if (player) {
@@ -84,15 +83,13 @@ public class HideZoneMainPanel extends JPanel {
                     MainFrame.showVideoFilesPanel();
                 }
             } else {
-                System.out.println(" Ставим настрйоки ");
                 MainFrame.setSettingPanel();
             }
         });
 
-        JButton saveButton = new JButton("<html>&#128190</html>");
-        saveButton.setFont(new Font(null, Font.BOLD, 30));
+        JButton saveButton = new JButton(Storage.getBundle().getString("savebutton"));
+        saveButton.setFont(new Font(null, Font.BOLD, 15));
         saveButton.addActionListener((actionEvent) -> {
-
             if (date != null) {
                 saveImage();
             } else {
@@ -102,6 +99,7 @@ public class HideZoneMainPanel extends JPanel {
                     Thread g = new Thread(() -> {
                         HideZoneLightingSearcher.createTestImageForCameraThreeAndFour(testZoneName);
                         infoLabel.setText("Images was created - " + testZoneName);
+                        MainFrame.showInformMassage("Test " + testZoneName, Color.RED);
                     });
                     g.start();
                 } else {
@@ -115,8 +113,30 @@ public class HideZoneMainPanel extends JPanel {
         southPanel.add(infoLabel, BorderLayout.CENTER);
         southPanel.add(saveButton, BorderLayout.EAST);
 
+        JPanel westPanel = new JPanel(new BorderLayout());
+
+        JLabel l = new JLabel("\u2195");
+        l.setAlignmentX(CENTER_ALIGNMENT);
+        l.setHorizontalAlignment(SwingConstants.CENTER);
+        l.setFont(new Font(null, Font.BOLD, 100));
+
+        JLabel northLabel = new JLabel(Storage.getBundle().getString("north"));
+        northLabel.setFont(new Font(null, Font.BOLD, 20));
+        northLabel.setAlignmentX(CENTER_ALIGNMENT);
+        northLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JLabel southLabel = new JLabel(Storage.getBundle().getString("south"));
+        southLabel.setFont(new Font(null, Font.BOLD, 20));
+        southLabel.setAlignmentX(CENTER_ALIGNMENT);
+        southLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+        westPanel.add(l, BorderLayout.CENTER);
+        westPanel.add(northLabel, BorderLayout.NORTH);
+        westPanel.add(southLabel, BorderLayout.SOUTH);
+
         this.add(mainPanel, BorderLayout.CENTER);
         this.add(southPanel, BorderLayout.SOUTH);
+        this.add(westPanel, BorderLayout.WEST);
     }
 
     private void saveImage() {

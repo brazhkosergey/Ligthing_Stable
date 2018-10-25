@@ -10,13 +10,9 @@ public class Main {
         long maxMemory = Runtime.getRuntime().maxMemory() / (1024 * 1024);
 
         log.info("Выделенная память для приложения - " + maxMemory);
-
-        System.out.println("Выделенная память для приложения - " + maxMemory);
-
 //        if (false) {
         if (maxMemory < 25000) {
             log.info("Памяти не достаточно, перегружаем приложени, с указанием большего количества памяти.");
-            System.out.println("Памяти не достаточно, перегружаем приложени, с указанием большего количества памяти.");
             String javaBin = "java ";
             final File currentJar;
             try {
@@ -34,9 +30,7 @@ public class Main {
         maxMemory = Runtime.getRuntime().maxMemory() / (1024 * 1024);
 
         log.info("Выделенная память для приложения - " + maxMemory);
-        System.out.println("Выделенная память для приложения - " + maxMemory);
         log.info("Памяти достаточно.");
-        System.out.println("Памяти достаточно.");
         try {
             MainFrame.getMainFrame();
         } catch (Exception e) {
@@ -44,7 +38,6 @@ public class Main {
         } catch (Error error) {
             log.error(error.getLocalizedMessage());
         }
-
     }
 
     public static Logger getLog() {

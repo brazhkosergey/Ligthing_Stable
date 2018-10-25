@@ -74,18 +74,23 @@ public class HideZoneLightingSearcher {
             for (int i = 0; i < size; i++) {
                 Double[] angles = new Double[4];
                 for (int groupNumber = 1; groupNumber < 5; groupNumber++) {
-                    BufferedImage mostWhiteImage = getMostWhiteImage(getFramesWithLightning(foldersFromEachCameraMap.get(groupNumber),
-                            eventsNumbersMap.get(groupNumber).get(i)));
+                    List<Integer> integers = eventsNumbersMap.get(groupNumber);
                     Double angle = null;
-                    if (mostWhiteImage != null) {
-                        List<int[]> cameraLinePoints = Storage.getLinesForHideZoneParsing().get(groupNumber);
-                        if (cameraLinePoints == null) {
-                            log.error("No border hide zone for group number - " + i);
-                            continue;
+                    if (integers != null) {
+                        BufferedImage mostWhiteImage = getMostWhiteImage(getFramesWithLightning(foldersFromEachCameraMap.get(groupNumber),
+                                integers.get(i)));
+                        if (mostWhiteImage != null) {
+                            List<int[]> cameraLinePoints = Storage.getLinesForHideZoneParsing().get(groupNumber);
+                            if (cameraLinePoints == null) {
+                                log.error("No border hide zone for group number - " + i);
+                                continue;
+                            }
+                            Integer numberOfLinePointCutLightning = getNumberOfLinePoint(cameraLinePoints, mostWhiteImage);
+                            if (numberOfLinePointCutLightning != null) {
+                                int distanceFromBeginningSarcophagusToPlaceLightningCutLine = getDistanceFromBeginningSarcophagusToPlaceLightningCutLine(numberOfLinePointCutLightning, groupNumber);
+                                angle = getAngleFromCameraGroup(groupNumber, distanceFromBeginningSarcophagusToPlaceLightningCutLine);
+                            }
                         }
-                        Integer numberOfLinePointCutLightning = getNumberOfLinePoint(cameraLinePoints, mostWhiteImage);
-                        int distanceFromBeginningSarcophagusToPlaceLightningCutLine = getDistanceFromBeginningSarcophagusToPlaceLightningCutLine(numberOfLinePointCutLightning, groupNumber);
-                        angle = getAngleFromCameraGroup(groupNumber, distanceFromBeginningSarcophagusToPlaceLightningCutLine);
                     }
                     angles[groupNumber - 1] = angle;
                 }
@@ -181,10 +186,12 @@ public class HideZoneLightingSearcher {
                         numberOfHideZone = 17 - numberOfHideZone;
                     }
                 }
-
+                if (numberOfHideZone == 0) {
+                    numberOfHideZone++;
+                }
                 for (int letter = 0; letter < 10; letter++) {
                     if (i <= 1) {
-                        int zoneChar = 170 - letter * 10;
+                        int zoneChar = 175 - letter * 10;
                         if (distanceToLightning > zoneChar) {
                             letterOfZone = String.valueOf(alphabet[letter]);
                             zoneName = letterOfZone + numberOfHideZone;
@@ -209,6 +216,7 @@ public class HideZoneLightingSearcher {
             String s = names[i];
             if (s != null) {
                 log.info("Group number " + (i + 1) + " calculates zone number " + s);
+                System.out.println("Group number " + (i + 1) + " calculates zone number " + s);
                 if (zoneName == null) {
                     zoneName = s;
                 }
@@ -342,16 +350,18 @@ public class HideZoneLightingSearcher {
         BufferedImage imageToReturn = null;
         int countWhitePixels = 0;
         for (BufferedImage image : bufferedImageList) {
-            int countWhitePixelsCurrentImage = 0;
-            for (int y = 0; y < image.getHeight(); y++) {
-                for (int x = 0; x < image.getWidth(); x++) {
-                    if (Storage.getColorRGBNumberSet().contains(image.getRGB(x, y))) {
-                        countWhitePixelsCurrentImage++;
+            if (image != null) {
+                int countWhitePixelsCurrentImage = 0;
+                for (int y = 0; y < image.getHeight(); y++) {
+                    for (int x = 0; x < image.getWidth(); x++) {
+                        if (Storage.getColorRGBNumberSet().contains(image.getRGB(x, y))) {
+                            countWhitePixelsCurrentImage++;
+                        }
                     }
                 }
-            }
-            if (countWhitePixelsCurrentImage > countWhitePixels) {
-                imageToReturn = image;
+                if (countWhitePixelsCurrentImage > countWhitePixels) {
+                    imageToReturn = image;
+                }
             }
         }
         return imageToReturn;
@@ -402,10 +412,12 @@ public class HideZoneLightingSearcher {
             Double angle = null;
             if (testImage != null) {
                 List<int[]> cameraLinePoints = Storage.getLinesForHideZoneParsing().get(groupNumber);
-                Integer numberOfLinePointCutLightning = getNumberOfLinePoint(cameraLinePoints, testImage);
-                if (numberOfLinePointCutLightning != null) {
-                    int distanceFromBeginningSarcophagusToPlaceLightningCutLine = getDistanceFromBeginningSarcophagusToPlaceLightningCutLine(numberOfLinePointCutLightning, groupNumber);
-                    angle = getAngleFromCameraGroup(groupNumber, distanceFromBeginningSarcophagusToPlaceLightningCutLine);
+                if (cameraLinePoints != null) {
+                    Integer numberOfLinePointCutLightning = getNumberOfLinePoint(cameraLinePoints, testImage);
+                    if (numberOfLinePointCutLightning != null) {
+                        int distanceFromBeginningSarcophagusToPlaceLightningCutLine = getDistanceFromBeginningSarcophagusToPlaceLightningCutLine(numberOfLinePointCutLightning, groupNumber);
+                        angle = getAngleFromCameraGroup(groupNumber, distanceFromBeginningSarcophagusToPlaceLightningCutLine);
+                    }
                 }
             }
             angles[groupNumber - 1] = angle;
@@ -474,12 +486,11 @@ public class HideZoneLightingSearcher {
                         disPix += pixelsSizesForHideZoneParsing[i];
                         if (disPix > distanceToDraw) {
                             n = i;
-                            System.out.println(disPix + " > " + distanceToDraw);
                             break;
                         }
                     }
-                    int[] lightningPointOne = Storage.getLinesForHideZoneParsing().get(1).get(n);
-                    drawLightningToImage(backGroundImageOne, lightningPointOne[0], lightningPointOne[1], 1);
+                    int[] lightningPoint = Storage.getLinesForHideZoneParsing().get(1).get(n);
+                    drawLightningToImage(backGroundImageOne, lightningPoint[0], lightningPoint[1], 1);
                 }
             } else {
                 double atan = Math.atan((double) (camerasPosition[0][0] + k1LHorizontal) / (camerasPosition[0][1] + camerasPosition[0][2]));
@@ -514,7 +525,6 @@ public class HideZoneLightingSearcher {
             int k2sHorizontal = (int) (Math.tan(angleSecond) * k2sVertical);
             int k2LHorizontal = 164 - (numberInt * 10 - 5) - k2sHorizontal;
             if (k2LHorizontal > 0) {
-                System.out.println("Можем отрисовать линию CAMERA 2 - " + k2LHorizontal);
                 double lengthOfViewZone = Storage.getLengthOfViewArcMap().get(2);
                 double mainViewAngle = Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[1][1]) -
                         Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[1][0]);
@@ -528,12 +538,11 @@ public class HideZoneLightingSearcher {
                     disPix += pixelsSizesForHideZoneParsing[i];
                     if (disPix > distanceToDraw) {
                         n = i;
-                        System.out.println(disPix + " > " + distanceToDraw);
                         break;
                     }
                 }
-                int[] lightningPointOne = Storage.getLinesForHideZoneParsing().get(2).get(n);
-                drawLightningToImage(backGroundImageSecond, lightningPointOne[0], lightningPointOne[1], 2);
+                int[] lightningPointSecond = Storage.getLinesForHideZoneParsing().get(2).get(n);
+                drawLightningToImage(backGroundImageSecond, lightningPointSecond[0], lightningPointSecond[1], 2);
             } else {
                 double atan = Math.atan((double) (camerasPosition[1][0] + k2LHorizontal) / (camerasPosition[1][1] + camerasPosition[1][2]));
                 double deltaA = Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[1][0]) - atan;//в радианах
@@ -579,7 +588,6 @@ public class HideZoneLightingSearcher {
                     disPix += pixelsSizesForHideZoneParsing[i];
                     if (disPix > distanceToDraw) {
                         n = i;
-                        System.out.println(disPix + " > " + distanceToDraw);
                         break;
                     }
                 }
@@ -601,14 +609,11 @@ public class HideZoneLightingSearcher {
                             break;
                         }
                     }
-                    int[] lightningPointOne = Storage.getLinesForHideZoneParsing().get(3).get(n);
+                    int[] lightningPointThree = Storage.getLinesForHideZoneParsing().get(3).get(n);
                     List<int[]> list = Storage.getLinesForHideZoneParsing().get(3);
                     int[] lastPoint = list.get(list.size() - 1);
-                    disPix = Math.abs(lastPoint[0] - lightningPointOne[0]);
+                    disPix = Math.abs(lastPoint[0] - lightningPointThree[0]);
                     drawLightningToImage(backGroundImageOne, (int) (lastPoint[0] + disPix), lastPoint[1], 3);
-                    System.out.println("ANGLE - " + deltaA);
-                    System.out.println("Расстояние - " + distanceToDraw);
-                    System.out.println("Пикселей - " + disPix);
                 }
             }
 //            ======================================================================
@@ -654,10 +659,10 @@ public class HideZoneLightingSearcher {
                             break;
                         }
                     }
-                    int[] lightningPointOne = Storage.getLinesForHideZoneParsing().get(4).get(n);
+                    int[] lightningPointFourth = Storage.getLinesForHideZoneParsing().get(4).get(n);
                     List<int[]> list = Storage.getLinesForHideZoneParsing().get(4);
                     int[] firstPoint = list.get(0);
-                    disPix = Math.abs(firstPoint[0] - lightningPointOne[0]);
+                    disPix = Math.abs(firstPoint[0] - lightningPointFourth[0]);
                     drawLightningToImage(backGroundImageOne, (int) (firstPoint[0] - disPix), firstPoint[1], 4);
                 }
             }
@@ -676,84 +681,6 @@ public class HideZoneLightingSearcher {
         g.setStroke(pen1);
         g.setColor(Color.WHITE);
         g.drawLine(x, y, x, 0);
-//        g.drawLine(lightningPoint[0], lightningPoint[1], lightningPoint[0], 0);
         Storage.getCameraGroups()[groupNumber - 1].setBackGroundImage(image);
     }
-//    private static String calculateHideZoneNumber(int groupNumber,
-//                                                  int distanceFromBeginningSarcophagusToPlaceLightningCutLineFirst,
-//                                                  int distanceFromBeginningSarcophagusToPlaceLightningCutLineSecond) {
-//
-//        int[][] camerasPosition = Storage.getAddressSaver().getCamerasPosition();
-//        int sizeOfHideZone;//своя для первой и третьей камеры
-//        if (groupNumber == 1) {
-//            sizeOfHideZone = 171;
-//        } else {
-//            sizeOfHideZone = 179;
-//        }
-//
-//        double fistCameraСathetusOne = (double) (distanceFromBeginningSarcophagusToPlaceLightningCutLineFirst) + camerasPosition[groupNumber - 1][0];
-//        double fistCameraСathetusTwo = (double) camerasPosition[groupNumber - 1][1] + camerasPosition[groupNumber - 1][2];
-//        double secondCameraСathetusOne = (double) distanceFromBeginningSarcophagusToPlaceLightningCutLineSecond + camerasPosition[groupNumber][0];
-//        double secondCameraСathetusTwo = (double) camerasPosition[groupNumber][1] + camerasPosition[groupNumber][2];
-//
-//        double angleFirstCamera = Math.atan(fistCameraСathetusOne / fistCameraСathetusTwo);
-//        double angleSecondCamera = Math.atan(secondCameraСathetusOne / secondCameraСathetusTwo);
-//
-//        int distanceBetweenCameras = camerasPosition[groupNumber - 1][0] + camerasPosition[groupNumber][0] + 164;
-//        int diffBetweenCameras = camerasPosition[groupNumber - 1][1] - camerasPosition[groupNumber][1];
-//        int firstCameraDistanceToLightning = 0;
-//        int secondCameraDistanceToLightning = 0;
-//        int numberOfHideZone = 0;
-//
-//        double tanOne;
-//        double tanTwo;
-//
-//        for (double i = camerasPosition[groupNumber - 1][0]; i < distanceBetweenCameras; i += 0.1) {
-//            tanOne = Math.tan(angleFirstCamera);
-//            tanTwo = Math.tan(angleSecondCamera);
-//            firstCameraDistanceToLightning = (int) (i / tanOne);
-//            secondCameraDistanceToLightning = (int) ((distanceBetweenCameras - i) / tanTwo);
-//            int firstCameraTotalDistanceToLightning = firstCameraDistanceToLightning - diffBetweenCameras;
-//
-//            if (Math.abs(firstCameraTotalDistanceToLightning - secondCameraDistanceToLightning) < Storage.getAddressSaver().getHideZoneIdentificationAccuracy()) {
-//                numberOfHideZone = (int) ((i - (double) camerasPosition[groupNumber - 1][0]) / 10) + 1;
-//                if (groupNumber != 1) {
-//                    numberOfHideZone = 17 - numberOfHideZone;
-//                }
-//                break;
-//            }
-//        }
-//
-//        int distanceToLightning = firstCameraDistanceToLightning - camerasPosition[groupNumber - 1][1];
-//        String zoneName = null;
-//        char[] alphabet = new char[26];
-//        for (int i = 0; i < 26; i++) {
-//            alphabet[i] = (char) ('a' + i);
-//        }
-//
-//        if (distanceToLightning >= camerasPosition[groupNumber - 1][2] && distanceToLightning <= sizeOfHideZone) {
-//            String letterOfZone = null;
-//            for (int i = 0; i < 10; i++) {
-//                if (groupNumber == 1) {
-//                    int zoneChar = 170 - i * 10;
-//                    if (distanceToLightning > zoneChar) {
-//                        letterOfZone = String.valueOf(alphabet[i]);
-//                        zoneName = letterOfZone + numberOfHideZone;
-//                        break;
-//                    }
-//                } else {
-//                    int zoneCharSize = 180 - i * 10;
-//                    if (distanceToLightning > zoneCharSize) {
-//                        letterOfZone = String.valueOf(alphabet[9 - i]);
-//                        zoneName = letterOfZone + numberOfHideZone;
-//                        break;
-//                    }
-//                }
-//            }
-//        } else {
-//            log.error("Out of hide zone");
-//            System.out.println("Out of hide zone");
-//        }
-//        return zoneName;
-//    }
 }

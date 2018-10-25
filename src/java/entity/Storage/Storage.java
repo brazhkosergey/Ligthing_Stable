@@ -195,7 +195,8 @@ public class Storage {
                 }
 
 //                for (double t = 0; t < 1; t += 0.005) {
-                for (double t = 0; t < 1; t += 0.01) {
+//                for (double t = 0; t < 1; t += 0.01) {
+                for (double t = 0; t < 1; t += 0.005) {
                     BackgroundImagePanel.eval(onePointToDrawLine, pointsToDrawLine, t);
                     listToReturn.add(new int[]{(int) onePointToDrawLine[0], (int) onePointToDrawLine[1]});
                 }

@@ -65,7 +65,8 @@ public class BackgroundImagePanel extends JPanel {
                     pointsToDrawLine[j][0] = sourcePoints[pointNumber][0];
                     pointsToDrawLine[j][1] = sourcePoints[pointNumber][1];
                 }
-                for (double t = 0; t < 1; t += 0.01) {
+//                for (double t = 0; t < 1; t += 0.01) {
+                for (double t = 0; t < 1; t += 0.005) {
                     eval(onePointToDrawLine, pointsToDrawLine, t);
                     g.fillRect((int) onePointToDrawLine[0], (int) onePointToDrawLine[1], lineSize, lineSize);
                 }

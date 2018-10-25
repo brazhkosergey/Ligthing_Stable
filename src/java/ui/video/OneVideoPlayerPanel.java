@@ -384,12 +384,6 @@ class OneVideoPlayerPanel extends JPanel {
                             totalFramesToSave += framesInFiles.get(file);
                             filesToSave.add(file);
                         }
-
-//                        String name1 = folder.getName();
-//                        String[] split = name1.split("-");
-//                        long dateLong = Long.parseLong(split[0]);
-
-
                         String name = folder.getParentFile().getName();
                         String[] split = name.split("\\{");
                         long dateLong = Long.parseLong(split[0]);
@@ -399,29 +393,15 @@ class OneVideoPlayerPanel extends JPanel {
                         dateFormat.applyPattern("dd MMMM yyyy,HH-mm-ss");
                         String dateString = dateFormat.format(date);
 
-
-//
-//                        String[] fpsSplit = split[1].split("\\.");
-//
-//                        int i = fpsSplit[0].indexOf(")");
-
-
                         name = folder.getName();
                         String numberOfGroupCameraString = name.substring(0, 1);
                         int i = name.indexOf(")");
                         String totalFpsString = name.substring(2, i);
                         int totalFPS = Integer.parseInt(totalFpsString);
 
-//                        String totalFpsString = fpsSplit[0].substring(2, i);
-//                        int totalFPS = Integer.parseInt(totalFpsString);
-
                         BufferedImage imageToConnect = null;
-//                        String absolutePathToImage = folder.getAbsolutePath().replace(".tmp", ".jpg");
-
-
                         String absolutePathToImage = folder.getParentFile().getAbsolutePath() + "\\" + numberOfGroupCameraString + ".jpg";
                         System.out.println(absolutePathToImage);
-
 
                         File imageFile = new File(absolutePathToImage);
                         if (imageFile.exists()) {
@@ -464,7 +444,8 @@ class OneVideoPlayerPanel extends JPanel {
         totalExportPanel.add(partExportPanel);
 
         this.setLayout(new BorderLayout());
-        if (numberVideoPanel % 2 != 0) {
+        if (numberVideoPanel == 1||numberVideoPanel == 4) {
+//        if (numberVideoPanel % 2 != 0) {
             this.add(totalExportPanel, BorderLayout.WEST);
             this.add(videoPanel, BorderLayout.CENTER);
         } else {

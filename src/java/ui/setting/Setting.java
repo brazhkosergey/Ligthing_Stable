@@ -11,6 +11,8 @@ import ui.video.HideZonePanel;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -284,11 +286,6 @@ public class Setting extends JPanel {
                     }
                 }
 
-//                if (mkdirs) {
-//                    currentFolder.setText(path);
-//                    MainFrame.setPath(path);
-//                }
-
                 Storage.getAddressSaver().saveSetting(countSecondsToSaveVideo, programCatchEnableCheckBox.isSelected(),
                         changeWhitePercent, lightSensitivity, opacity, port, path, hideZoneIdentificationAccuracySlider.getValue(),
                         hideZoneIdentificationAccuracySlider.getValue());
@@ -306,7 +303,6 @@ public class Setting extends JPanel {
                 saveButton.setForeground(new Color(46, 139, 87));
             } catch (Exception exc) {
                 log.error(exc.getMessage());
-                MainFrame.showInformMassage("ERROR", Color.red);
             }
         });
 
@@ -343,6 +339,30 @@ public class Setting extends JPanel {
 
         passwordTextField = new JTextField();
         passwordTextField.setPreferredSize(new Dimension(150, 30));
+        passwordTextField.addKeyListener((new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    String passwordString = passwordTextField.getText();
+                    if (passwordString.length() > 1 && passwordString.compareTo(Storage.getPassword()) == 0) {
+                        passwordPane.setVisible(false);
+                        allSettingPane.setVisible(true);
+                    } else {
+                        wrongPasswordLabel.setVisible(true);
+                    }
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+
+            }
+        }));
         JButton passwordButton = new JButton(Storage.getBundle().getString("editpasswordbutton"));
         passwordButton.setPreferredSize(new Dimension(150, 30));
         passwordButton.addActionListener((e) -> {
@@ -486,7 +506,6 @@ public class Setting extends JPanel {
             }
             if (zoneNameTest != null) {
                 if (zoneNameTest.length() < 5) {
-                    System.out.println("Test zone name is - " + zoneNameTest);
                     hideZoneTestPanel = new HideZonePanel(zoneNameTest, false);
                     backgroundSettingPanel.add(hideZoneTestPanel,
                             BorderLayout.CENTER);
@@ -530,21 +549,21 @@ public class Setting extends JPanel {
         hideZoneAccuracyPanel.setBorder(BorderFactory.createEtchedBorder());
         hideZoneAccuracyPanel.setPreferredSize(new Dimension(375, 130));
 
-        JLabel hideZoneIdentificationAccuracyLabel = new JLabel(Storage.getBundle().getString("hideZoneIdentificationAccuracyLabel") +
-                " " + Storage.getAddressSaver().getHideZoneIdentificationAccuracy());
-        hideZoneIdentificationAccuracyLabel.setPreferredSize(new Dimension(370, 25));
-
-        hideZoneIdentificationAccuracySlider = new JSlider();
-        hideZoneIdentificationAccuracySlider.setPreferredSize(new Dimension(370, 28));
-        hideZoneIdentificationAccuracySlider.setMinorTickSpacing(1);
-        hideZoneIdentificationAccuracySlider.setPaintTicks(true);
-        hideZoneIdentificationAccuracySlider.setMinimum(5);
-        hideZoneIdentificationAccuracySlider.setMaximum(10);
-        hideZoneIdentificationAccuracySlider.setValue(Storage.getAddressSaver().getHideZoneIdentificationAccuracy());
-        hideZoneIdentificationAccuracySlider.addChangeListener((g) -> {
-            hideZoneIdentificationAccuracyLabel.setText(Storage.getBundle().getString("hideZoneIdentificationAccuracyLabel") +
-                    " " + hideZoneIdentificationAccuracySlider.getValue());
-        });
+//        JLabel hideZoneIdentificationAccuracyLabel = new JLabel(Storage.getBundle().getString("hideZoneIdentificationAccuracyLabel") +
+//                " " + Storage.getAddressSaver().getHideZoneIdentificationAccuracy());
+//        hideZoneIdentificationAccuracyLabel.setPreferredSize(new Dimension(370, 25));
+//
+//        hideZoneIdentificationAccuracySlider = new JSlider();
+//        hideZoneIdentificationAccuracySlider.setPreferredSize(new Dimension(370, 28));
+//        hideZoneIdentificationAccuracySlider.setMinorTickSpacing(1);
+//        hideZoneIdentificationAccuracySlider.setPaintTicks(true);
+//        hideZoneIdentificationAccuracySlider.setMinimum(5);
+//        hideZoneIdentificationAccuracySlider.setMaximum(10);
+//        hideZoneIdentificationAccuracySlider.setValue(Storage.getAddressSaver().getHideZoneIdentificationAccuracy());
+//        hideZoneIdentificationAccuracySlider.addChangeListener((g) -> {
+//            hideZoneIdentificationAccuracyLabel.setText(Storage.getBundle().getString("hideZoneIdentificationAccuracyLabel") +
+//                    " " + hideZoneIdentificationAccuracySlider.getValue());
+//        });
 
         JLabel hideZoneIdentificationAccuracyComparePixelsLabel = new JLabel(Storage.getBundle().getString("hideZoneIdentificationAccuracyComparePixelsLabel") +
                 " " + Storage.getAddressSaver().getHideZoneIdentificationAccuracyComparePixels());
@@ -554,16 +573,16 @@ public class Setting extends JPanel {
         hideZoneIdentificationAccuracyComparePixelsSlider.setPreferredSize(new Dimension(370, 28));
         hideZoneIdentificationAccuracyComparePixelsSlider.setMinorTickSpacing(1);
         hideZoneIdentificationAccuracyComparePixelsSlider.setPaintTicks(true);
-        hideZoneIdentificationAccuracyComparePixelsSlider.setMinimum(0);
-        hideZoneIdentificationAccuracyComparePixelsSlider.setMaximum(5);
+        hideZoneIdentificationAccuracyComparePixelsSlider.setMinimum(1);
+        hideZoneIdentificationAccuracyComparePixelsSlider.setMaximum(6);
         hideZoneIdentificationAccuracyComparePixelsSlider.setValue(Storage.getAddressSaver().getHideZoneIdentificationAccuracyComparePixels());
         hideZoneIdentificationAccuracyComparePixelsSlider.addChangeListener((g) -> {
             hideZoneIdentificationAccuracyComparePixelsLabel.setText(Storage.getBundle().getString("hideZoneIdentificationAccuracyComparePixelsLabel") +
                     " " + hideZoneIdentificationAccuracyComparePixelsSlider.getValue());
         });
 
-        hideZoneAccuracyPanel.add(hideZoneIdentificationAccuracyLabel);
-        hideZoneAccuracyPanel.add(hideZoneIdentificationAccuracySlider);
+//        hideZoneAccuracyPanel.add(hideZoneIdentificationAccuracyLabel);
+//        hideZoneAccuracyPanel.add(hideZoneIdentificationAccuracySlider);
         hideZoneAccuracyPanel.add(hideZoneIdentificationAccuracyComparePixelsLabel);
         hideZoneAccuracyPanel.add(hideZoneIdentificationAccuracyComparePixelsSlider);
         hideZoneSettingPanel.add(hideZoneAccuracyPanel);
@@ -623,7 +642,8 @@ public class Setting extends JPanel {
                                 pointsToDrawLine[j][1] = (double) ints[pointNumber][1] / bufferedImage.getHeight() * imageHeight + y;
                             }
 
-                            for (double t = 0; t < 1; t += 0.01) {
+                            for (double t = 0; t < 1; t += 0.005) {
+//                            for (double t = 0; t < 1; t += 0.01) {
                                 BackgroundImagePanel.eval(onePointToDrawLine, pointsToDrawLine, t);
                                 g.fillRect((int) onePointToDrawLine[0], (int) onePointToDrawLine[1], 2, 2);
                             }

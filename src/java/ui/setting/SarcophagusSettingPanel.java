@@ -428,10 +428,8 @@ public class SarcophagusSettingPanel extends JPanel {
         centerPanel.add(hideZoneLinePanel, BorderLayout.CENTER);
         centerPanel.add(southHideZonePanel, BorderLayout.SOUTH);
 
-        Font buttonFont = new Font(null, Font.BOLD, 50);
-
-        JButton saveButton = new JButton("<html>&#128190</html>");
-        saveButton.setFont(buttonFont);
+        JButton saveButton = new JButton(Storage.getBundle().getString("savebutton"));
+        saveButton.setFont(new Font(null, Font.BOLD, 15));
         saveButton.addActionListener((af) -> {
             int[][] position = new int[][]{new int[3], new int[3], new int[3], new int[3]};
             position[0][0] = Integer.parseInt(firstCameraLeftRightTextField.getText());
@@ -454,8 +452,8 @@ public class SarcophagusSettingPanel extends JPanel {
             saveButton.setForeground(new Color(47, 123, 21));
         });
 
-        JButton backButton = new JButton("<html>&#11178</html>");
-        backButton.setFont(buttonFont);
+        JButton backButton = new JButton(Storage.getBundle().getString("backbutton"));
+        backButton.setFont(new Font(null, Font.BOLD, 15));
         backButton.addActionListener((as) -> {
             Setting.getSetting().backToSetting();
             saveButton.setForeground(Color.DARK_GRAY);

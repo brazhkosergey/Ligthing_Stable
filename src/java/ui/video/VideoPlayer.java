@@ -133,6 +133,16 @@ public class VideoPlayer extends JPanel {
         boolean hideZoneDetected = false;
 
         for (int j = 1; j < 5; j++) {
+
+            if (j == 3 && oneVideoPlayerPanelsList.size() == 2) {
+                j = 4;
+            }
+            if (oneVideoPlayerPanelsList.size() == 4) {
+                continue;
+            }
+
+
+
             File folder = foldersWithVideoFiles.get(j);
             if (folder != null) {
                 String name = folder.getName();
@@ -246,9 +256,17 @@ public class VideoPlayer extends JPanel {
                 }
             });
 
+
+
+
             threadList.add(videoPlayer.getShowVideoThread());
+
             mainVideoPane.add(videoPlayer);
             oneVideoPlayerPanelsList.add(videoPlayer);
+
+            if (j == 4) {
+                j = 2;
+            }
         }
 
         for (Integer integer : eventFrameNumberMap.keySet()) {

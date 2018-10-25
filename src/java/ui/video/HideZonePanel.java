@@ -27,7 +27,7 @@ public class HideZonePanel extends JPanel {
         if (hideZoneName != null) {
             hideZoneDetectedNames = hideZoneName.split(",");
         }
-        hideZoneAreaMap = new TreeMap<>();
+        hideZoneAreaMap = new TreeMap<>(new MyComparator());
     }
 
     @Override
@@ -87,34 +87,29 @@ public class HideZonePanel extends JPanel {
                         yOfLastZone = y;
                     }
 
-                    if (i != 0) {
-                        graphics2D.setColor(new Color(184, 184, 184));
-
-                        for (int k = 0; k < 16; k++) {
-                            int x1 = (k * (pictureWidth - circleDiameter - 10) / 16);
-                            String nameOfZone = String.valueOf(alphabet[numberOfLine]) + (k + 1);
-
-                            HideZoneArea hideZoneArea = new HideZoneArea(nameOfZone);
-                            hideZoneAreaMap.put(hideZoneArea.getNameOfArea(), hideZoneArea);
-
+                    graphics2D.setColor(new Color(184, 184, 184));
+                    for (int k = 0; k < 16; k++) {
+                        int x1 = (k * (pictureWidth - circleDiameter - 10) / 16);
+                        String nameOfZone = String.valueOf(alphabet[numberOfLine]) + (k + 1);
+                        HideZoneArea hideZoneArea = new HideZoneArea(nameOfZone);
+                        hideZoneAreaMap.put(hideZoneArea.getNameOfArea(), hideZoneArea);
+                        if (i != 0) {
                             graphics2D.drawString(nameOfZone.toUpperCase(), x1OfPicture + x1 + (pictureWidth - circleDiameter - 10) / 32 - 5, y1OfPicture + y - 3);
-
-                            if (i != 86) {
-                                HideZoneArea hideZoneAreaLast = hideZoneAreaMap.get(String.valueOf(alphabet[numberOfLine - 1]) + (k + 1));
-                                int heightOfZone = yOfLastZone - y;
-                                int widthOfZone = (pictureWidth - circleDiameter - 10) / 16;
-                                hideZoneAreaLast.setHeightOfZone(heightOfZone);
-                                hideZoneAreaLast.setWidthOfZone(widthOfZone);
-                                hideZoneAreaLast.setxOfZone(x1);
-                                hideZoneAreaLast.setyOfZone(y);
-                            }
                         }
-
-                        yOfLastZone = y;
-
-                        graphics2D.setColor(Color.BLACK);
-                        numberOfLine++;
+                        if (i != 86) {
+                            HideZoneArea hideZoneAreaLast = hideZoneAreaMap.get(String.valueOf(alphabet[numberOfLine - 1]) + (k + 1));
+                            int heightOfZone = yOfLastZone - y;
+                            int widthOfZone = (pictureWidth - circleDiameter - 10) / 16;
+                            hideZoneAreaLast.setHeightOfZone(heightOfZone);
+                            hideZoneAreaLast.setWidthOfZone(widthOfZone);
+                            hideZoneAreaLast.setxOfZone(x1);
+                            hideZoneAreaLast.setyOfZone(y);
+                        }
                     }
+                    yOfLastZone = y;
+                    graphics2D.setColor(Color.BLACK);
+                    numberOfLine++;
+
                 }
             }
 
@@ -156,13 +151,9 @@ public class HideZonePanel extends JPanel {
                     }
                 }
             }
-
             graphics2D.setColor(Color.DARK_GRAY);
-
             graphics2D.drawRect(x1OfPicture, yOfProtectedZone, pictureWidth - circleDiameter - 10, heightOfProtectedZone);
-
             graphics2D.setColor(new Color(146, 154, 251, 200));
-
             graphics2D.fillRect(x1OfPicture, yOfProtectedZone, pictureWidth - circleDiameter - 10, heightOfProtectedZone);
         } else {
             g.setFont(new Font(null, Font.BOLD, 100));
@@ -183,7 +174,11 @@ public class HideZonePanel extends JPanel {
             if (e.getClickCount() > 1) {
                 int x = e.getX() - x1OfPicture;
                 int y = e.getY() - y1OfPicture;
+
                 for (String zoneName : hideZoneAreaMap.keySet()) {
+                    if(zoneName.compareTo("j1")==0){
+                        continue;
+                    }
                     HideZoneArea hideZoneArea = hideZoneAreaMap.get(zoneName);
                     if (x > hideZoneArea.getxOfZone() &&
                             hideZoneArea.getxOfZone() + hideZoneArea.getWidthOfZone() > x &&
@@ -220,4 +215,18 @@ public class HideZonePanel extends JPanel {
     public String getTestZoneName() {
         return testZoneName;
     }
+
+
+    private class MyComparator implements Comparator<String> {
+        @Override
+        public int compare(String o1, String o2) {
+            int comp = o1.substring(0, 1).compareTo(o2.substring(0, 1));
+            if (comp == 0) {
+                comp = Integer.valueOf(o1.substring(1, o1.length())).compareTo(Integer.valueOf(o2.substring(1, o2.length())));
+            }
+            return comp;
+        }
+    }
 }
+
+

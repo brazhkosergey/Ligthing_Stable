@@ -1,26 +1,30 @@
-import entity.HideZoneLightingSearcher;
+import entity.Storage.Storage;
 
-import java.io.File;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import java.awt.*;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class Test {
 
     public static void main(String[] args) {
-        Random random = new Random();
-        Set<String> set = new HashSet<>();
-        for(int i =0;i<5;i++){
-            int l = random.nextInt(5);
-            System.out.println(l);
-            set.add(String.valueOf(l));
-            set.add(null);
+
+        for (int rowNumber = 0; rowNumber < 2; rowNumber++) {
+            String rowPosition;
+            switch (rowNumber) {
+                case 0:
+                    rowPosition = BorderLayout.NORTH;
+                    break;
+                case 1:
+                    rowPosition = BorderLayout.SOUTH;
+                    break;
+            }
+            for (int columnNumber = 0; columnNumber < 2; columnNumber++) {
+                System.out.println(2 * rowNumber + columnNumber + 1);
+
+            }
         }
-        System.out.println("====================");
-        for(String s:set){
-            System.out.println(s);
-        }
-        System.out.println("====================");
-        System.out.println(set.size());
     }
 }
