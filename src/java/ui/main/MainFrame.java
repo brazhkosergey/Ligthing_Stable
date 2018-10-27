@@ -123,47 +123,6 @@ public class MainFrame extends JFrame {
         setVisible(true);
         pack();
     }
-
-//    public static void addLinePoint(int groupNumber, int[][] list, boolean edit) {
-//        linePoints.put(groupNumber, list);
-//        if (edit) {
-//            addressSaver.saveLinePoints(groupNumber, list);
-//        }
-//
-//        if (list != null) {
-//            linesForHideZoneParsing.put(groupNumber, getLineForParsing(list));
-//        }
-//    }
-//
-//    private static List<int[]> getLineForParsing(int[][] linePoints) {
-//
-//        List<int[]> listToReturn = new LinkedList<>();
-//
-//        double[][] pointsToDrawLine;
-//        double[] onePointToDrawLine = new double[2];
-//
-//        pointsToDrawLine = new double[4][];
-//        for (int i = 1; i < 5; i++) {
-//            pointsToDrawLine[i - 1] = new double[2];
-//        }
-//
-//        for (int i = 0; i < linePoints.length; i++) {
-//            if (linePoints.length > i + 3) {
-//                for (int j = 0; j < 4; j++) {
-//                    int pointNumber = i + j;
-//                    pointsToDrawLine[j][0] = linePoints[pointNumber][0];
-//                    pointsToDrawLine[j][1] = linePoints[pointNumber][1];
-//                }
-//
-//                for (double t = 0; t < 1; t += 0.001) {
-//                    BackgroundImagePanel.eval(onePointToDrawLine, pointsToDrawLine, t);
-//                    listToReturn.add(new int[]{(int) onePointToDrawLine[0], (int) onePointToDrawLine[1]});
-//                }
-//            }
-//        }
-//        return listToReturn;
-//    }
-
     /**
      * starting application after choosing language
      */
@@ -287,43 +246,44 @@ public class MainFrame extends JFrame {
         /*
       Thread set the socket server to wait request from sensor
      */
-        Thread alarmThread = new Thread(() -> {
-            ServerSocket ss = null;
-            try {
-                ss = new ServerSocket(Storage.getPort());
-            } catch (IOException ignored) {
-            }
-
-            while (true) {
-                try {
-                    audioPacketCount.setForeground(new Color(29, 142, 27));
-                    setAlarmServerLabelColor(Storage.getPort(), new Color(29, 142, 27));
-                    log.info("Ждем сигнал сработки на порт - " + Storage.getPort());
-                    Socket socket = ss.accept();
-                    log.info("Получили сигнал сработки на порт " + Storage.getPort());
-                    VideoCreator.startCatchVideo(false);
-                    socket.close();
-                } catch (Exception e) {
-                    log.error(e.getLocalizedMessage());
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e1) {
-                        e1.printStackTrace();
-                    }
-                    setAlarmServerLabelColor(Storage.getPort(), Color.red);
-                    audioPacketCount.setForeground(Color.red);
-                }
-            }
-        });
-        alarmThread.setName("Alarm Thread");
-        alarmThread.start();
+//        Thread alarmThread = new Thread(() -> {
+//            ServerSocket ss = null;
+//            try {
+//                ss = new ServerSocket(Storage.getPort());
+//            } catch (IOException ignored) {
+//            }
+//
+//            while (true) {
+//                try {
+//                    audioPacketCount.setForeground(new Color(29, 142, 27));
+//                    setAlarmServerLabelColor(Storage.getPort(), new Color(29, 142, 27));
+//                    log.info("Ждем сигнал сработки на порт - " + Storage.getPort());
+//                    Socket socket = ss.accept();
+//                    log.info("Получили сигнал сработки на порт " + Storage.getPort());
+//                    VideoCreator.startCatchVideo(false);
+//                    socket.close();
+//                } catch (Exception e) {
+//                    log.error(e.getLocalizedMessage());
+//                    try {
+//                        Thread.sleep(2000);
+//                    } catch (InterruptedException e1) {
+//                        e1.printStackTrace();
+//                    }
+//                    setAlarmServerLabelColor(Storage.getPort(), Color.red);
+//                    audioPacketCount.setForeground(Color.red);
+//                }
+//            }
+//        });
+//        alarmThread.setName("Alarm Thread");
+//        alarmThread.start();
 
 
         Thread additionaAlarmThread = new Thread(() -> {
             ServerSocket ss = null;
             BufferedReader in = null;
             try {
-                ss = new ServerSocket(4001);
+//                ss = new ServerSocket(4001);
+                ss = new ServerSocket(Storage.getPort());
                 Socket socket = ss.accept();
                 in = new BufferedReader(
                         new InputStreamReader(socket.getInputStream()));
@@ -331,7 +291,8 @@ public class MainFrame extends JFrame {
                     try {
                         audioPacketCount.setForeground(new Color(29, 142, 27));
                         setAlarmServerLabelColor(Storage.getPort(), new Color(29, 142, 27));
-                        log.info("Ждем сигнал сработки на порт - " + 4001);
+//                        log.info("Ждем сигнал сработки на порт - " + 4001);
+                        log.info("Ждем сигнал сработки на порт - " + Storage.getPort());
                         String inputLine = in.readLine();
                         String[] parts = inputLine.split("\\s+");
                         if (!parts[0].equals("flash") || parts.length <= 3 || !tryParseInt(parts[3]) || Integer.parseInt(parts[3]) != 0) {
@@ -347,7 +308,8 @@ public class MainFrame extends JFrame {
                         } catch (InterruptedException e1) {
                             e1.printStackTrace();
                         }
-                        setAlarmServerLabelColor(4001, Color.red);
+//                        setAlarmServerLabelColor(4001, Color.red);
+                        setAlarmServerLabelColor(Storage.getPort(), Color.red);
                         audioPacketCount.setForeground(Color.red);
                     }
                 }
