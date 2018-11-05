@@ -9,10 +9,14 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class Camera {
+
+
     private static Logger log = Logger.getLogger("file");
 
     private int number;
@@ -67,8 +71,6 @@ public class Camera {
      * counts of white percent of last 10 images
      */
     private Deque<Integer> whiteDeque;
-    private int percentWhiteDiff = 0;
-
 
     public Camera(int number, CameraGroup cameraGroup) {
         this.cameraGroup = cameraGroup;
@@ -124,6 +126,7 @@ public class Camera {
                                 ImageIO.setUseCache(false);
                                 BufferedImage image = ImageIO.read(inputStream);
                                 inputStream.close();
+
                                 cameraPanel.setBufferedImage(CameraPanel.processImage(scanCountOfWhitePixelsPercent(image), cameraPanel.getWidth(), cameraPanel.getHeight()));
                                 cameraPanel.repaint();
                                 fpsShow++;
@@ -144,7 +147,9 @@ public class Camera {
                         }
                     }
                 } else {
+
                     cameraPanel.getTitle().setTitle(Storage.getBundle().getString("cameradoesnotwork"));
+
                     try {
                         Thread.sleep(2000);
                     } catch (InterruptedException e) {
@@ -259,35 +264,34 @@ public class Camera {
     private BufferedImage scanCountOfWhitePixelsPercent(BufferedImage bi) {
         if (Storage.isProgramLightCatchEnable()) {
             int countWhite = 0;
-            for (int y = 0; y < bi.getHeight(); y += 2) {
-                for (int x = 0; x < bi.getWidth(); x += 2) {
+            int totalCount = 0;
+
+            for (int y = 0; y < bi.getHeight(); y += 3) {
+                for (int x = 0; x < bi.getWidth(); x += 3) {
+                    totalCount++;
                     if (Storage.getColorRGBNumberSet().contains(bi.getRGB(x, y))) {
                         countWhite++;
                     }
                 }
             }
-            whiteDeque.addFirst(countWhite);
-            if (whiteDeque.size() > 10) {
+            int percentOfWhite = countWhite * 100000 / totalCount;
+            whiteDeque.addFirst(percentOfWhite);
+
+            System.out.println("Процентов белого - " + percentOfWhite);
+            if (whiteDeque.size() > 5) {
                 int total = 0;
                 for (Integer integer : whiteDeque) {
                     total += integer;
                 }
                 int average = total / whiteDeque.size();
                 if (countWhite != 0) {
-
-                    int differentWhitePixelsAverage = Math.abs(average - countWhite);
-                    if (differentWhitePixelsAverage != 0) {
+                    int differentWhitePixelsAverage = (percentOfWhite) - average;
+                    if (differentWhitePixelsAverage > 0) {
                         if (average != 0) {
                             int diffPercent = differentWhitePixelsAverage * 100 / average;
-                            int abs = Math.abs(diffPercent);
-                            int percentDiffWhiteFromSetting = Storage.getPercentDiffWhite();
-                            if (percentWhiteDiff != percentDiffWhiteFromSetting) {
-                                percentWhiteDiff = percentDiffWhiteFromSetting;
-                            } else {
-                                if (abs > percentWhiteDiff * 50) {
-                                    VideoCreator.startCatchVideo(true);
-                                    whiteDeque.clear();
-                                }
+                            if (diffPercent > Storage.getPercentDiffWhite() * 35) {
+                                VideoCreator.startCatchVideo(true);
+                                whiteDeque.clear();
                             }
                         }
                     }

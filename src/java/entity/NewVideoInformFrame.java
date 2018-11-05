@@ -8,7 +8,9 @@ import java.awt.*;
 
 public class NewVideoInformFrame extends JFrame {
 
-    public NewVideoInformFrame() {
+    private static NewVideoInformFrame newVideoInformFrame;
+
+    private NewVideoInformFrame() {
         super();
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         int sizeWidth = 250;
@@ -26,11 +28,10 @@ public class NewVideoInformFrame extends JFrame {
         JButton okButton = new JButton("OK");
         okButton.setPreferredSize(new Dimension(90, 30));
         okButton.addActionListener((e) -> {
-            this.dispose();
-            VideoCreator.restartNewVideoFrame();
             MainFrame.showSecondsAlreadySaved("");
-            VideoCreator.setShowInformMessage(false);
             MainFrame.showVideoFilesPanel();
+            newVideoInformFrame = null;
+            this.dispose();
         });
 
         JLabel label = new JLabel("Test");
@@ -48,5 +49,11 @@ public class NewVideoInformFrame extends JFrame {
         this.add(outPanel);
         this.setVisible(true);
         this.pack();
+    }
+
+    public static void getNewVideoInformFrame() {
+        if (newVideoInformFrame == null) {
+            newVideoInformFrame = new NewVideoInformFrame();
+        }
     }
 }

@@ -102,7 +102,6 @@ public class VideoCreator {
                     for (CameraGroup cameraGroup : Storage.getCameraGroups()) {
                         cameraGroup.startSaveVideo(programingLightCatch, folderForBytes);
                     }
-
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -126,16 +125,9 @@ public class VideoCreator {
             soundSaver.stopSaveAudio();
         }
 
-        if (!showInformMessage) {
-            showInformMessage = programCatchLightning;
-        }
-
-        if (showInformMessage) {
+        if (programCatchLightning) {
             MainFrame.showSecondsAlreadySaved(Storage.getBundle().getString("endofsavinglabel"));
-            if (!informFrameNewVideo) {
-                new NewVideoInformFrame();
-                informFrameNewVideo = true;
-            }
+            NewVideoInformFrame.getNewVideoInformFrame();
         } else {
             MainFrame.showSecondsAlreadySaved(" ");
         }
@@ -151,15 +143,21 @@ public class VideoCreator {
                 }
                 File storageFolder = new File(Storage.getPath() + "\\bytes\\");
                 File[] videoFiles = storageFolder.listFiles();
+                int numberOfUncheckedFiles = 0;
                 if (videoFiles != null) {
                     for (File file : videoFiles) {
                         if (!file.getName().contains("{")) {
-                            renamed = HideZoneLightingSearcher.findHideZoneAreaAndRenameFolder(file);
+                            numberOfUncheckedFiles++;
+                            if (HideZoneLightingSearcher.findHideZoneAreaAndRenameFolder(file)) {
+                                numberOfUncheckedFiles--;
+                            }
                         }
                     }
                 }
+                renamed = numberOfUncheckedFiles == 0;
             }
         });
+        lookingForHideZoneLightingThread.setPriority(Thread.MIN_PRIORITY);
         lookingForHideZoneLightingThread.start();
     }
 

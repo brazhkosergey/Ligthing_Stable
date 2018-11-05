@@ -45,11 +45,10 @@ public class HideZoneLightingSearcher {
             maps[1] = new HashMap<>();
             Map<Integer, File> foldersFromEachCameraMap = new HashMap<>();
             Map<Integer, List<Integer>> eventsNumbersMap = new HashMap<>();
-            List<Integer> eventFramesNumberList = null;
+            List<Integer> eventFramesNumberList = new ArrayList<>();
             for (File oneFolderFromCamera : foldersFromEachCamera) {
                 String nameOfFolder = oneFolderFromCamera.getName();
                 if (!nameOfFolder.contains(".jpg")) {
-                    eventFramesNumberList = new ArrayList<>();
                     int cameraGroupNumber = Integer.parseInt(nameOfFolder.substring(0, 1));
                     String eventsNumbersString = nameOfFolder.substring(nameOfFolder.indexOf('[') + 1, nameOfFolder.length() - 1);
                     if (eventsNumbersString.contains(",")) {
@@ -574,6 +573,7 @@ public class HideZoneLightingSearcher {
             int k3sVertical = distance - 5;
             int k3sHorizontal = (int) (Math.tan(angleThird) * k3sVertical);
             int k3LHorizontal = 164 - numberInt * 10 + 5 - k3sHorizontal;
+
             if (k3LHorizontal > 0) {
                 double lengthOfViewZone = Storage.getLengthOfViewArcMap().get(3);
                 double mainViewAngle = Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[2][1]) -
@@ -624,6 +624,10 @@ public class HideZoneLightingSearcher {
             int k4sVertical = distance - 5;
             int k4sHorizontal = (int) (Math.tan(angleFourth) * k4sVertical);
             int k4LHorizontal = numberInt * 10 - 5 - k4sHorizontal;
+
+            System.out.println("Расстояние 3 - " + k3Horizontal);
+            System.out.println("Расстояние 4 - " + k4Horizontal);
+
             if (k4LHorizontal > 0) {
                 double lengthOfViewZone = Storage.getLengthOfViewArcMap().get(4);
                 double mainViewAngle = Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[3][1]) -

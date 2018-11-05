@@ -74,7 +74,7 @@ public class AddressSaver {
     private int hideZoneIdentificationAccuracyComparePixels;
 
     private AddressSaver() {
-        lightSensitivity = 140;
+        lightSensitivity = 190;
         camerasPosition = new int[4][];
         camerasPosition[0] = new int[]{70, 90, 91};
         camerasPosition[1] = new int[]{90, 140, 100};
@@ -135,7 +135,7 @@ public class AddressSaver {
      */
 
     public void saveSetting(int timeToSave, boolean programLightCatchEnable, int changeWhitePercent,
-                            int lightSensitivity, int opacity, int port, String path, int hideZoneIdentificationAccuracy
+                            int lightSensitivity, int opacity, int port, String path
             , int hideZoneIdentificationAccuracyComparePixels) {
         this.changeWhitePercent = changeWhitePercent;
         this.lightSensitivity = lightSensitivity;
@@ -144,7 +144,6 @@ public class AddressSaver {
         this.programLightCatchEnable = programLightCatchEnable;
         this.port = port;
         this.path = path;
-        this.hideZoneIdentificationAccuracy = hideZoneIdentificationAccuracy;
         this.hideZoneIdentificationAccuracyComparePixels = hideZoneIdentificationAccuracyComparePixels;
         savePasswordSaverToFile();
     }
@@ -184,8 +183,10 @@ public class AddressSaver {
                 JAXBContext context = JAXBContext.newInstance(AddressSaver.class);
                 Marshaller marshaller = context.createMarshaller();
                 marshaller.marshal(this, file);
+
+                System.out.println("Done");
             }
-        } catch (IOException | JAXBException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -273,7 +274,6 @@ public class AddressSaver {
             if (camerasViewAnglesTangens[i] == null) {
                 camerasViewAnglesTangens[i] = new double[2];
             }
-
             camerasViewAnglesTangens[i][0] = (double) camerasPosition[i][0] / (camerasPosition[i][1] + camerasPosition[i][2]);
             camerasViewAnglesTangens[i][1] = (double) (camerasPosition[i][0] + 164) / (camerasPosition[i][1] + camerasPosition[i][2]);
         }
@@ -281,17 +281,12 @@ public class AddressSaver {
 
     private void setCamerasDistanceToViewArc() {
         for (int groupNumber = 0; groupNumber < 4; groupNumber++) {
-//            distancesToSarcophagus[groupNumber] = (double) getCamerasPosition()[groupNumber][0] / Math.sin(getCamerasViewAnglesTangens()[groupNumber][0]);
             distancesToSarcophagus[groupNumber] = (double) getCamerasPosition()[groupNumber][0] / Math.sin(Math.atan(getCamerasViewAnglesTangens()[groupNumber][0]));
         }
     }
 
     public String getAudioAddress() {
         return audioAddress;
-    }
-
-    public int getHideZoneIdentificationAccuracy() {
-        return hideZoneIdentificationAccuracy;
     }
 
     public int getHideZoneIdentificationAccuracyComparePixels() {

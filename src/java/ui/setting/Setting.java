@@ -30,7 +30,6 @@ public class Setting extends JPanel {
     private JTextField defaultPort;
     private JTextField defaultFolder;
 
-    private JSlider hideZoneIdentificationAccuracySlider;
     private JSlider hideZoneIdentificationAccuracyComparePixelsSlider;
 
     public JButton saveButton;
@@ -138,7 +137,7 @@ public class Setting extends JPanel {
         lightSensitivitySlider.setPreferredSize(new Dimension(680, 28));
         lightSensitivitySlider.setMinorTickSpacing(1);
         lightSensitivitySlider.setPaintTicks(true);
-        lightSensitivitySlider.setMinimum(140);
+        lightSensitivitySlider.setMinimum(190);
         lightSensitivitySlider.setMaximum(230);
         lightSensitivitySlider.setValue(Storage.getColorLightNumber());
         lightSensitivitySlider.addChangeListener(e -> {
@@ -287,8 +286,8 @@ public class Setting extends JPanel {
                 }
 
                 Storage.getAddressSaver().saveSetting(countSecondsToSaveVideo, programCatchEnableCheckBox.isSelected(),
-                        changeWhitePercent, lightSensitivity, opacity, port, path, hideZoneIdentificationAccuracySlider.getValue(),
-                        hideZoneIdentificationAccuracySlider.getValue());
+                        changeWhitePercent, lightSensitivity, opacity, port, path,
+                        hideZoneIdentificationAccuracyComparePixelsSlider.getValue());
                 log.info("Настройки изменены. Время сохранения: " + countSecondsToSaveVideo +
                         ", Фиксируем програмные сработки: " + programCatchEnableCheckBox.isSelected() +
                         ", процент вспышки на изображении: " + changeWhitePercent +
@@ -302,7 +301,8 @@ public class Setting extends JPanel {
                 MainFrame.showInformMassage(Storage.getBundle().getString("savedbutton"), new Color(46, 139, 87));
                 saveButton.setForeground(new Color(46, 139, 87));
             } catch (Exception exc) {
-                log.error(exc.getMessage());
+                exc.printStackTrace();
+                log.error(exc.getLocalizedMessage());
             }
         });
 

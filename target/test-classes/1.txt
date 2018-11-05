@@ -2,6 +2,8 @@ http://94.244.33.211:80/mjpg/video.mjpg?COUNTER - 3
 
 http://31.42.168.71:80/mjpg/video.mjpg?COUNTER - 4  камянец подольский
 
+http://80.70.17.194:8081/mjpg/video.mjpg - мигалка
+
 LIGHTNING_STABLE
 lsvss
 

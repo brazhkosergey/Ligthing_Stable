@@ -36,7 +36,7 @@ public class Storage {
 
     private static int percentDiffWhite = 5;
 
-    private static int colorLightNumber = 180;
+    private static int colorLightNumber = 200;
 
     private static Set<Integer> colorRGBNumberSet;
 
@@ -276,13 +276,10 @@ public class Storage {
                         if (i == 238 & k == 238 & g == 238) {
                             continue;
                         }
-                        int rgb = new Color(i, k, g).getRGB();
-                        colorRGBNumberSet.add(rgb);
+                        colorRGBNumberSet.add(new Color(i, k, g).getRGB());
                     }
                 }
             }
-
-
         });
         colorNumbersUpdateThread.start();
     }
