@@ -30,12 +30,10 @@ public class NewVideoInformFrame extends JFrame {
         okButton.addActionListener((e) -> {
             MainFrame.showSecondsAlreadySaved("");
             MainFrame.showVideoFilesPanel();
-            newVideoInformFrame = null;
-            this.dispose();
+            this.setVisible(false);
         });
 
-        JLabel label = new JLabel("Test");
-        label.setText(Storage.getBundle().getString("endofsaving"));
+        JLabel label = new JLabel(Storage.getBundle().getString("endofsaving"));
         label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setHorizontalTextPosition(SwingConstants.CENTER);
         label.setFont(new Font(null, Font.BOLD, 16));
@@ -54,6 +52,8 @@ public class NewVideoInformFrame extends JFrame {
     public static void getNewVideoInformFrame() {
         if (newVideoInformFrame == null) {
             newVideoInformFrame = new NewVideoInformFrame();
+        } else {
+            newVideoInformFrame.setVisible(true);
         }
     }
 }

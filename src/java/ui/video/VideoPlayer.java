@@ -481,7 +481,6 @@ public class VideoPlayer extends JPanel {
      */
     private void createPlayerThread() {
         int frameRate = 1000 / FPS;
-
         Thread timer = new Thread(() -> {
             try {
                 Thread.sleep(2000);

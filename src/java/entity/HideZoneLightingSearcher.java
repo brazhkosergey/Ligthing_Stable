@@ -9,6 +9,10 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -26,81 +30,106 @@ public class HideZoneLightingSearcher {
         }
     }
 
+    public static void findHideZoneAreaAndRenameFolder(File folderWithFiles) {
+        if (!folderWithFiles.getName().contains("{")) {
+            MainFrame.showInformMassage(Storage.getBundle().getString("startedprocessing"), new Color(23, 114, 26));
+            try {
+                Date date = new Date(Long.parseLong(folderWithFiles.getName()));
+                log.info("Date - " + date.toString());
+            } catch (Exception i) {
+                log.error("Date - " + folderWithFiles.getName());
+            }
+            StringBuilder stringBuilder = new StringBuilder();
+            File[] foldersFromEachCamera = folderWithFiles.listFiles();
+            if (foldersFromEachCamera != null) {
+                Map<Integer, File>[] maps = new Map[2];
+                maps[0] = new HashMap<>();
+                maps[1] = new HashMap<>();
+                Map<Integer, File> foldersFromEachCameraMap = new HashMap<>();
+                Map<Integer, List<Integer>> eventsNumbersMap = new HashMap<>();
+                List<Integer> eventFramesNumberList = null;
+                for (File oneFolderFromCamera : foldersFromEachCamera) {
+                    eventFramesNumberList = new ArrayList<>();
+                    String nameOfFolder = oneFolderFromCamera.getName();
+                    if (!nameOfFolder.contains(".jpg")) {
+                        int cameraGroupNumber = Integer.parseInt(nameOfFolder.substring(0, 1));
+                        String eventsNumbersString = nameOfFolder.substring(nameOfFolder.indexOf('[') + 1, nameOfFolder.length() - 1);
+                        if (eventsNumbersString.contains(",")) {
+                            String[] split = eventsNumbersString.split(",");
+                            for (String numberString : split) {
+                                addEventNumberToList(numberString, eventFramesNumberList);
+                            }
+                        } else {
+                            addEventNumberToList(eventsNumbersString, eventFramesNumberList);
+                        }
+                        eventsNumbersMap.put(cameraGroupNumber, eventFramesNumberList);
 
-    static boolean findHideZoneAreaAndRenameFolder(File folderWithFiles) {
-        MainFrame.showInformMassage(Storage.getBundle().getString("startedprocessing"), new Color(23, 114, 26));
+                        if (cameraGroupNumber < 3) {
+                            maps[0].put(cameraGroupNumber, oneFolderFromCamera);
+                        } else {
+                            maps[1].put(cameraGroupNumber, oneFolderFromCamera);
+                        }
+                        foldersFromEachCameraMap.put(cameraGroupNumber, oneFolderFromCamera);
+                    }
+                }
+                int size = 0;
+                for (Integer gr : eventsNumbersMap.keySet()) {
+                    size = eventsNumbersMap.get(gr).size();
+                    if (size > 0) {
+                        break;
+                    }
+                }
+
+                for (int i = 0; i < size; i++) {
+                    Double[] angles = new Double[4];
+                    for (int groupNumber = 1; groupNumber < 5; groupNumber++) {
+                        List<Integer> integers = eventsNumbersMap.get(groupNumber);
+                        Double angle = null;
+                        if (integers != null) {
+                            BufferedImage mostWhiteImage = getMostWhiteImage(getFramesWithLightning(foldersFromEachCameraMap.get(groupNumber),
+                                    integers.get(i)));
+                            if (mostWhiteImage != null) {
+                                List<int[]> cameraLinePoints = Storage.getLinesForHideZoneParsing().get(groupNumber);
+                                if (cameraLinePoints == null) {
+                                    log.error("No border hide zone for group number - " + i);
+                                    continue;
+                                }
+                                Integer numberOfLinePointCutLightning = getNumberOfLinePoint(cameraLinePoints, mostWhiteImage);
+                                if (numberOfLinePointCutLightning != null) {
+                                    int distanceFromBeginningSarcophagusToPlaceLightningCutLine = getDistanceFromBeginningSarcophagusToPlaceLightningCutLine(numberOfLinePointCutLightning, groupNumber);
+                                    angle = getAngleFromCameraGroup(groupNumber, distanceFromBeginningSarcophagusToPlaceLightningCutLine);
+                                }
+                            }
+                        }
+                        angles[groupNumber - 1] = angle;
+                    }
+                    String zoneName = getZoneName(angles);
+                    stringBuilder.append(zoneName);
+                    if (i != size - 1) {
+                        stringBuilder.append(',');
+                    }
+                }
+            }
+            Path moveFrom = Paths.get(folderWithFiles.getAbsolutePath());
+            Path moveTo = Paths.get(folderWithFiles.getAbsolutePath() + "{" + stringBuilder.toString() + "}");
+            renameVideo(moveFrom, moveTo, 0);
+        }
+    }
+
+
+    private static void renameVideo(Path moveFrom, Path moveTo, int number) {
         try {
-            Date date = new Date(Long.parseLong(folderWithFiles.getName()));
-            log.info("Date - " + date.toString());
-        } catch (Exception i) {
-            log.error("Date - " + folderWithFiles.getName());
-        }
-
-        StringBuilder stringBuilder = new StringBuilder();
-        File[] foldersFromEachCamera = folderWithFiles.listFiles();
-        if (foldersFromEachCamera != null) {
-
-            Map<Integer, File>[] maps = new Map[2];
-            maps[0] = new HashMap<>();
-            maps[1] = new HashMap<>();
-            Map<Integer, File> foldersFromEachCameraMap = new HashMap<>();
-            Map<Integer, List<Integer>> eventsNumbersMap = new HashMap<>();
-            List<Integer> eventFramesNumberList = new ArrayList<>();
-            for (File oneFolderFromCamera : foldersFromEachCamera) {
-                String nameOfFolder = oneFolderFromCamera.getName();
-                if (!nameOfFolder.contains(".jpg")) {
-                    int cameraGroupNumber = Integer.parseInt(nameOfFolder.substring(0, 1));
-                    String eventsNumbersString = nameOfFolder.substring(nameOfFolder.indexOf('[') + 1, nameOfFolder.length() - 1);
-                    if (eventsNumbersString.contains(",")) {
-                        String[] split = eventsNumbersString.split(",");
-                        for (String numberString : split) {
-                            addEventNumberToList(numberString, eventFramesNumberList);
-                        }
-                    } else {
-                        addEventNumberToList(eventsNumbersString, eventFramesNumberList);
-                    }
-                    eventsNumbersMap.put(cameraGroupNumber, eventFramesNumberList);
-
-                    if (cameraGroupNumber < 3) {
-                        maps[0].put(cameraGroupNumber, oneFolderFromCamera);
-                    } else {
-                        maps[1].put(cameraGroupNumber, oneFolderFromCamera);
-                    }
-                    foldersFromEachCameraMap.put(cameraGroupNumber, oneFolderFromCamera);
-                }
+            Files.move(moveFrom, moveTo, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            System.out.println("Rename nubmer " + ++number);
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
             }
-            int size = eventFramesNumberList.size();
-            for (int i = 0; i < size; i++) {
-                Double[] angles = new Double[4];
-                for (int groupNumber = 1; groupNumber < 5; groupNumber++) {
-                    List<Integer> integers = eventsNumbersMap.get(groupNumber);
-                    Double angle = null;
-                    if (integers != null) {
-                        BufferedImage mostWhiteImage = getMostWhiteImage(getFramesWithLightning(foldersFromEachCameraMap.get(groupNumber),
-                                integers.get(i)));
-                        if (mostWhiteImage != null) {
-                            List<int[]> cameraLinePoints = Storage.getLinesForHideZoneParsing().get(groupNumber);
-                            if (cameraLinePoints == null) {
-                                log.error("No border hide zone for group number - " + i);
-                                continue;
-                            }
-                            Integer numberOfLinePointCutLightning = getNumberOfLinePoint(cameraLinePoints, mostWhiteImage);
-                            if (numberOfLinePointCutLightning != null) {
-                                int distanceFromBeginningSarcophagusToPlaceLightningCutLine = getDistanceFromBeginningSarcophagusToPlaceLightningCutLine(numberOfLinePointCutLightning, groupNumber);
-                                angle = getAngleFromCameraGroup(groupNumber, distanceFromBeginningSarcophagusToPlaceLightningCutLine);
-                            }
-                        }
-                    }
-                    angles[groupNumber - 1] = angle;
-                }
-                String zoneName = getZoneName(angles);
-                stringBuilder.append(zoneName);
-                if (i != size - 1) {
-                    stringBuilder.append(',');
-                }
-            }
+            renameVideo(moveFrom, moveTo, number);
+            e.printStackTrace();
         }
-        return folderWithFiles.renameTo(new File(folderWithFiles.getAbsolutePath() + "{" + stringBuilder.toString() + "}"));
     }
 
     private static int getDistanceFromBeginningSarcophagusToPlaceLightningCutLine(int numberOfLinePoint, int groupNumber) {
@@ -131,6 +160,7 @@ public class HideZoneLightingSearcher {
     private static String getZoneName(Double[] angles) {
         String[] names = new String[4];
         for (int i = 0; i < 4; i++) {
+            System.out.println("Number of Calculation " + i);
             Double angeFirst = angles[i];
             Double angleSecond;
             if (i != 3) {
@@ -139,7 +169,11 @@ public class HideZoneLightingSearcher {
                 angleSecond = angles[0];
             }
 
+            System.out.println("Angle 1 - " + angeFirst);
+            System.out.println("Angle 2 - " + angleSecond);
+
             if (angeFirst != null && angleSecond != null) {
+                System.out.println("making calculation ");
                 if (i % 2 != 0) {
                     angeFirst = (Math.PI / 2) - angeFirst;
                     angleSecond = (Math.PI / 2) - angleSecond;
@@ -230,6 +264,10 @@ public class HideZoneLightingSearcher {
                 if (n > countEqualZoneNames) {
                     countEqualZoneNames = n;
                     zoneName = s;
+                } else {
+                    if (i == 0 || i == 2) {
+                        zoneName = s;
+                    }
                 }
             }
         }
@@ -429,6 +467,7 @@ public class HideZoneLightingSearcher {
 
     public static void createTestImageForCameraThreeAndFour(String zoneName) {
         if (zoneName != null) {
+
             if (images == null) {
                 images = new HashMap<>();
                 for (int i = 1; i < 5; i++) {
@@ -461,94 +500,75 @@ public class HideZoneLightingSearcher {
                 }
             }
 //            -----------------------------------------------------
-            Integer k1Horizontal = camerasPosition[0][0] + numberInt * 10 - 5;
-            Integer k1Vertical = camerasPosition[0][1] + camerasPosition[0][2] + 80 - distance + 5;
-
-            double angleOne = Math.atan((double) k1Horizontal / k1Vertical);
-            int k1sVertical = 80 - distance + 5;
-            int k1sHorizontal = (int) (Math.tan(angleOne) * k1sVertical);
-            int k1LHorizontal = numberInt * 10 - 5 - k1sHorizontal;
-
-            if (k1LHorizontal > 0) {
-                double lengthOfViewZone = Storage.getLengthOfViewArcMap().get(1);
-                double mainViewAngle = Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[0][1]) -
-                        Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[0][0]);
-                double angle = angleOne - Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[0][0]);
-                int distanceToDraw = (int) (angle * lengthOfViewZone / mainViewAngle);
-
-                BufferedImage backGroundImageOne = images.get(1);
-                double[] pixelsSizesForHideZoneParsing = Storage.getPixelsSizesForHideZoneParsingMap().get(1);
-                if (pixelsSizesForHideZoneParsing != null) {
-                    double disPix = 0.0;
-                    int n = 0;
-                    for (int i = pixelsSizesForHideZoneParsing.length - 1; i >= 0; i--) {
-                        disPix += pixelsSizesForHideZoneParsing[i];
-                        if (disPix > distanceToDraw) {
-                            n = i;
-                            break;
+            BufferedImage backGroundImageOne = images.get(1);
+            if (backGroundImageOne != null) {
+                Integer k1Horizontal = camerasPosition[0][0] + numberInt * 10 - 5;
+                Integer k1Vertical = camerasPosition[0][1] + camerasPosition[0][2] + 80 - distance + 5;
+                double angleOne = Math.atan((double) k1Horizontal / k1Vertical);
+                int k1sVertical = 80 - distance + 5;
+                int k1sHorizontal = (int) (Math.tan(angleOne) * k1sVertical);
+                int k1LHorizontal = numberInt * 10 - 5 - k1sHorizontal;
+                if (k1LHorizontal > 0) {
+                    double lengthOfViewZone = Storage.getLengthOfViewArcMap().get(1);
+                    double mainViewAngle = Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[0][1]) -
+                            Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[0][0]);
+                    double angle = angleOne - Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[0][0]);
+                    int distanceToDraw = (int) (angle * lengthOfViewZone / mainViewAngle);
+                    double[] pixelsSizesForHideZoneParsing = Storage.getPixelsSizesForHideZoneParsingMap().get(1);
+                    if (pixelsSizesForHideZoneParsing != null) {
+                        double disPix = 0.0;
+                        int n = 0;
+                        for (int i = pixelsSizesForHideZoneParsing.length - 1; i >= 0; i--) {
+                            disPix += pixelsSizesForHideZoneParsing[i];
+                            if (disPix > distanceToDraw) {
+                                n = i;
+                                break;
+                            }
                         }
+                        int[] lightningPoint = Storage.getLinesForHideZoneParsing().get(1).get(n);
+                        drawLightningToImage(backGroundImageOne, lightningPoint[0], lightningPoint[1], 1);
                     }
-                    int[] lightningPoint = Storage.getLinesForHideZoneParsing().get(1).get(n);
-                    drawLightningToImage(backGroundImageOne, lightningPoint[0], lightningPoint[1], 1);
-                }
-            } else {
-                double atan = Math.atan((double) (camerasPosition[0][0] + k1LHorizontal) / (camerasPosition[0][1] + camerasPosition[0][2]));
-                double deltaA = Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[0][0]) - atan;//в радианах
-                double distanceToDraw = (Math.abs(deltaA * ((camerasPosition[0][1] + camerasPosition[0][2]) / Math.cos(angleOne))));
-                BufferedImage backGroundImageOne = images.get(1);
-                double[] pixelsSizesForHideZoneParsing = Storage.getPixelsSizesForHideZoneParsingMap().get(1);
-                if (pixelsSizesForHideZoneParsing != null) {
-                    double disPix = 0.0;
-                    int n = 0;
-                    for (int i = pixelsSizesForHideZoneParsing.length - 1; i >= 0; i--) {
-                        disPix += pixelsSizesForHideZoneParsing[i];
-                        if (disPix > distanceToDraw) {
-                            n = i;
-                            break;
+                } else {
+                    double atan = Math.atan((double) (camerasPosition[0][0] + k1LHorizontal) / (camerasPosition[0][1] + camerasPosition[0][2]));
+                    double deltaA = Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[0][0]) - atan;//в радианах
+                    double distanceToDraw = (Math.abs(deltaA * ((camerasPosition[0][1] + camerasPosition[0][2]) / Math.cos(angleOne))));
+                    double[] pixelsSizesForHideZoneParsing = Storage.getPixelsSizesForHideZoneParsingMap().get(1);
+                    if (pixelsSizesForHideZoneParsing != null) {
+                        double disPix = 0.0;
+                        int n = 0;
+                        for (int i = pixelsSizesForHideZoneParsing.length - 1; i >= 0; i--) {
+                            disPix += pixelsSizesForHideZoneParsing[i];
+                            if (disPix > distanceToDraw) {
+                                n = i;
+                                break;
+                            }
                         }
+                        int[] lightningPointOne = Storage.getLinesForHideZoneParsing().get(1).get(n);
+                        List<int[]> list = Storage.getLinesForHideZoneParsing().get(1);
+                        int[] lastPoint = list.get(list.size() - 1);
+                        disPix = Math.abs(lastPoint[0] - lightningPointOne[0]);
+                        drawLightningToImage(backGroundImageOne, (int) (lastPoint[0] + disPix), lastPoint[1], 1);
                     }
-                    int[] lightningPointOne = Storage.getLinesForHideZoneParsing().get(1).get(n);
-                    List<int[]> list = Storage.getLinesForHideZoneParsing().get(1);
-                    int[] lastPoint = list.get(list.size() - 1);
-                    disPix = Math.abs(lastPoint[0] - lightningPointOne[0]);
-                    drawLightningToImage(backGroundImageOne, (int) (lastPoint[0] + disPix), lastPoint[1], 1);
                 }
             }
-
 //            ======================================================================
-            Integer k2Horizontal = camerasPosition[1][0] + 164 - (numberInt * 10 - 5);
-            Integer k2Vertical = camerasPosition[1][1] + camerasPosition[1][2] + 80 - (distance - 5);
+            BufferedImage backGroundImageSecond = images.get(2);
+            if (backGroundImageSecond != null) {
+                Integer k2Horizontal = camerasPosition[1][0] + 164 - (numberInt * 10 - 5);
+                Integer k2Vertical = camerasPosition[1][1] + camerasPosition[1][2] + 80 - (distance - 5);
+                double angleSecond = Math.atan((double) k2Horizontal / k2Vertical);
+                int k2sVertical = 80 - (distance - 5);
+                int k2sHorizontal = (int) (Math.tan(angleSecond) * k2sVertical);
+                int k2LHorizontal = 164 - (numberInt * 10 - 5) - k2sHorizontal;
+                if (k2LHorizontal > 0) {
+                    double lengthOfViewZone = Storage.getLengthOfViewArcMap().get(2);
+                    double mainViewAngle = Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[1][1]) -
+                            Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[1][0]);
+                    double angle = angleSecond - Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[1][0]);
+                    int distanceToDraw = (int) (angle * lengthOfViewZone / mainViewAngle);
 
-            double angleSecond = Math.atan((double) k2Horizontal / k2Vertical);
-            int k2sVertical = 80 - (distance - 5);
-            int k2sHorizontal = (int) (Math.tan(angleSecond) * k2sVertical);
-            int k2LHorizontal = 164 - (numberInt * 10 - 5) - k2sHorizontal;
-            if (k2LHorizontal > 0) {
-                double lengthOfViewZone = Storage.getLengthOfViewArcMap().get(2);
-                double mainViewAngle = Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[1][1]) -
-                        Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[1][0]);
-                double angle = angleSecond - Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[1][0]);
-                int distanceToDraw = (int) (angle * lengthOfViewZone / mainViewAngle);
-                BufferedImage backGroundImageSecond = images.get(2);
-                double[] pixelsSizesForHideZoneParsing = Storage.getPixelsSizesForHideZoneParsingMap().get(2);
-                double disPix = 0.0;
-                int n = 0;
-                for (int i = 0; i < pixelsSizesForHideZoneParsing.length; i++) {
-                    disPix += pixelsSizesForHideZoneParsing[i];
-                    if (disPix > distanceToDraw) {
-                        n = i;
-                        break;
-                    }
-                }
-                int[] lightningPointSecond = Storage.getLinesForHideZoneParsing().get(2).get(n);
-                drawLightningToImage(backGroundImageSecond, lightningPointSecond[0], lightningPointSecond[1], 2);
-            } else {
-                double atan = Math.atan((double) (camerasPosition[1][0] + k2LHorizontal) / (camerasPosition[1][1] + camerasPosition[1][2]));
-                double deltaA = Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[1][0]) - atan;//в радианах
-                double distanceToDraw = (Math.abs(deltaA * ((camerasPosition[1][1] + camerasPosition[1][2]) / Math.cos(angleSecond))));
-                BufferedImage backGroundImageOne = images.get(2);
-                double[] pixelsSizesForHideZoneParsing = Storage.getPixelsSizesForHideZoneParsingMap().get(1);
-                if (pixelsSizesForHideZoneParsing != null) {
+
+                    double[] pixelsSizesForHideZoneParsing = Storage.getPixelsSizesForHideZoneParsingMap().get(2);
                     double disPix = 0.0;
                     int n = 0;
                     for (int i = 0; i < pixelsSizesForHideZoneParsing.length; i++) {
@@ -558,48 +578,49 @@ public class HideZoneLightingSearcher {
                             break;
                         }
                     }
-                    int[] lightningPointOne = Storage.getLinesForHideZoneParsing().get(2).get(n);
-                    List<int[]> list = Storage.getLinesForHideZoneParsing().get(2);
-                    int[] firstPoint = list.get(0);
-                    disPix = Math.abs(firstPoint[0] - lightningPointOne[0]);
-                    drawLightningToImage(backGroundImageOne, (int) (firstPoint[0] - disPix), firstPoint[1], 2);
-                }
-            }
-
-            Integer k3Horizontal = camerasPosition[2][0] + 164 - numberInt * 10 + 5;
-            Integer k3Vertical = camerasPosition[2][1] + camerasPosition[2][2] + distance - 5;
-
-            double angleThird = Math.atan((double) k3Horizontal / k3Vertical);
-            int k3sVertical = distance - 5;
-            int k3sHorizontal = (int) (Math.tan(angleThird) * k3sVertical);
-            int k3LHorizontal = 164 - numberInt * 10 + 5 - k3sHorizontal;
-
-            if (k3LHorizontal > 0) {
-                double lengthOfViewZone = Storage.getLengthOfViewArcMap().get(3);
-                double mainViewAngle = Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[2][1]) -
-                        Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[2][0]);
-                double angle = angleThird - Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[2][0]);
-                int distanceToDraw = (int) (angle * lengthOfViewZone / mainViewAngle);
-                BufferedImage backGroundImageThree = images.get(3);
-                double[] pixelsSizesForHideZoneParsing = Storage.getPixelsSizesForHideZoneParsingMap().get(3);
-                double disPix = 0.0;
-                int n = 0;
-                for (int i = pixelsSizesForHideZoneParsing.length - 1; i >= 0; i--) {
-                    disPix += pixelsSizesForHideZoneParsing[i];
-                    if (disPix > distanceToDraw) {
-                        n = i;
-                        break;
+                    int[] lightningPointSecond = Storage.getLinesForHideZoneParsing().get(2).get(n);
+                    drawLightningToImage(backGroundImageSecond, lightningPointSecond[0], lightningPointSecond[1], 2);
+                } else {
+                    double atan = Math.atan((double) (camerasPosition[1][0] + k2LHorizontal) / (camerasPosition[1][1] + camerasPosition[1][2]));
+                    double deltaA = Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[1][0]) - atan;//в радианах
+                    double distanceToDraw = (Math.abs(deltaA * ((camerasPosition[1][1] + camerasPosition[1][2]) / Math.cos(angleSecond))));
+                    double[] pixelsSizesForHideZoneParsing = Storage.getPixelsSizesForHideZoneParsingMap().get(1);
+                    if (pixelsSizesForHideZoneParsing != null) {
+                        double disPix = 0.0;
+                        int n = 0;
+                        for (int i = 0; i < pixelsSizesForHideZoneParsing.length; i++) {
+                            disPix += pixelsSizesForHideZoneParsing[i];
+                            if (disPix > distanceToDraw) {
+                                n = i;
+                                break;
+                            }
+                        }
+                        int[] lightningPointOne = Storage.getLinesForHideZoneParsing().get(2).get(n);
+                        List<int[]> list = Storage.getLinesForHideZoneParsing().get(2);
+                        int[] firstPoint = list.get(0);
+                        disPix = Math.abs(firstPoint[0] - lightningPointOne[0]);
+                        drawLightningToImage(backGroundImageSecond, (int) (firstPoint[0] - disPix), firstPoint[1], 2);
                     }
                 }
-                int[] lightningPointThree = Storage.getLinesForHideZoneParsing().get(3).get(n);
-                drawLightningToImage(backGroundImageThree, lightningPointThree[0], lightningPointThree[1], 3);
-            } else {
-                double atan = Math.atan((double) (camerasPosition[2][0] + k3LHorizontal) / (camerasPosition[2][1] + camerasPosition[2][2]));
-                double deltaA = Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[2][0]) - atan;//в радианах
-                double distanceToDraw = (Math.abs(deltaA * ((camerasPosition[2][1] + camerasPosition[2][2]) / Math.cos(angleThird))));
-                BufferedImage backGroundImageOne = images.get(3);
-                double[] pixelsSizesForHideZoneParsing = Storage.getPixelsSizesForHideZoneParsingMap().get(3);
-                if (pixelsSizesForHideZoneParsing != null) {
+            }
+//====================================================================
+            BufferedImage backGroundImageThree = images.get(3);
+            if (backGroundImageThree != null) {
+                Integer k3Horizontal = camerasPosition[2][0] + 164 - numberInt * 10 + 5;
+                Integer k3Vertical = camerasPosition[2][1] + camerasPosition[2][2] + distance - 5;
+
+                double angleThird = Math.atan((double) k3Horizontal / k3Vertical);
+                int k3sVertical = distance - 5;
+                int k3sHorizontal = (int) (Math.tan(angleThird) * k3sVertical);
+                int k3LHorizontal = 164 - numberInt * 10 + 5 - k3sHorizontal;
+
+                if (k3LHorizontal > 0) {
+                    double lengthOfViewZone = Storage.getLengthOfViewArcMap().get(3);
+                    double mainViewAngle = Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[2][1]) -
+                            Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[2][0]);
+                    double angle = angleThird - Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[2][0]);
+                    int distanceToDraw = (int) (angle * lengthOfViewZone / mainViewAngle);
+                    double[] pixelsSizesForHideZoneParsing = Storage.getPixelsSizesForHideZoneParsingMap().get(3);
                     double disPix = 0.0;
                     int n = 0;
                     for (int i = pixelsSizesForHideZoneParsing.length - 1; i >= 0; i--) {
@@ -610,50 +631,46 @@ public class HideZoneLightingSearcher {
                         }
                     }
                     int[] lightningPointThree = Storage.getLinesForHideZoneParsing().get(3).get(n);
-                    List<int[]> list = Storage.getLinesForHideZoneParsing().get(3);
-                    int[] lastPoint = list.get(list.size() - 1);
-                    disPix = Math.abs(lastPoint[0] - lightningPointThree[0]);
-                    drawLightningToImage(backGroundImageOne, (int) (lastPoint[0] + disPix), lastPoint[1], 3);
+                    drawLightningToImage(backGroundImageThree, lightningPointThree[0], lightningPointThree[1], 3);
+                } else {
+                    double atan = Math.atan((double) (camerasPosition[2][0] + k3LHorizontal) / (camerasPosition[2][1] + camerasPosition[2][2]));
+                    double deltaA = Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[2][0]) - atan;//в радианах
+                    double distanceToDraw = (Math.abs(deltaA * ((camerasPosition[2][1] + camerasPosition[2][2]) / Math.cos(angleThird))));
+                    double[] pixelsSizesForHideZoneParsing = Storage.getPixelsSizesForHideZoneParsingMap().get(3);
+                    if (pixelsSizesForHideZoneParsing != null) {
+                        double disPix = 0.0;
+                        int n = 0;
+                        for (int i = pixelsSizesForHideZoneParsing.length - 1; i >= 0; i--) {
+                            disPix += pixelsSizesForHideZoneParsing[i];
+                            if (disPix > distanceToDraw) {
+                                n = i;
+                                break;
+                            }
+                        }
+                        int[] lightningPointThree = Storage.getLinesForHideZoneParsing().get(3).get(n);
+                        List<int[]> list = Storage.getLinesForHideZoneParsing().get(3);
+                        int[] lastPoint = list.get(list.size() - 1);
+                        disPix = Math.abs(lastPoint[0] - lightningPointThree[0]);
+                        drawLightningToImage(backGroundImageThree, (int) (lastPoint[0] + disPix), lastPoint[1], 3);
+                    }
                 }
             }
 //            ======================================================================
-            Integer k4Horizontal = camerasPosition[3][0] + numberInt * 10 - 5;
-            Integer k4Vertical = camerasPosition[3][1] + camerasPosition[3][2] + distance - 5;
-
-            double angleFourth = Math.atan((double) k4Horizontal / k4Vertical);
-            int k4sVertical = distance - 5;
-            int k4sHorizontal = (int) (Math.tan(angleFourth) * k4sVertical);
-            int k4LHorizontal = numberInt * 10 - 5 - k4sHorizontal;
-
-            System.out.println("Расстояние 3 - " + k3Horizontal);
-            System.out.println("Расстояние 4 - " + k4Horizontal);
-
-            if (k4LHorizontal > 0) {
-                double lengthOfViewZone = Storage.getLengthOfViewArcMap().get(4);
-                double mainViewAngle = Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[3][1]) -
-                        Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[3][0]);
-                double angle = angleFourth - Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[3][0]);
-                int distanceToDraw = (int) (angle * lengthOfViewZone / mainViewAngle);
-                BufferedImage backGroundImageFourth = images.get(4);
-                double[] pixelsSizesForHideZoneParsing = Storage.getPixelsSizesForHideZoneParsingMap().get(4);
-                double disPix = 0.0;
-                int n = 0;
-                for (int i = 0; i < pixelsSizesForHideZoneParsing.length; i++) {
-                    disPix += pixelsSizesForHideZoneParsing[i];
-                    if (disPix > distanceToDraw) {
-                        n = i;
-                        break;
-                    }
-                }
-                int[] lightningPointFourth = Storage.getLinesForHideZoneParsing().get(4).get(n);
-                drawLightningToImage(backGroundImageFourth, lightningPointFourth[0], lightningPointFourth[1], 4);
-            } else {
-                double atan = Math.atan((double) (camerasPosition[3][0] + k4LHorizontal) / (camerasPosition[3][1] + camerasPosition[3][2]));
-                double deltaA = Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[3][0]) - atan;//в радианах
-                double distanceToDraw = (Math.abs(deltaA * ((camerasPosition[3][1] + camerasPosition[3][2]) / Math.cos(angleFourth))));
-                BufferedImage backGroundImageOne = images.get(4);
-                double[] pixelsSizesForHideZoneParsing = Storage.getPixelsSizesForHideZoneParsingMap().get(4);
-                if (pixelsSizesForHideZoneParsing != null) {
+            BufferedImage backGroundImageFourth = images.get(4);
+            if (backGroundImageFourth != null) {
+                Integer k4Horizontal = camerasPosition[3][0] + numberInt * 10 - 5;
+                Integer k4Vertical = camerasPosition[3][1] + camerasPosition[3][2] + distance - 5;
+                double angleFourth = Math.atan((double) k4Horizontal / k4Vertical);
+                int k4sVertical = distance - 5;
+                int k4sHorizontal = (int) (Math.tan(angleFourth) * k4sVertical);
+                int k4LHorizontal = numberInt * 10 - 5 - k4sHorizontal;
+                if (k4LHorizontal > 0) {
+                    double lengthOfViewZone = Storage.getLengthOfViewArcMap().get(4);
+                    double mainViewAngle = Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[3][1]) -
+                            Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[3][0]);
+                    double angle = angleFourth - Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[3][0]);
+                    int distanceToDraw = (int) (angle * lengthOfViewZone / mainViewAngle);
+                    double[] pixelsSizesForHideZoneParsing = Storage.getPixelsSizesForHideZoneParsingMap().get(4);
                     double disPix = 0.0;
                     int n = 0;
                     for (int i = 0; i < pixelsSizesForHideZoneParsing.length; i++) {
@@ -664,10 +681,29 @@ public class HideZoneLightingSearcher {
                         }
                     }
                     int[] lightningPointFourth = Storage.getLinesForHideZoneParsing().get(4).get(n);
-                    List<int[]> list = Storage.getLinesForHideZoneParsing().get(4);
-                    int[] firstPoint = list.get(0);
-                    disPix = Math.abs(firstPoint[0] - lightningPointFourth[0]);
-                    drawLightningToImage(backGroundImageOne, (int) (firstPoint[0] - disPix), firstPoint[1], 4);
+                    drawLightningToImage(backGroundImageFourth, lightningPointFourth[0], lightningPointFourth[1], 4);
+                } else {
+                    double atan = Math.atan((double) (camerasPosition[3][0] + k4LHorizontal) / (camerasPosition[3][1] + camerasPosition[3][2]));
+                    double deltaA = Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[3][0]) - atan;//в радианах
+                    double distanceToDraw = (Math.abs(deltaA * ((camerasPosition[3][1] + camerasPosition[3][2]) / Math.cos(angleFourth))));
+
+                    double[] pixelsSizesForHideZoneParsing = Storage.getPixelsSizesForHideZoneParsingMap().get(4);
+                    if (pixelsSizesForHideZoneParsing != null) {
+                        double disPix = 0.0;
+                        int n = 0;
+                        for (int i = 0; i < pixelsSizesForHideZoneParsing.length; i++) {
+                            disPix += pixelsSizesForHideZoneParsing[i];
+                            if (disPix > distanceToDraw) {
+                                n = i;
+                                break;
+                            }
+                        }
+                        int[] lightningPointFourth = Storage.getLinesForHideZoneParsing().get(4).get(n);
+                        List<int[]> list = Storage.getLinesForHideZoneParsing().get(4);
+                        int[] firstPoint = list.get(0);
+                        disPix = Math.abs(firstPoint[0] - lightningPointFourth[0]);
+                        drawLightningToImage(backGroundImageFourth, (int) (firstPoint[0] - disPix), firstPoint[1], 4);
+                    }
                 }
             }
         }

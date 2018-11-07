@@ -2,6 +2,7 @@ package ui.main;
 
 import entity.Camera.Camera;
 import entity.Camera.CameraGroup;
+import entity.HideZoneLightingSearcher;
 import entity.VideoCreator;
 import entity.Storage.Storage;
 import javafx.scene.layout.Border;
@@ -282,7 +283,6 @@ public class MainFrame extends JFrame {
             ServerSocket ss = null;
             BufferedReader in = null;
             try {
-//                ss = new ServerSocket(4001);
                 ss = new ServerSocket(Storage.getPort());
                 Socket socket = ss.accept();
                 in = new BufferedReader(
@@ -291,7 +291,6 @@ public class MainFrame extends JFrame {
                     try {
                         audioPacketCount.setForeground(new Color(29, 142, 27));
                         setAlarmServerLabelColor(Storage.getPort(), new Color(29, 142, 27));
-//                        log.info("Ждем сигнал сработки на порт - " + 4001);
                         log.info("Ждем сигнал сработки на порт - " + Storage.getPort());
                         String inputLine = in.readLine();
                         String[] parts = inputLine.split("\\s+");
@@ -299,7 +298,6 @@ public class MainFrame extends JFrame {
                             System.out.println("Не сработка");
                             continue;
                         }
-                        System.out.println("Cработка");
                         VideoCreator.startCatchVideo(false);
                     } catch (Exception e) {
                         log.error(e.getLocalizedMessage());
@@ -308,7 +306,6 @@ public class MainFrame extends JFrame {
                         } catch (InterruptedException e1) {
                             e1.printStackTrace();
                         }
-//                        setAlarmServerLabelColor(4001, Color.red);
                         setAlarmServerLabelColor(Storage.getPort(), Color.red);
                         audioPacketCount.setForeground(Color.red);
                     }
@@ -326,7 +323,6 @@ public class MainFrame extends JFrame {
         });
         additionaAlarmThread.setName("Additional Alarm Thread");
         additionaAlarmThread.start();
-
 
         List<File> folders = new ArrayList<>();
         File imageHideZoneSaveFolder = new File(Storage.getDefaultPath() + "\\hideZoneImages\\");
@@ -410,7 +406,6 @@ public class MainFrame extends JFrame {
         videoButton.setPreferredSize(new Dimension(120, 30));
         videoButton.addActionListener((e) -> {
             MainFrame.showSecondsAlreadySaved("");
-            VideoCreator.setShowInformMessage(false);
             showVideoFilesPanel();
         });
 

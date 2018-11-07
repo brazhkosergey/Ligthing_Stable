@@ -277,7 +277,6 @@ public class Camera {
             int percentOfWhite = countWhite * 100000 / totalCount;
             whiteDeque.addFirst(percentOfWhite);
 
-            System.out.println("Процентов белого - " + percentOfWhite);
             if (whiteDeque.size() > 5) {
                 int total = 0;
                 for (Integer integer : whiteDeque) {
@@ -289,7 +288,7 @@ public class Camera {
                     if (differentWhitePixelsAverage > 0) {
                         if (average != 0) {
                             int diffPercent = differentWhitePixelsAverage * 100 / average;
-                            if (diffPercent > Storage.getPercentDiffWhite() * 35) {
+                            if (diffPercent > Storage.getPercentDiffWhite() * 50) {
                                 VideoCreator.startCatchVideo(true);
                                 whiteDeque.clear();
                             }

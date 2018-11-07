@@ -162,13 +162,6 @@ public class Storage {
             d = distances[i];
             distances[i] = d * ratio;
         }
-
-        System.out.println(groupNumber + " Видимая зона длинна - " + lengthOfViewArc);
-        System.out.println(groupNumber + " Угол у основания - " + Math.toDegrees(angleIncrement));
-        System.out.println("Линия длинной - " + totalLineLength + " пикселей. По факту - " + distanceBetweenPoints +
-                ".Разница - " + (totalLineLength - distanceBetweenPoints));
-        System.out.println("========================================================================================");
-
         return distances;
     }
 

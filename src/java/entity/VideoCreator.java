@@ -40,14 +40,12 @@ public class VideoCreator {
      */
     private static int secondVideoAlreadySave = 1;
 
-    private static boolean showInformMessage = false;
-
-    private static boolean informFrameNewVideo = false;
+    private static Set<CameraGroup> groups = new HashSet<>();
 
     /**
      * @param programingLightCatch - program or sensor catch lightning
      */
-    public static void startCatchVideo(boolean programingLightCatch) {
+    public static synchronized void startCatchVideo(boolean programingLightCatch) {
         boolean anyCameraEnable = false;
         for (CameraGroup cameraGroup : Storage.getCameraGroups()) {
             for (Camera camera : cameraGroup.getCameras()) {
@@ -72,25 +70,28 @@ public class VideoCreator {
             }
 
             if (!saveVideoEnable) {
-                folderForBytes = new File(Storage.getPath() + "\\bytes\\" + System.currentTimeMillis());
-                boolean mkdirs = folderForBytes.mkdirs();
-                if (mkdirs) {
-                    log.info("Событие " + new Date(System.currentTimeMillis()).toString() + event + ". Сохраняем секунд - " + Storage.getSecondsToSave());
-                    startSaveVideoForAllCreatorsThread = new Thread(() -> {
-                        saveVideoEnable = true;
-                        while (saveVideoEnable) {
-                            MainFrame.showSecondsAlreadySaved(Storage.getBundle().getString("savedword") +
-                                    (secondVideoAlreadySave++) + Storage.getBundle().getString("seconds"));
-                            try {
-                                Thread.sleep(1000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
+                saveVideoEnable = true;
+                if (folderForBytes == null) {
+                    long l = System.currentTimeMillis();
+                    folderForBytes = new File(Storage.getPath() + "\\bytes\\" +l );
+                    System.out.println("Запускаем сохранение, поток - " + Thread.currentThread().getName()+"\n" + "Name of File "+ l);
+                    if (folderForBytes.mkdirs()) {
+                        log.info("Событие " + new Date(l).toString() + event + ". Сохраняем секунд - " + Storage.getSecondsToSave());
+                        startSaveVideoForAllCreatorsThread = new Thread(() -> {
+                            while (saveVideoEnable) {
+                                MainFrame.showSecondsAlreadySaved(Storage.getBundle().getString("savedword") +
+                                        (secondVideoAlreadySave++) + Storage.getBundle().getString("seconds"));
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
                             }
-                        }
-                        secondVideoAlreadySave = 1;
-                        startSaveVideoForAllCreatorsThread = null;
-                    });
-                    startSaveVideoForAllCreatorsThread.start();
+                            secondVideoAlreadySave = 1;
+                            startSaveVideoForAllCreatorsThread = null;
+                        });
+                        startSaveVideoForAllCreatorsThread.start();
+                    }
                 }
             } else {
                 log.info("Еще одна сработка, продолжаем событие " + new Date(System.currentTimeMillis()).toString() + " " + event);
@@ -120,54 +121,36 @@ public class VideoCreator {
      * stop catch bytes from cameras
      */
     public static void stopCatchVideo(boolean programCatchLightning) {
-        SoundSaver soundSaver = Storage.getSoundSaver();
-        if (soundSaver != null) {
-            soundSaver.stopSaveAudio();
-        }
-
-        if (programCatchLightning) {
-            MainFrame.showSecondsAlreadySaved(Storage.getBundle().getString("endofsavinglabel"));
-            NewVideoInformFrame.getNewVideoInformFrame();
-        } else {
-            MainFrame.showSecondsAlreadySaved(" ");
-        }
-        saveVideoEnable = false;
-
-        Thread lookingForHideZoneLightingThread = new Thread(() -> {
-            boolean renamed = false;
-            while (!renamed) {
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                File storageFolder = new File(Storage.getPath() + "\\bytes\\");
-                File[] videoFiles = storageFolder.listFiles();
-                int numberOfUncheckedFiles = 0;
-                if (videoFiles != null) {
-                    for (File file : videoFiles) {
-                        if (!file.getName().contains("{")) {
-                            numberOfUncheckedFiles++;
-                            if (HideZoneLightingSearcher.findHideZoneAreaAndRenameFolder(file)) {
-                                numberOfUncheckedFiles--;
-                            }
-                        }
-                    }
-                }
-                renamed = numberOfUncheckedFiles == 0;
+        if (saveVideoEnable) {
+            folderForBytes = null;
+            saveVideoEnable = false;
+            SoundSaver soundSaver = Storage.getSoundSaver();
+            if (soundSaver != null) {
+                soundSaver.stopSaveAudio();
             }
-        });
-        lookingForHideZoneLightingThread.setPriority(Thread.MIN_PRIORITY);
-        lookingForHideZoneLightingThread.start();
+            if (programCatchLightning) {
+                MainFrame.showSecondsAlreadySaved(Storage.getBundle().getString("endofsavinglabel"));
+                NewVideoInformFrame.getNewVideoInformFrame();
+            } else {
+                MainFrame.showSecondsAlreadySaved(" ");
+            }
+        }
     }
 
-
-    static void restartNewVideoFrame() {
-        VideoCreator.informFrameNewVideo = false;
+    public static boolean informCreatorAboutStartingSaving(CameraGroup cameraGroup) {
+        boolean add = groups.add(cameraGroup);
+        return add;
     }
 
-    public static void setShowInformMessage(boolean showInformMessage) {
-        VideoCreator.showInformMessage = showInformMessage;
+    public static void informCreatorAboutCompletingSaving(CameraGroup cameraGroup, File folderToScan) {
+        groups.remove(cameraGroup);
+        if (groups.size() == 0) {
+            Thread lookingForHideZoneLightingThread = new Thread(() -> {
+                HideZoneLightingSearcher.findHideZoneAreaAndRenameFolder(folderToScan);
+            });
+            lookingForHideZoneLightingThread.setPriority(Thread.MIN_PRIORITY);
+            lookingForHideZoneLightingThread.start();
+        }
     }
 
     public static void saveAudioBytes(Map<Long, byte[]> map) {

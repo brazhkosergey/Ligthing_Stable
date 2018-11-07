@@ -3,6 +3,7 @@ package entity.Camera;
 import entity.Storage.Storage;
 import entity.VideoCreator;
 import org.apache.log4j.Logger;
+import ui.video.VideoFilesPanel;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -91,6 +92,8 @@ public class CameraGroup {
     private File folderToSave;
 
     private boolean containProgramCatchLightning;
+
+    private boolean informVideoCreatorAboutStartingSaving = false;
 
     public CameraGroup(int groupNumber) {
         this.groupNumber = groupNumber;
@@ -218,6 +221,10 @@ public class CameraGroup {
                             }
 
                             if (enableSaveVideo) {
+                                if (!informVideoCreatorAboutStartingSaving) {
+                                    informVideoCreatorAboutStartingSaving = VideoCreator.informCreatorAboutStartingSaving(this);
+                                }
+
                                 if (stopSaveVideoInt >= Storage.getSecondsToSave() && totalCountFrames > 0) {
                                     stopSaveVideoInt = 0;
                                     VideoCreator.stopCatchVideo(containProgramCatchLightning);
@@ -297,7 +304,15 @@ public class CameraGroup {
                                             "Кадров - " + currentTotalCountImage + ". " +
                                             "Файлов в буфере " + size + ". " +
                                             "Сохранили секунд " + secondsCount);
+
+                                    try {
+                                        Thread.sleep(1000);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    VideoCreator.informCreatorAboutCompletingSaving(this, folderToSave);
                                     enableSaveVideo = false;
+                                    informVideoCreatorAboutStartingSaving = false;
                                 }
                             } else {
                                 while (fileDeque.size() > Storage.getSecondsToSave()) {
@@ -321,8 +336,11 @@ public class CameraGroup {
                                                 fpsList.remove(0);
                                                 fileToDel.delete();
                                             }
+                                        } else {
+                                            break;
                                         }
                                     } catch (Exception e) {
+                                        e.printStackTrace();
                                         log.error(e.getMessage());
                                     }
                                 }
@@ -336,7 +354,7 @@ public class CameraGroup {
                 } else {
                     VideoCreator.isSaveVideoEnable();
                     try {
-                        Thread.sleep(1);
+                        Thread.sleep(2);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
