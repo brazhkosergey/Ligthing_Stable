@@ -53,6 +53,7 @@ public class SoundSaver extends Thread {
 
     private Thread mainThread;
     private Thread updateDataThread;
+    private String path;
 
     public SoundSaver(String addressName) {
         try {
@@ -61,8 +62,6 @@ public class SoundSaver extends Thread {
             int i1 = substring.indexOf("/");
             String address = substring.substring(0, i1);
             String fileName = substring.substring(i1, substring.length());
-            System.out.println("Адресс аудио потока - " + address);
-            System.out.println("Имя файла аудио потока - " + fileName);
 
             FileName = fileName; //"/axis-media/media.amp"     rtsp://184.72.239.149/vod/mp4:BigBuckBunny_175k.mov
             try {
@@ -96,7 +95,6 @@ public class SoundSaver extends Thread {
                         } catch (InterruptedIOException iioe) {
                         } catch (IOException ioe) {
                             ioe.printStackTrace();
-                            System.out.println("Exception caught: " + ioe);
                         }
                     }
                 });
@@ -187,7 +185,8 @@ public class SoundSaver extends Thread {
         startSaveAudio = true;
     }
 
-    public void stopSaveAudio() {
+    public void stopSaveAudio(String path) {
+        this.path = path;
         stopSaveAudio = true;
     }
 
@@ -218,13 +217,12 @@ public class SoundSaver extends Thread {
         hearSound = false;
         if (connect) {
             RTSPSeqNb++;
-            //Send TEARDOWN message to the server
             send_RTSP_request("TEARDOWN");
         }
     }
 
     private void saveSoundToFile(Map<Long, byte[]> mainMapSaveFile) {
-        VideoCreator.saveAudioBytes(mainMapSaveFile);
+        VideoCreator.getVideoCreator().saveAudioBytes(mainMapSaveFile, path);
     }
 
     private int parse_server_response() {

@@ -23,9 +23,7 @@ import java.util.Date;
  */
 public class Setting extends JPanel {
     private static Logger log = Logger.getLogger("file");
-
     private static Setting setting;
-
     private JLabel portLabel;
     private JTextField defaultPort;
     private JTextField defaultFolder;
@@ -45,7 +43,6 @@ public class Setting extends JPanel {
     private JButton testButton;
     private JButton createTestImageButton;
     private Component testButtonRigidArea;
-
 
     private JLabel testLabel;
     private HideZonePanel hideZoneTestPanel;
@@ -243,8 +240,8 @@ public class Setting extends JPanel {
                     testButtonRigidArea.setVisible(true);
                 }
 
-                int value = countShowSlider.getValue();
-                Storage.setShowFramesPercent(value);
+                int countShowFrames = countShowSlider.getValue();
+                Storage.setShowFramesPercent(countShowFrames);
 
                 Storage.setProgramLightCatchEnable(programCatchEnableCheckBox.isSelected());
                 int changeWhitePercent = sliderChangeWhite.getValue();
@@ -287,7 +284,7 @@ public class Setting extends JPanel {
 
                 Storage.getAddressSaver().saveSetting(countSecondsToSaveVideo, programCatchEnableCheckBox.isSelected(),
                         changeWhitePercent, lightSensitivity, opacity, port, path,
-                        hideZoneIdentificationAccuracyComparePixelsSlider.getValue());
+                        hideZoneIdentificationAccuracyComparePixelsSlider.getValue(),countShowFrames);
                 log.info("Настройки изменены. Время сохранения: " + countSecondsToSaveVideo +
                         ", Фиксируем програмные сработки: " + programCatchEnableCheckBox.isSelected() +
                         ", процент вспышки на изображении: " + changeWhitePercent +

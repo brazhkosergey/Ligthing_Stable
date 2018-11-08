@@ -274,6 +274,7 @@ public class Camera {
                     }
                 }
             }
+
             int percentOfWhite = countWhite * 100000 / totalCount;
             whiteDeque.addFirst(percentOfWhite);
 
@@ -289,9 +290,14 @@ public class Camera {
                         if (average != 0) {
                             int diffPercent = differentWhitePixelsAverage * 100 / average;
                             if (diffPercent > Storage.getPercentDiffWhite() * 50) {
-                                VideoCreator.startCatchVideo(true);
+                                VideoCreator.getVideoCreator().startCatchVideo(true);
                                 whiteDeque.clear();
                             }
+//                            else {
+//                                if (VideoCreator.isTest()) {
+//                                    VideoCreator.getVideoCreator().startCatchVideo(true);
+//                                }
+//                            }
                         }
                     }
                 } else {
@@ -372,6 +378,7 @@ public class Camera {
             } else {
                 catchVideo = true;
                 cameraPanel.startShowVideo();
+                VideoCreator.getVideoCreator().setAnyCameraEnable(true);
             }
         } else {
             catchVideo = false;

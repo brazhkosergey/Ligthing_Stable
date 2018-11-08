@@ -232,7 +232,6 @@ public class SarcophagusSettingPanel extends JPanel {
         thirdCameraLeftRightTextField.setMaximumSize(new Dimension(40, 25));
         thirdCameraLeftRightTextField.setHorizontalAlignment(SwingConstants.CENTER);
 
-
         JLabel h3Label = new JLabel("h3");
         h3Label.setPreferredSize(new Dimension(40, 25));
         h3Label.setHorizontalAlignment(SwingConstants.CENTER);
@@ -459,7 +458,6 @@ public class SarcophagusSettingPanel extends JPanel {
             saveButton.setForeground(Color.DARK_GRAY);
         });
 
-
         firstCameraLeftRightTextField.addKeyListener(new MyKeyAdapter());
 
         JPanel backPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -479,7 +477,6 @@ public class SarcophagusSettingPanel extends JPanel {
     }
 
     private void setPosition(int[][] position) {
-
         firstCameraLeftRightTextField.setText(String.valueOf(position[0][0]));
         firstCameraUpDownTextField.setText(String.valueOf(position[0][1]));
 

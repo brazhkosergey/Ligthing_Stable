@@ -31,7 +31,7 @@ public class HideZoneLightingSearcher {
     }
 
     public static void findHideZoneAreaAndRenameFolder(File folderWithFiles) {
-        if (!folderWithFiles.getName().contains("{")) {
+        if (!folderWithFiles.getName().contains("{")&&!folderWithFiles.getName().contains("wav")) {
             MainFrame.showInformMassage(Storage.getBundle().getString("startedprocessing"), new Color(23, 114, 26));
             try {
                 Date date = new Date(Long.parseLong(folderWithFiles.getName()));
@@ -121,7 +121,6 @@ public class HideZoneLightingSearcher {
         try {
             Files.move(moveFrom, moveTo, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            System.out.println("Rename nubmer " + ++number);
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e1) {
@@ -160,7 +159,6 @@ public class HideZoneLightingSearcher {
     private static String getZoneName(Double[] angles) {
         String[] names = new String[4];
         for (int i = 0; i < 4; i++) {
-            System.out.println("Number of Calculation " + i);
             Double angeFirst = angles[i];
             Double angleSecond;
             if (i != 3) {
@@ -168,9 +166,6 @@ public class HideZoneLightingSearcher {
             } else {
                 angleSecond = angles[0];
             }
-
-            System.out.println("Angle 1 - " + angeFirst);
-            System.out.println("Angle 2 - " + angleSecond);
 
             if (angeFirst != null && angleSecond != null) {
                 System.out.println("making calculation ");
@@ -526,7 +521,7 @@ public class HideZoneLightingSearcher {
                             }
                         }
                         int[] lightningPoint = Storage.getLinesForHideZoneParsing().get(1).get(n);
-                        drawLightningToImage(backGroundImageOne, lightningPoint[0], lightningPoint[1], 1);
+                        drawLightningToImage(backGroundImageOne, lightningPoint[0], lightningPoint[1], 1, zoneName);
                     }
                 } else {
                     double atan = Math.atan((double) (camerasPosition[0][0] + k1LHorizontal) / (camerasPosition[0][1] + camerasPosition[0][2]));
@@ -547,7 +542,7 @@ public class HideZoneLightingSearcher {
                         List<int[]> list = Storage.getLinesForHideZoneParsing().get(1);
                         int[] lastPoint = list.get(list.size() - 1);
                         disPix = Math.abs(lastPoint[0] - lightningPointOne[0]);
-                        drawLightningToImage(backGroundImageOne, (int) (lastPoint[0] + disPix), lastPoint[1], 1);
+                        drawLightningToImage(backGroundImageOne, (int) (lastPoint[0] + disPix), lastPoint[1], 1, zoneName);
                     }
                 }
             }
@@ -566,20 +561,23 @@ public class HideZoneLightingSearcher {
                             Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[1][0]);
                     double angle = angleSecond - Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[1][0]);
                     int distanceToDraw = (int) (angle * lengthOfViewZone / mainViewAngle);
-
-
                     double[] pixelsSizesForHideZoneParsing = Storage.getPixelsSizesForHideZoneParsingMap().get(2);
-                    double disPix = 0.0;
                     int n = 0;
-                    for (int i = 0; i < pixelsSizesForHideZoneParsing.length; i++) {
-                        disPix += pixelsSizesForHideZoneParsing[i];
-                        if (disPix > distanceToDraw) {
-                            n = i;
-                            break;
+                    double disPix = 0.0;
+                    if (k2LHorizontal < 164) {
+                        for (int i = 0; i < pixelsSizesForHideZoneParsing.length; i++) {
+                            disPix += pixelsSizesForHideZoneParsing[i];
+                            if (disPix > distanceToDraw) {
+                                n = i;
+                                System.out.println(disPix + ">" + distanceToDraw + " - n=" + n);
+                                break;
+                            }
                         }
+                    } else {
+                        n = pixelsSizesForHideZoneParsing.length - 1;
                     }
                     int[] lightningPointSecond = Storage.getLinesForHideZoneParsing().get(2).get(n);
-                    drawLightningToImage(backGroundImageSecond, lightningPointSecond[0], lightningPointSecond[1], 2);
+                    drawLightningToImage(backGroundImageSecond, lightningPointSecond[0], lightningPointSecond[1], 2, zoneName);
                 } else {
                     double atan = Math.atan((double) (camerasPosition[1][0] + k2LHorizontal) / (camerasPosition[1][1] + camerasPosition[1][2]));
                     double deltaA = Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[1][0]) - atan;//в радианах
@@ -588,18 +586,24 @@ public class HideZoneLightingSearcher {
                     if (pixelsSizesForHideZoneParsing != null) {
                         double disPix = 0.0;
                         int n = 0;
-                        for (int i = 0; i < pixelsSizesForHideZoneParsing.length; i++) {
-                            disPix += pixelsSizesForHideZoneParsing[i];
-                            if (disPix > distanceToDraw) {
-                                n = i;
-                                break;
+                        if (k2LHorizontal < 164) {
+                            for (int i = 0; i < pixelsSizesForHideZoneParsing.length; i++) {
+                                disPix += pixelsSizesForHideZoneParsing[i];
+                                if (disPix > distanceToDraw) {
+                                    n = i;
+                                    System.out.println(disPix + ">" + distanceToDraw + " - n=" + n);
+                                    break;
+                                }
                             }
+                        } else {
+                            n = pixelsSizesForHideZoneParsing.length - 1;
                         }
+
                         int[] lightningPointOne = Storage.getLinesForHideZoneParsing().get(2).get(n);
                         List<int[]> list = Storage.getLinesForHideZoneParsing().get(2);
                         int[] firstPoint = list.get(0);
                         disPix = Math.abs(firstPoint[0] - lightningPointOne[0]);
-                        drawLightningToImage(backGroundImageSecond, (int) (firstPoint[0] - disPix), firstPoint[1], 2);
+                        drawLightningToImage(backGroundImageSecond, (int) (firstPoint[0] - disPix), firstPoint[1], 2, zoneName);
                     }
                 }
             }
@@ -614,6 +618,7 @@ public class HideZoneLightingSearcher {
                 int k3sHorizontal = (int) (Math.tan(angleThird) * k3sVertical);
                 int k3LHorizontal = 164 - numberInt * 10 + 5 - k3sHorizontal;
 
+                System.out.println("distance " + k3LHorizontal);
                 if (k3LHorizontal > 0) {
                     double lengthOfViewZone = Storage.getLengthOfViewArcMap().get(3);
                     double mainViewAngle = Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[2][1]) -
@@ -631,7 +636,7 @@ public class HideZoneLightingSearcher {
                         }
                     }
                     int[] lightningPointThree = Storage.getLinesForHideZoneParsing().get(3).get(n);
-                    drawLightningToImage(backGroundImageThree, lightningPointThree[0], lightningPointThree[1], 3);
+                    drawLightningToImage(backGroundImageThree, lightningPointThree[0], lightningPointThree[1], 3, zoneName);
                 } else {
                     double atan = Math.atan((double) (camerasPosition[2][0] + k3LHorizontal) / (camerasPosition[2][1] + camerasPosition[2][2]));
                     double deltaA = Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[2][0]) - atan;//в радианах
@@ -651,7 +656,7 @@ public class HideZoneLightingSearcher {
                         List<int[]> list = Storage.getLinesForHideZoneParsing().get(3);
                         int[] lastPoint = list.get(list.size() - 1);
                         disPix = Math.abs(lastPoint[0] - lightningPointThree[0]);
-                        drawLightningToImage(backGroundImageThree, (int) (lastPoint[0] + disPix), lastPoint[1], 3);
+                        drawLightningToImage(backGroundImageThree, (int) (lastPoint[0] + disPix), lastPoint[1], 3, zoneName);
                     }
                 }
             }
@@ -681,7 +686,7 @@ public class HideZoneLightingSearcher {
                         }
                     }
                     int[] lightningPointFourth = Storage.getLinesForHideZoneParsing().get(4).get(n);
-                    drawLightningToImage(backGroundImageFourth, lightningPointFourth[0], lightningPointFourth[1], 4);
+                    drawLightningToImage(backGroundImageFourth, lightningPointFourth[0], lightningPointFourth[1], 4, zoneName);
                 } else {
                     double atan = Math.atan((double) (camerasPosition[3][0] + k4LHorizontal) / (camerasPosition[3][1] + camerasPosition[3][2]));
                     double deltaA = Math.atan(Storage.getAddressSaver().getCamerasViewAnglesTangens()[3][0]) - atan;//в радианах
@@ -702,19 +707,18 @@ public class HideZoneLightingSearcher {
                         List<int[]> list = Storage.getLinesForHideZoneParsing().get(4);
                         int[] firstPoint = list.get(0);
                         disPix = Math.abs(firstPoint[0] - lightningPointFourth[0]);
-                        drawLightningToImage(backGroundImageFourth, (int) (firstPoint[0] - disPix), firstPoint[1], 4);
+                        drawLightningToImage(backGroundImageFourth, (int) (firstPoint[0] - disPix), firstPoint[1], 4, zoneName);
                     }
                 }
             }
         }
     }
 
-    private static void drawLightningToImage(BufferedImage bufferedImage, int x, int y, int groupNumber) {
+    private static void drawLightningToImage(BufferedImage bufferedImage, int x, int y, int groupNumber, String zoneName) {
         BufferedImage backImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), bufferedImage.getType());
         Graphics2D g1 = (Graphics2D) backImage.getGraphics();
         g1.setColor(Color.BLACK);
         g1.fillRect(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
-
         BufferedImage image = ServiceCamera.connectImage(bufferedImage, backImage, 0.5f);
         Graphics2D g = (Graphics2D) image.getGraphics();
         BasicStroke pen1 = new BasicStroke(4);
@@ -722,5 +726,16 @@ public class HideZoneLightingSearcher {
         g.setColor(Color.WHITE);
         g.drawLine(x, y, x, 0);
         Storage.getCameraGroups()[groupNumber - 1].setBackGroundImage(image);
+//        ====================================TEST======================================================================
+        if (image != null) {
+            File imageFile = new File(Storage.getPath() + "\\" + groupNumber + " - TEST " + zoneName + ".jpg");
+            try {
+                if (imageFile.createNewFile()) {
+                    ImageIO.write(image, "jpg", imageFile);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

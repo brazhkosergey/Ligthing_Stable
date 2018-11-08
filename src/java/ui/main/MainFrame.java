@@ -189,7 +189,7 @@ public class MainFrame extends JFrame {
             boolean startRec = true;
 
             while (true) {
-                if (VideoCreator.isSaveVideoEnable()) {
+                if (VideoCreator.getVideoCreator().isSaveVideoEnable()) {
                     if (startRec) {
                         startRec = false;
                     }
@@ -278,17 +278,19 @@ public class MainFrame extends JFrame {
 //        alarmThread.setName("Alarm Thread");
 //        alarmThread.start();
 
-
         Thread additionaAlarmThread = new Thread(() -> {
             ServerSocket ss = null;
             BufferedReader in = null;
             try {
                 ss = new ServerSocket(Storage.getPort());
+                System.out.println("Port "+ Storage.getPort());
                 Socket socket = ss.accept();
+                System.out.println("Port accept "+ Storage.getPort());
                 in = new BufferedReader(
                         new InputStreamReader(socket.getInputStream()));
                 while (true) {
                     try {
+                        System.out.println("Starting server");
                         audioPacketCount.setForeground(new Color(29, 142, 27));
                         setAlarmServerLabelColor(Storage.getPort(), new Color(29, 142, 27));
                         log.info("Ждем сигнал сработки на порт - " + Storage.getPort());
@@ -298,7 +300,7 @@ public class MainFrame extends JFrame {
                             System.out.println("Не сработка");
                             continue;
                         }
-                        VideoCreator.startCatchVideo(false);
+                        VideoCreator.getVideoCreator().startCatchVideo(false);
                     } catch (Exception e) {
                         log.error(e.getLocalizedMessage());
                         try {
@@ -438,13 +440,13 @@ public class MainFrame extends JFrame {
         startEventButton = new JButton("REC");
         startEventButton.setVisible(false);
         startEventButton.addActionListener((e -> {
-            VideoCreator.startCatchVideo(false);
+            VideoCreator.getVideoCreator().startCatchVideo(false);
         }));
 
         startButtonProgrammingCatch = new JButton("REC PR");
         startButtonProgrammingCatch.setVisible(false);
         startButtonProgrammingCatch.addActionListener((e -> {
-            VideoCreator.startCatchVideo(true);
+            VideoCreator.getVideoCreator().startCatchVideo(true);
         }));
 
         northPanel.add(audioPacketCount);
@@ -553,7 +555,6 @@ public class MainFrame extends JFrame {
 //        central.setBorder(BorderFactory.createEtchedBorder());
 //        allCameraPanel.add(central,BorderLayout.CENTER);
 //        =====================================================
-
         for (int groupNumber = 0; groupNumber < 4; groupNumber++) {
             if (groupNumber == 2 && cameraBlock.size() == 2) {
                 groupNumber = 3;

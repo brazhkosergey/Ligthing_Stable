@@ -2,7 +2,6 @@ package ui.setting;
 
 import javax.swing.*;
 import java.awt.event.*;
-import java.util.List;
 
 public class BackgroundSettingListener implements MouseMotionListener, MouseWheelListener, MouseListener {
     private JPanel panel;

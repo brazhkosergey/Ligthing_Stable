@@ -3,6 +3,7 @@ package entity.Storage;
 import entity.AddressSaver;
 import entity.Camera.Camera;
 import entity.Camera.CameraGroup;
+import entity.VideoCreator;
 import entity.sound.SoundSaver;
 import org.apache.log4j.Logger;
 import ui.main.MainFrame;
@@ -26,7 +27,6 @@ public class Storage {
     private static Map<Integer, List<int[]>> linesForHideZoneParsing;
     private static Map<Integer, double[]> pixelsSizesForHideZoneParsingMap;
     private static Map<Integer, Double> lengthOfViewArcMap;
-
 
     private static AddressSaver addressSaver;
 
@@ -52,7 +52,8 @@ public class Storage {
 
     private static ResourceBundle bundle;
 
-    private static int showFramesPercent = 15;
+    private static int showFramesPercent;
+
 
     private static CameraGroup[] cameraGroups;
 
@@ -90,6 +91,7 @@ public class Storage {
     }
 
     public static void startAllCameras() {
+        VideoCreator.getVideoCreator().setAnyCameraEnable(false);
 
         for (int groupNumber = 0; groupNumber < 4; groupNumber++) {
             for (int cameraNumber = 0; cameraNumber < 2; cameraNumber++) {
@@ -276,7 +278,6 @@ public class Storage {
         });
         colorNumbersUpdateThread.start();
     }
-
 
     public static Set<Integer> getColorRGBNumberSet() {
         return colorRGBNumberSet;

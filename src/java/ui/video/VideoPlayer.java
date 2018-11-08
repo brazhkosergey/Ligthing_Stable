@@ -447,7 +447,7 @@ public class VideoPlayer extends JPanel {
         setSliderPosition(0);
         Thread stopPlayingWhileRecordingThread = new Thread(() -> {
             while (VideoPlayer.isShowVideoPlayer()) {
-                if (VideoCreator.isSaveVideoEnable()) {
+                if (VideoCreator.getVideoCreator().isSaveVideoEnable()) {
                     stop();
                 } else {
                     try {

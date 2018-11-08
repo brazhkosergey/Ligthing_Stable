@@ -70,16 +70,21 @@ public class AddressSaver {
     private double[][] camerasViewAnglesTangens;
     private double[] distancesToSarcophagus;
 
-    private int hideZoneIdentificationAccuracy;
     private int hideZoneIdentificationAccuracyComparePixels;
+    int countShowFrames;
 
     private AddressSaver() {
         lightSensitivity = 190;
+        countShowFrames = 15;
         camerasPosition = new int[4][];
-        camerasPosition[0] = new int[]{70, 90, 91};
-        camerasPosition[1] = new int[]{90, 140, 100};
-        camerasPosition[2] = new int[]{180, 150, 100};
-        camerasPosition[3] = new int[]{30, 140, 99};
+//        camerasPosition[0] = new int[]{74, 91, 91};
+//        camerasPosition[1] = new int[]{91, 137, 100};
+//        camerasPosition[2] = new int[]{12, 147, 100};
+//        camerasPosition[3] = new int[]{48, 139, 99};
+        camerasPosition[0] = new int[3];
+        camerasPosition[1] = new int[3];
+        camerasPosition[2] = new int[3];
+        camerasPosition[3] = new int[3];
         camerasViewAnglesTangens = new double[4][];
         distancesToSarcophagus = new double[4];
         setCamerasViewAnglesTangens();
@@ -88,8 +93,6 @@ public class AddressSaver {
         for (int i = 0; i < 8; i++) {
             camerasIdentificationInformation[i] = new String[3];
         }
-
-        hideZoneIdentificationAccuracy = 7;
         hideZoneIdentificationAccuracyComparePixels = 1;
         PASS = "PASS";
     }
@@ -136,7 +139,7 @@ public class AddressSaver {
 
     public void saveSetting(int timeToSave, boolean programLightCatchEnable, int changeWhitePercent,
                             int lightSensitivity, int opacity, int port, String path
-            , int hideZoneIdentificationAccuracyComparePixels) {
+            , int hideZoneIdentificationAccuracyComparePixels, int countShowFrames) {
         this.changeWhitePercent = changeWhitePercent;
         this.lightSensitivity = lightSensitivity;
         this.opacity = opacity;
@@ -145,6 +148,7 @@ public class AddressSaver {
         this.port = port;
         this.path = path;
         this.hideZoneIdentificationAccuracyComparePixels = hideZoneIdentificationAccuracyComparePixels;
+        this.countShowFrames = countShowFrames;
         savePasswordSaverToFile();
     }
 
@@ -183,8 +187,6 @@ public class AddressSaver {
                 JAXBContext context = JAXBContext.newInstance(AddressSaver.class);
                 Marshaller marshaller = context.createMarshaller();
                 marshaller.marshal(this, file);
-
-                System.out.println("Done");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -260,6 +262,7 @@ public class AddressSaver {
         }
         Storage.setPort(port);
         Storage.setPassword(PASS);
+        Storage.setShowFramesPercent(countShowFrames);
     }
 
     public void setCamerasPosition(int[][] camerasPosition) {

@@ -222,12 +222,12 @@ public class CameraGroup {
 
                             if (enableSaveVideo) {
                                 if (!informVideoCreatorAboutStartingSaving) {
-                                    informVideoCreatorAboutStartingSaving = VideoCreator.informCreatorAboutStartingSaving(this);
+                                    informVideoCreatorAboutStartingSaving = VideoCreator.getVideoCreator().informCreatorAboutStartingSaving(this);
                                 }
 
                                 if (stopSaveVideoInt >= Storage.getSecondsToSave() && totalCountFrames > 0) {
                                     stopSaveVideoInt = 0;
-                                    VideoCreator.stopCatchVideo(containProgramCatchLightning);
+                                    VideoCreator.getVideoCreator().stopCatchVideo(containProgramCatchLightning);
                                     containProgramCatchLightning = false;
                                     log.info("Сохраняем данные. Группа номер - " + groupNumber);
                                     StringBuilder stringBuilder = new StringBuilder();
@@ -310,7 +310,7 @@ public class CameraGroup {
                                     } catch (InterruptedException e) {
                                         e.printStackTrace();
                                     }
-                                    VideoCreator.informCreatorAboutCompletingSaving(this, folderToSave);
+                                    VideoCreator.getVideoCreator().informCreatorAboutCompletingSaving(this, folderToSave);
                                     enableSaveVideo = false;
                                     informVideoCreatorAboutStartingSaving = false;
                                 }
@@ -352,7 +352,7 @@ public class CameraGroup {
                     }
                     oneSecond = false;
                 } else {
-                    VideoCreator.isSaveVideoEnable();
+                    VideoCreator.getVideoCreator().isSaveVideoEnable();
                     try {
                         Thread.sleep(2);
                     } catch (InterruptedException e) {

@@ -176,9 +176,9 @@ public class HideZonePanel extends JPanel {
                 int y = e.getY() - y1OfPicture;
 
                 for (String zoneName : hideZoneAreaMap.keySet()) {
-                    if(zoneName.compareTo("j1")==0){
-                        continue;
-                    }
+//                    if(zoneName.compareTo("j1")==0){
+//                        continue;
+//                    }
                     HideZoneArea hideZoneArea = hideZoneAreaMap.get(zoneName);
                     if (x > hideZoneArea.getxOfZone() &&
                             hideZoneArea.getxOfZone() + hideZoneArea.getWidthOfZone() > x &&

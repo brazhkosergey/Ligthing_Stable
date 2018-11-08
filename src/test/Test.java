@@ -8,23 +8,45 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class Test {
+    static boolean start = false;
 
     public static void main(String[] args) {
 
-        for (int rowNumber = 0; rowNumber < 2; rowNumber++) {
-            String rowPosition;
-            switch (rowNumber) {
-                case 0:
-                    rowPosition = BorderLayout.NORTH;
-                    break;
-                case 1:
-                    rowPosition = BorderLayout.SOUTH;
-                    break;
-            }
-            for (int columnNumber = 0; columnNumber < 2; columnNumber++) {
-                System.out.println(2 * rowNumber + columnNumber + 1);
+        TestMethod testMethod = new TestMethod();
 
+        Thread thread = new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(1500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                start = true;
+                System.out.println("===================================================");
             }
+        });
+        thread.start();
+
+        for (int i = 0; i < 10; i++) {
+            Thread th = new Thread(() -> {
+                while (true) {
+                    if (start) {
+                        testMethod.print();
+                    } else {
+                        try {
+                            Thread.sleep(1);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+            th.setName("Поток " + i + ": ");
+            th.start();
         }
+    }
+
+    public static void setStart() {
+        start = false;
     }
 }
