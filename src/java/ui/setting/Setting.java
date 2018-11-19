@@ -151,7 +151,7 @@ public class Setting extends JPanel {
         sliderChangeWhite.setMinorTickSpacing(1);
         sliderChangeWhite.setPaintTicks(true);
         sliderChangeWhite.setMinimum(2);
-        sliderChangeWhite.setMaximum(9);
+        sliderChangeWhite.setMaximum(90);
         sliderChangeWhite.setValue(Storage.getPercentDiffWhite());
         sliderChangeWhite.addChangeListener(e -> {
             changeWhiteLabel.setText(Storage.getBundle().getString("lightening") + sliderChangeWhite.getValue() + " %");

@@ -88,6 +88,7 @@ public class HideZonePanel extends JPanel {
                     }
 
                     graphics2D.setColor(new Color(184, 184, 184));
+                    graphics2D.setColor(Color.BLACK);
                     for (int k = 0; k < 16; k++) {
                         int x1 = (k * (pictureWidth - circleDiameter - 10) / 16);
                         String nameOfZone = String.valueOf(alphabet[numberOfLine]) + (k + 1);
@@ -109,7 +110,6 @@ public class HideZonePanel extends JPanel {
                     yOfLastZone = y;
                     graphics2D.setColor(Color.BLACK);
                     numberOfLine++;
-
                 }
             }
 
@@ -117,7 +117,7 @@ public class HideZonePanel extends JPanel {
                     y1OfPicture + pictureHeight / 2 - circleDiameter / 2,
                     circleDiameter, circleDiameter);
 
-            int yOfProtectedZone = y1OfPicture + (34 * pictureHeight / 86);
+            int yOfProtectedZone = y1OfPicture + (29 * pictureHeight / 86);
             int heightOfProtectedZone = 28 * pictureHeight / 86;
 
             if (!testMode) {
@@ -125,15 +125,13 @@ public class HideZonePanel extends JPanel {
                     HideZoneArea hideZoneArea = hideZoneAreaMap.get(hideZoneName);
                     if (hideZoneArea != null) {
                         graphics2D.setColor(new Color(255, 211, 45, 200));
-
                         int getYOfZone = hideZoneArea.getyOfZone();
                         int heightOfZone = hideZoneArea.getHeightOfZone();
-
                         graphics2D.fillRect(x1OfPicture + hideZoneArea.getxOfZone(), y1OfPicture + getYOfZone, hideZoneArea.getWidthOfZone(), heightOfZone);
-
                         if (hideZoneName.contains("f") ||
                                 hideZoneName.contains("e") ||
-                                hideZoneName.contains("d")) {
+                                hideZoneName.contains("d") ||
+                                hideZoneName.contains("g")) {
                             graphics2D.fillOval(x1OfPicture + pictureWidth - circleDiameter,
                                     y1OfPicture + pictureHeight / 2 - circleDiameter / 2,
                                     circleDiameter, circleDiameter);
@@ -155,6 +153,11 @@ public class HideZonePanel extends JPanel {
             graphics2D.drawRect(x1OfPicture, yOfProtectedZone, pictureWidth - circleDiameter - 10, heightOfProtectedZone);
             graphics2D.setColor(new Color(146, 154, 251, 200));
             graphics2D.fillRect(x1OfPicture, yOfProtectedZone, pictureWidth - circleDiameter - 10, heightOfProtectedZone);
+
+            BasicStroke pen1 = new BasicStroke(4);
+            graphics2D.setStroke(pen1);
+            graphics2D.setColor(new Color(255, 211, 45));
+            graphics2D.drawLine(x1OfPicture - 5, y1OfPicture + pictureHeight / 2, x1OfPicture + pictureWidth + 5 - circleDiameter - 10, y1OfPicture + pictureHeight / 2);
         } else {
             g.setFont(new Font(null, Font.BOLD, 100));
             g.drawString("\u2300", panelWidth / 2, panelHeight / 2);
@@ -176,9 +179,6 @@ public class HideZonePanel extends JPanel {
                 int y = e.getY() - y1OfPicture;
 
                 for (String zoneName : hideZoneAreaMap.keySet()) {
-//                    if(zoneName.compareTo("j1")==0){
-//                        continue;
-//                    }
                     HideZoneArea hideZoneArea = hideZoneAreaMap.get(zoneName);
                     if (x > hideZoneArea.getxOfZone() &&
                             hideZoneArea.getxOfZone() + hideZoneArea.getWidthOfZone() > x &&

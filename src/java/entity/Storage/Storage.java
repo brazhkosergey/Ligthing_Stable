@@ -26,7 +26,6 @@ public class Storage {
     private static Map<Integer, int[][]> linePoints;
     private static Map<Integer, List<int[]>> linesForHideZoneParsing;
     private static Map<Integer, double[]> pixelsSizesForHideZoneParsingMap;
-    private static Map<Integer, Double> lengthOfViewArcMap;
 
     private static AddressSaver addressSaver;
 
@@ -34,7 +33,7 @@ public class Storage {
 
     private static int secondsToSave = 30;
 
-    private static int percentDiffWhite = 5;
+    private static int percentDiffWhite = 50;
 
     private static int colorLightNumber = 200;
 
@@ -87,7 +86,6 @@ public class Storage {
         linePoints = new HashMap<>();
         linesForHideZoneParsing = new HashMap<>();
         pixelsSizesForHideZoneParsingMap = new TreeMap<>();
-        lengthOfViewArcMap = new HashMap<>();
     }
 
     public static void startAllCameras() {
@@ -133,42 +131,44 @@ public class Storage {
         double angleMax = Math.atan(groupNumberViewAnglesTangences[1]);
         double angleIncrement = angleMax - angleMin;
 
-        double distanceToSarcophagusRadius = Storage.getAddressSaver().getCamerasPosition()[groupNumber - 1][0] / Math.sin(angleMin);
-        double lengthOfViewArc = distanceToSarcophagusRadius * Math.sqrt(2 - 2 * Math.cos(angleIncrement));
+        double distanceToSarcophagusMinRadius = Storage.getAddressSaver().getCamerasPosition()[groupNumber - 1][0] / Math.sin(angleMin);
+        double distanceToSarcophagusMaxRadius = (Storage.getAddressSaver().getCamerasPosition()[groupNumber - 1][0] + 164) / Math.sin(angleMax);
 
-        lengthOfViewArcMap.put(groupNumber, lengthOfViewArc);
+        double lengthOfViewArc = distanceToSarcophagusMinRadius * Math.sqrt(2 - 2 * Math.cos(angleIncrement));
         double[] distances = new double[linesForHideZoneParsing.size()];
-        double totalLineLength = 0.0;
 
+        int[] fistPoint = linesForHideZoneParsing.get(0);
+        int[] lastPoint = linesForHideZoneParsing.get(linesForHideZoneParsing.size() - 1);
+        int horizontal = fistPoint[0] - lastPoint[0];
+        int vertical = fistPoint[1] - lastPoint[1];
+        double lengthOfLinePixels = Math.sqrt((Math.pow(horizontal, 2.0) +
+                Math.pow(vertical, 2.0)));
 
-        for (int i = 1; i < linesForHideZoneParsing.size(); i++) {
-            int[] previousPoint = linesForHideZoneParsing.get(i - 1);
+        double angleFirstToLineTriangle = Math.PI - Math.PI / 2 - angleMax;
+
+        double angleOneToPointTriangle;
+        double angleSecondToPointTriangle;
+        double v;
+        for (int i = 0; i < linesForHideZoneParsing.size(); i++) {
             int[] currentPoint = linesForHideZoneParsing.get(i);
-            int horizontal = previousPoint[0] - currentPoint[0];
-            int vertical = previousPoint[1] - currentPoint[1];
+            horizontal = fistPoint[0] - currentPoint[0];
+            vertical = fistPoint[1] - currentPoint[1];
             double distanceBetweenPoints = Math.sqrt((Math.pow(horizontal, 2.0) +
                     Math.pow(vertical, 2.0)));
-            distances[i - 1] = distanceBetweenPoints;
-            totalLineLength += distanceBetweenPoints;
-        }
 
-        int x = linesForHideZoneParsing.get(0)[0] - linesForHideZoneParsing.get(linesForHideZoneParsing.size() - 1)[0];
-        int y = linesForHideZoneParsing.get(0)[1] - linesForHideZoneParsing.get(linesForHideZoneParsing.size() - 1)[1];
-
-        double ratio = lengthOfViewArc / totalLineLength;
-        double distanceBetweenPoints = Math.sqrt((Math.pow(x, 2.0) +
-                Math.pow(y, 2.0)));
-        double d;
-
-        for (int i = 0; i < distances.length; i++) {
-            d = distances[i];
-            distances[i] = d * ratio;
+            if (groupNumber %2!=0) {
+                angleOneToPointTriangle = distanceBetweenPoints / lengthOfLinePixels * angleIncrement;
+                angleSecondToPointTriangle = Math.PI - angleOneToPointTriangle - angleFirstToLineTriangle;
+                v = distanceToSarcophagusMaxRadius * Math.sin(angleOneToPointTriangle) / Math.sin(angleSecondToPointTriangle);
+                distances[i] = v;
+            } else {
+                angleOneToPointTriangle = angleIncrement - (distanceBetweenPoints / lengthOfLinePixels * angleIncrement);
+                angleSecondToPointTriangle = Math.PI - angleOneToPointTriangle - angleFirstToLineTriangle;
+                v = distanceToSarcophagusMaxRadius * Math.sin(angleOneToPointTriangle) / Math.sin(angleSecondToPointTriangle);
+                distances[i] = 164 - v;
+            }
         }
         return distances;
-    }
-
-    public static Map<Integer, Double> getLengthOfViewArcMap() {
-        return lengthOfViewArcMap;
     }
 
     private static List<int[]> getLineForParsing(int[][] linePoints, int groupNumber) {
@@ -189,8 +189,6 @@ public class Storage {
                     pointsToDrawLine[j][1] = linePoints[pointNumber][1];
                 }
 
-//                for (double t = 0; t < 1; t += 0.005) {
-//                for (double t = 0; t < 1; t += 0.01) {
                 for (double t = 0; t < 1; t += 0.005) {
                     BackgroundImagePanel.eval(onePointToDrawLine, pointsToDrawLine, t);
                     listToReturn.add(new int[]{(int) onePointToDrawLine[0], (int) onePointToDrawLine[1]});

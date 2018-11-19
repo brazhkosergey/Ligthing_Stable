@@ -274,8 +274,7 @@ public class Camera {
                     }
                 }
             }
-
-            int percentOfWhite = countWhite * 100000 / totalCount;
+            int percentOfWhite = countWhite * 100 / totalCount;
             whiteDeque.addFirst(percentOfWhite);
 
             if (whiteDeque.size() > 5) {
@@ -285,20 +284,10 @@ public class Camera {
                 }
                 int average = total / whiteDeque.size();
                 if (countWhite != 0) {
-                    int differentWhitePixelsAverage = (percentOfWhite) - average;
-                    if (differentWhitePixelsAverage > 0) {
-                        if (average != 0) {
-                            int diffPercent = differentWhitePixelsAverage * 100 / average;
-                            if (diffPercent > Storage.getPercentDiffWhite() * 50) {
-                                VideoCreator.getVideoCreator().startCatchVideo(true);
-                                whiteDeque.clear();
-                            }
-//                            else {
-//                                if (VideoCreator.isTest()) {
-//                                    VideoCreator.getVideoCreator().startCatchVideo(true);
-//                                }
-//                            }
-                        }
+                    int differentWhitePixelsAverage = percentOfWhite - average;
+                    if (differentWhitePixelsAverage > Storage.getPercentDiffWhite()) {
+                        VideoCreator.getVideoCreator().startCatchVideo(true);
+                        whiteDeque.clear();
                     }
                 } else {
                     if (average != 0) {
