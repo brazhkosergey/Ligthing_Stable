@@ -19,6 +19,8 @@ import java.util.List;
 public class VideoFilesPanel extends JPanel {
 
     private static VideoPlayer currentPlayer;
+    private static boolean testMode;
+    private static Component rigidArea;
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat();
     private static VideoFilesPanel videoFilesPanel;
@@ -207,13 +209,12 @@ public class VideoFilesPanel extends JPanel {
 
             JButton createTestButton = new JButton("TEST");
             createTestButton.addActionListener((pf) -> {
-
                 File parentFolder = null;
                 for (int cameraGroup = 1; cameraGroup < 5; cameraGroup++) {
                     File folderFromOneCameraGroup = folderWithVideos.get(cameraGroup);
                     if (folderFromOneCameraGroup != null) {
                         parentFolder = folderFromOneCameraGroup.getParentFile();
-                        BufferedImage backGroundImage = Storage.getCameraGroups()[cameraGroup-1].getBackGroundImage();
+                        BufferedImage backGroundImage = Storage.getCameraGroups()[cameraGroup - 1].getBackGroundImage();
                         if (backGroundImage != null) {
                             HideZoneLightingSearcher.injectImage(folderFromOneCameraGroup, backGroundImage);
                         }
@@ -234,7 +235,9 @@ public class VideoFilesPanel extends JPanel {
                     showVideos();
                 }
             });
-
+            createTestButton.setVisible(testMode);
+            
+            rigidArea = Box.createRigidArea(new Dimension(50, 30));
 
             mainVideoPanel.setBorder(BorderFactory.createBevelBorder(0));
             mainVideoPanel.setMaximumSize(new Dimension(1100, 45));
@@ -246,11 +249,9 @@ public class VideoFilesPanel extends JPanel {
             mainVideoPanel.add(countFilesLabel);
             mainVideoPanel.add(Box.createRigidArea(new Dimension(20, 30)));
             mainVideoPanel.add(countTimeLabel);
-
-
-            mainVideoPanel.add(Box.createRigidArea(new Dimension(300, 30)));
+            mainVideoPanel.add(Box.createRigidArea(new Dimension(250, 30)));
+            mainVideoPanel.add(rigidArea);
             mainVideoPanel.add(createTestButton);
-
 
             mainVideoPanel.add(Box.createRigidArea(new Dimension(15, 30)));
             mainVideoPanel.add(showVideoButton);
@@ -265,6 +266,11 @@ public class VideoFilesPanel extends JPanel {
 
         mainScrollPanel.repaint();
         MainFrame.setCentralPanel(this);
+    }
+
+    public static void setTestMode(boolean testMode) {
+        VideoFilesPanel.testMode = testMode;
+        rigidArea.setVisible(!testMode);
     }
 
     /**

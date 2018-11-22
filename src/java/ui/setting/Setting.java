@@ -7,6 +7,7 @@ import ui.camera.CameraPanel;
 import ui.main.MainFrame;
 import ui.video.HideZoneMainPanel;
 import ui.video.HideZonePanel;
+import ui.video.VideoFilesPanel;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -228,18 +229,23 @@ public class Setting extends JPanel {
         saveButton.setFont(new Font(null, Font.BOLD, 20));
         saveButton.addActionListener((e) -> {
             try {
-                if (testModeCheckBox.isSelected()) {
-                    MainFrame.setTestMode(true);
-                    testButton.setVisible(true);
-                    testButtonRigidArea.setVisible(false);
-                    createTestImageButton.setVisible(true);
-                } else {
-                    MainFrame.setTestMode(false);
-                    testButton.setVisible(false);
-                    createTestImageButton.setVisible(false);
-                    testButtonRigidArea.setVisible(true);
-                }
+                MainFrame.setTestMode(testModeCheckBox.isSelected());
+                testButton.setVisible(testModeCheckBox.isSelected());
+                createTestImageButton.setVisible(testModeCheckBox.isSelected());
+                testButtonRigidArea.setVisible(!testModeCheckBox.isSelected());
+                VideoFilesPanel.setTestMode(testModeCheckBox.isSelected());
 
+//                if (testModeCheckBox.isSelected()) {
+//                    MainFrame.setTestMode(true);
+//                    testButton.setVisible(true);
+//                    createTestImageButton.setVisible(true);
+//                    testButtonRigidArea.setVisible(false);
+//                } else {
+//                    MainFrame.setTestMode(false);
+//                    testButton.setVisible(false);
+//                    createTestImageButton.setVisible(false);
+//                    testButtonRigidArea.setVisible(true);
+//                }
                 int countShowFrames = countShowSlider.getValue();
                 Storage.setShowFramesPercent(countShowFrames);
 
