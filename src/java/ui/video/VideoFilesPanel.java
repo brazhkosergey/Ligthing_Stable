@@ -1,11 +1,13 @@
 package ui.video;
 
+import entity.HideZoneLightingSearcher;
 import entity.Storage.Storage;
 import ui.main.MainFrame;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -94,6 +96,7 @@ public class VideoFilesPanel extends JPanel {
                         mapOfFiles.put(dataLong, map);
                     }
                 } catch (Exception ignored) {
+                    ignored.printStackTrace();
                 }
             }
         }
@@ -202,6 +205,37 @@ public class VideoFilesPanel extends JPanel {
                 mainVideoPanel.setBackground(Color.LIGHT_GRAY);
             }
 
+            JButton createTestButton = new JButton("TEST");
+            createTestButton.addActionListener((pf) -> {
+
+                File parentFolder = null;
+                for (int cameraGroup = 1; cameraGroup < 5; cameraGroup++) {
+                    File folderFromOneCameraGroup = folderWithVideos.get(cameraGroup);
+                    if (folderFromOneCameraGroup != null) {
+                        parentFolder = folderFromOneCameraGroup.getParentFile();
+                        BufferedImage backGroundImage = Storage.getCameraGroups()[cameraGroup-1].getBackGroundImage();
+                        if (backGroundImage != null) {
+                            HideZoneLightingSearcher.injectImage(folderFromOneCameraGroup, backGroundImage);
+                        }
+                    }
+                }
+                File newFile = null;
+                if (parentFolder != null) {
+                    String path = parentFolder.getAbsolutePath();
+                    if (path.contains("{")) {
+                        path = path.split("\\{")[0];
+                    }
+
+                    newFile = new File(path);
+                    parentFolder.renameTo(newFile);
+                }
+                if (newFile != null) {
+                    HideZoneLightingSearcher.findHideZoneAreaAndRenameFolder(newFile);
+                    showVideos();
+                }
+            });
+
+
             mainVideoPanel.setBorder(BorderFactory.createBevelBorder(0));
             mainVideoPanel.setMaximumSize(new Dimension(1100, 45));
             mainVideoPanel.add(numberLabel);
@@ -212,7 +246,13 @@ public class VideoFilesPanel extends JPanel {
             mainVideoPanel.add(countFilesLabel);
             mainVideoPanel.add(Box.createRigidArea(new Dimension(20, 30)));
             mainVideoPanel.add(countTimeLabel);
-            mainVideoPanel.add(Box.createRigidArea(new Dimension(360, 30)));
+
+
+            mainVideoPanel.add(Box.createRigidArea(new Dimension(300, 30)));
+            mainVideoPanel.add(createTestButton);
+
+
+            mainVideoPanel.add(Box.createRigidArea(new Dimension(15, 30)));
             mainVideoPanel.add(showVideoButton);
             mainVideoPanel.add(Box.createRigidArea(new Dimension(15, 30)));
             mainVideoPanel.add(hideZoneButton);

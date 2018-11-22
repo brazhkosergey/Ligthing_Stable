@@ -26,7 +26,6 @@ class OneVideoPlayerPanel extends JPanel {
      */
     private File folder;
 
-
     /**
      * interface variables
      */
@@ -91,7 +90,6 @@ class OneVideoPlayerPanel extends JPanel {
     private boolean allFilesIsInBuff;
     private int numberOfFrameFromStartVideo = 0;
     private int currentFrameNumber = 0;
-
 
     /**
      * this thread will be created and run each time, when it will be null, and VideoPlayer ask this OneVideoPlayerPanel to show frame
@@ -465,7 +463,6 @@ class OneVideoPlayerPanel extends JPanel {
             if (image != null) {
                 String path = Storage.getPath() + "\\" + System.currentTimeMillis() + "-" + numberVideoPanel + ".jpg";
                 File file = new File(path);
-                System.out.println("Путь к файлу - " + path);
                 try {
                     if (file.createNewFile()) {
                         if (backGround == null || !saveBackGround) {

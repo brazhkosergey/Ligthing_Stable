@@ -292,7 +292,7 @@ public class HideZoneLightingSearcher {
                 }
             }
 
-            int firstFrameNumber = frameNumber - 6;
+            int firstFrameNumber = frameNumber - 5;
             int lastFrameNumber = frameNumber + 5;
 
             if (firstFrameNumber < 0) {
@@ -383,11 +383,22 @@ public class HideZoneLightingSearcher {
                         }
                     }
                 }
+
                 if (countWhitePixelsCurrentImage > countWhitePixels) {
+                    countWhitePixels = countWhitePixelsCurrentImage;
                     imageToReturn = image;
                 }
             }
         }
+
+        File file = new File(Storage.getPath()+"\\" + System.currentTimeMillis() + ".jpg");
+        try {
+            file.createNewFile();
+            ImageIO.write(imageToReturn, "jpg", file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         return imageToReturn;
     }
 
@@ -425,6 +436,50 @@ public class HideZoneLightingSearcher {
 
     private static boolean comparePoints(int[] linePoint, int[] lightningPoint, int accuracy) {
         return Math.abs(linePoint[0] - lightningPoint[0]) < accuracy && Math.abs(linePoint[1] - lightningPoint[1]) < accuracy;
+    }
+
+
+    private static int getPixelNumber(double[] pixelsSizesForHideZoneParsing, double lHorizontal, int groupNubmer) {
+        int n = 0;
+        double diff = 165.0;
+        double searchLength;
+        searchLength = Math.abs(lHorizontal);
+        if (groupNubmer % 2 != 0) {
+            searchLength = (double) 164 - Math.abs(lHorizontal);
+        }
+        for (int i = 0; i < pixelsSizesForHideZoneParsing.length; i++) {
+            double abs = Math.abs(pixelsSizesForHideZoneParsing[i] - searchLength);
+            if (abs < diff) {
+                diff = abs;
+                n = i;
+            }
+        }
+        return n;
+    }
+
+    private static void drawLightningToImage(BufferedImage bufferedImage, int x, int y, int groupNumber, String zoneName) {
+        BufferedImage backImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), bufferedImage.getType());
+        Graphics2D g1 = (Graphics2D) backImage.getGraphics();
+        g1.setColor(Color.BLACK);
+        g1.fillRect(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
+        BufferedImage image = ServiceCamera.connectImage(bufferedImage, backImage, 0.5f);
+        Graphics2D g = (Graphics2D) image.getGraphics();
+        BasicStroke pen1 = new BasicStroke(4);
+        g.setStroke(pen1);
+        g.setColor(Color.WHITE);
+        g.drawLine(x, y, x, 0);
+        Storage.getCameraGroups()[groupNumber - 1].setBackGroundImage(image);
+//        ====================================TEST======================================================================
+        if (image != null) {
+            File imageFile = new File(Storage.getPath() + "\\" + groupNumber + " - TEST " + zoneName + ".jpg");
+            try {
+                if (imageFile.createNewFile()) {
+                    ImageIO.write(image, "jpg", imageFile);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static String getZoneNameTest() {
@@ -646,46 +701,100 @@ public class HideZoneLightingSearcher {
         }
     }
 
-    private static int getPixelNumber(double[] pixelsSizesForHideZoneParsing, double lHorizontal, int groupNubmer) {
-        int n = 0;
-        double diff = 165.0;
-        double searchLength;
-        searchLength = Math.abs(lHorizontal);
-        if (groupNubmer % 2 != 0) {
-            searchLength = (double) 164 - Math.abs(lHorizontal);
-        }
-        for (int i = 0; i < pixelsSizesForHideZoneParsing.length; i++) {
-            double abs = Math.abs(pixelsSizesForHideZoneParsing[i] - searchLength);
-            if (abs < diff) {
-                diff = abs;
-                n = i;
-            }
-        }
-        return n;
-    }
-
-    private static void drawLightningToImage(BufferedImage bufferedImage, int x, int y, int groupNumber, String zoneName) {
-        BufferedImage backImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), bufferedImage.getType());
-        Graphics2D g1 = (Graphics2D) backImage.getGraphics();
-        g1.setColor(Color.BLACK);
-        g1.fillRect(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight());
-        BufferedImage image = ServiceCamera.connectImage(bufferedImage, backImage, 0.5f);
-        Graphics2D g = (Graphics2D) image.getGraphics();
-        BasicStroke pen1 = new BasicStroke(4);
-        g.setStroke(pen1);
-        g.setColor(Color.WHITE);
-        g.drawLine(x, y, x, 0);
-        Storage.getCameraGroups()[groupNumber - 1].setBackGroundImage(image);
-//        ====================================TEST======================================================================
-        if (image != null) {
-            File imageFile = new File(Storage.getPath() + "\\" + groupNumber + " - TEST " + zoneName + ".jpg");
-            try {
-                if (imageFile.createNewFile()) {
-                    ImageIO.write(image, "jpg", imageFile);
+    public static void injectImage(File folder, BufferedImage image) {
+        if (folder != null) {
+            String name = folder.getName();
+            int frameToReplace = 0;
+            int first = name.indexOf("[");
+            int second = name.indexOf("]");
+            String substring = name.substring(first + 1, second);
+            String[] eventsSplit = substring.split(",");
+            String aSplit = eventsSplit[0];
+            boolean contains = aSplit.contains("(");
+            if (contains) {
+                String s = aSplit.substring(1, aSplit.length() - 1);
+                try {
+                    frameToReplace = Integer.parseInt(s);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+            } else {
+                try {
+                    frameToReplace = Integer.parseInt(aSplit);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
+
+            int x = 0;
+            int t;
+            int totalCountFrames = 0;
+            File[] files = folder.listFiles();
+            if (files != null) {
+                for (File file : files) {
+
+                    String fileName = file.getName();
+
+                    String[] fileNameSplit = fileName.split("\\.");
+                    String[] lastSplit = fileNameSplit[0].split("-");
+                    String countFramesString = lastSplit[1];
+                    int countFrames = Integer.parseInt(countFramesString);
+                    totalCountFrames += countFrames;
+                    if (totalCountFrames >= frameToReplace) {
+                        totalCountFrames = totalCountFrames - countFrames;
+                        File testFile = new File(file.getAbsolutePath() + "test");
+                        try {
+
+                            FileInputStream fileInputStream = new FileInputStream(file);
+                            BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
+
+                            ByteArrayOutputStream temporaryStream = new ByteArrayOutputStream(65535);
+                            FileOutputStream fileOutputStream = new FileOutputStream(testFile);
+
+
+                            testFile.createNewFile();
+                            do {
+                                t = x;
+                                try {
+                                    x = bufferedInputStream.read();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                temporaryStream.write(x);
+                                if (x == 216 && t == 255) {// начало изображения
+                                    temporaryStream.reset();
+                                    temporaryStream.write(t);
+                                    temporaryStream.write(x);
+                                } else if (x == 217 && t == 255) {//конец изображения
+                                    byte[] imageBytes = temporaryStream.toByteArray();
+                                    totalCountFrames++;
+                                    if (totalCountFrames == frameToReplace) {
+                                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                        ImageIO.write(image, "jpg", baos);
+                                        baos.flush();
+                                        imageBytes = baos.toByteArray();
+                                        baos.close();
+                                    }
+                                    fileOutputStream.write(imageBytes);
+                                }
+                            } while (x > -1);
+                            fileOutputStream.flush();
+                            fileOutputStream.close();
+
+                            fileInputStream.close();
+                            bufferedInputStream.close();
+                            temporaryStream.close();
+                            file.delete();
+                            testFile.renameTo(file);
+                            break;
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+
+
         }
     }
 }
