@@ -217,7 +217,6 @@ public class ServiceCamera {
         return image;
     }
 
-
     public static void savePartOfVideoFile(String pathToFileToSave, List<File> filesListToEncode, int totalFPS, BufferedImage backgroundImage) {
         File videoFile = new File(pathToFileToSave);
         if (videoFile.exists()) {
@@ -293,8 +292,8 @@ public class ServiceCamera {
                                         writer.encodeVideo(0, image, nextFrameTime,
                                                 TimeUnit.MILLISECONDS);
                                     }
-                                    image = null;
 
+                                    image = null;
 
                                     if (count % 2 == 0) {
                                         MainFrame.showInformMassage(Storage.getBundle().getString("saveframenumber") +

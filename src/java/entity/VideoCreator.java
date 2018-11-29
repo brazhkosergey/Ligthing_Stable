@@ -1,6 +1,5 @@
 package entity;
 
-import entity.Camera.Camera;
 import entity.Camera.CameraGroup;
 import entity.Storage.Storage;
 import entity.sound.SoundSaver;
@@ -83,7 +82,7 @@ public class VideoCreator {
         this.anyCameraEnable = anyCameraEnable;
     }
 
-    public synchronized boolean isThreadInside() {
+    private synchronized boolean isThreadInside() {
         return threadInside;
     }
 
@@ -161,7 +160,6 @@ public class VideoCreator {
      */
     public void stopCatchVideo(boolean programCatchLightning) {
         if (saveVideoEnable) {
-            System.out.println("==========================COMPLETE==========================");
             String path = folderForBytes.getAbsolutePath();
             folderForBytes = null;
             saveVideoEnable = false;

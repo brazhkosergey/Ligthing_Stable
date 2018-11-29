@@ -128,9 +128,22 @@ class OneVideoPlayerPanel extends JPanel {
 
     private boolean fullSize;
 
+    private String dateString;
+
     OneVideoPlayerPanel(File folderWithFilesBytesToShowVideo, int numberVideoPanel) {
         this.numberVideoPanel = numberVideoPanel;
         this.folder = folderWithFilesBytesToShowVideo;
+
+        if (folder != null) {
+            System.out.println(folderWithFilesBytesToShowVideo);
+            System.out.println(folderWithFilesBytesToShowVideo.getAbsolutePath());
+            String nameF = folder.getParentFile().getName();
+            Date date = new Date(Long.parseLong(nameF.split("\\{")[0]));
+            SimpleDateFormat dateFormat = new SimpleDateFormat();
+            dateFormat.applyPattern("dd MMMM yyyy,HH-mm-ss");
+            dateString = dateFormat.format(date);
+        }
+
         videoPlayerToShowOneVideo = new VideoPlayerToShowOneVideo();
         eventFrameNumberList = new ArrayList<>();
         buffImageThreadMap = new HashMap<>();
@@ -330,7 +343,7 @@ class OneVideoPlayerPanel extends JPanel {
                 if (startFrame < 1 || endFrameInt < 1) {
                     continueSave = false;
                     informPartExportLabel.setText(Storage.getBundle().getString("secondinformvideoplayerlabel")
-                            + startFrame + Storage.getBundle().getString("thirdinformvideoplayerlabel") + endFrameInt + "<hr></html>");
+                            + startFrame + " " + Storage.getBundle().getString("thirdinformvideoplayerlabel") + endFrameInt + "<hr></html>");
                 }
 
                 if (endFrameInt > totalCountFrames || endFrameInt > totalCountFrames) {
@@ -382,16 +395,8 @@ class OneVideoPlayerPanel extends JPanel {
                             totalFramesToSave += framesInFiles.get(file);
                             filesToSave.add(file);
                         }
-                        String name = folder.getParentFile().getName();
-                        String[] split = name.split("\\{");
-                        long dateLong = Long.parseLong(split[0]);
 
-                        Date date = new Date(dateLong);
-                        SimpleDateFormat dateFormat = new SimpleDateFormat();
-                        dateFormat.applyPattern("dd MMMM yyyy,HH-mm-ss");
-                        String dateString = dateFormat.format(date);
-
-                        name = folder.getName();
+                        String name = folder.getName();
                         String numberOfGroupCameraString = name.substring(0, 1);
                         int i = name.indexOf(")");
                         String totalFpsString = name.substring(2, i);
@@ -399,6 +404,7 @@ class OneVideoPlayerPanel extends JPanel {
 
                         BufferedImage imageToConnect = null;
                         String absolutePathToImage = folder.getParentFile().getAbsolutePath() + "\\" + numberOfGroupCameraString + ".jpg";
+
                         System.out.println(absolutePathToImage);
 
                         File imageFile = new File(absolutePathToImage);
@@ -410,9 +416,13 @@ class OneVideoPlayerPanel extends JPanel {
                             }
                         }
 
-                        String pathToVideo = Storage.getPath() + "\\" + dateString + ".from " + firstFile + " till " + lastFile + ". group -" + numberVideoPanel + ".mp4";
-                        System.out.println(dateString);
-                        informPartExportLabel.setText(Storage.getBundle().getString("sixinformvideoplayerlabel") + (lastFile - firstFile) + Storage.getBundle().getString("seveninformvideoplayerlabel") + totalFramesToSave + ".<hr></html>");
+                        String pathToVideo = Storage.getPath() + "\\" + dateString + "_from_" + firstFile + "_till_" + lastFile + "_group-" + numberVideoPanel + ".mp4";
+                        String s = Storage.getBundle().getString("sixinformvideoplayerlabel") +
+                                (lastFile - firstFile) + Storage.getBundle().getString("seveninformvideoplayerlabel") +
+                                totalFramesToSave + ".<hr></html>";
+                        //<html>Будет сохранено <br> Cекунд: 6.<br> Кадров: 67.<hr></html>
+                        System.out.println(s);
+                        informPartExportLabel.setText(s);
                         ServiceCamera.savePartOfVideoFile(pathToVideo, filesToSave, totalFPS, imageToConnect);
                     }
                 }
@@ -442,7 +452,7 @@ class OneVideoPlayerPanel extends JPanel {
         totalExportPanel.add(partExportPanel);
 
         this.setLayout(new BorderLayout());
-        if (numberVideoPanel == 1||numberVideoPanel == 4) {
+        if (numberVideoPanel == 1 || numberVideoPanel == 4) {
 //        if (numberVideoPanel % 2 != 0) {
             this.add(totalExportPanel, BorderLayout.WEST);
             this.add(videoPanel, BorderLayout.CENTER);
@@ -461,7 +471,8 @@ class OneVideoPlayerPanel extends JPanel {
             int i = currentFrameNumber;
             BufferedImage image = readImage(framesBytesInBuffMap.get(i));
             if (image != null) {
-                String path = Storage.getPath() + "\\" + System.currentTimeMillis() + "-" + numberVideoPanel + ".jpg";
+//                String path = Storage.getPath() + "\\" + System.currentTimeMillis() + "-" + numberVideoPanel + ".jpg";
+                String path = Storage.getPath() + "\\" + dateString + "_group-" + numberVideoPanel + "_frame-" + currentFrameNumber + ".jpg";
                 File file = new File(path);
                 try {
                     if (file.createNewFile()) {
@@ -479,6 +490,7 @@ class OneVideoPlayerPanel extends JPanel {
                 }
             } else {
                 MainFrame.showInformMassage(Storage.getBundle().getString("cannotsaveinform"), new Color(171, 40, 33));
+                System.out.println("Image  " + image);
             }
         });
         thread.start();
@@ -495,7 +507,7 @@ class OneVideoPlayerPanel extends JPanel {
             showFrameThread = new Thread(() -> {
                 Integer sizeOfPart = tempEventsMapPartSize.get(partNumber);
                 double i = (double) currentFramePositionPercent / 100000;
-                int frameToShowInPart = (int) (i * sizeOfPart);
+                int frameToShowInPart = (int) ((i * sizeOfPart) + 0.5);
 
                 Integer startFrameOFPart;
                 if (partNumber == 0) {

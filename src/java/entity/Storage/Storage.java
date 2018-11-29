@@ -305,6 +305,11 @@ public class Storage {
 
     public static void setPath(String path) {
         Storage.path = path;
+        String pathToSave = Storage.getPath() + "\\hideZoneImages\\";
+        File file = new File(pathToSave);
+        if(!file.exists()){
+            file.mkdirs();
+        }
     }
 
     public static String getDefaultPath() {

@@ -225,44 +225,74 @@ public class HideZoneLightingSearcher {
 
         String zoneName = null;
         int countEqualZoneNames = 0;
+
+        Map<String, Integer> map = new TreeMap<>();
         for (int i = 0; i < 4; i++) {
             String s = names[i];
             if (s != null) {
                 log.info("Group number " + (i + 1) + " calculates zone number " + s);
-                if (zoneName == null) {
-                    zoneName = s;
-                }
-                int n = 0;
-                for (int k = 0; k < 4; k++) {
-                    if (k != i &&
-                            names[k] != null &&
-                            s.compareTo(names[k]) == 0) {
-                        n++;
-                    }
-                }
-                if (n > countEqualZoneNames) {
-                    countEqualZoneNames = n;
-                    zoneName = s;
+                System.out.println("Group number " + (i + 1) + " calculates zone number " + s);
+                if (map.containsKey(s)) {
+                    Integer integer = map.get(s);
+                    integer++;
+                    map.put(s, integer);
                 } else {
-                    if (s.contains("j")) {
-                        if (i == 1 || i == 3) {
-                            zoneName = s;
-                        }
-                    } else {
-                        if (i == 0 || i == 2) {
-                            zoneName = s;
-                        }
-                    }
-
-
+                    map.put(s, 1);
                 }
             }
         }
+
+        for (String zone : map.keySet()) {
+            Integer integer = map.get(zone);
+            if (integer > countEqualZoneNames) {
+                countEqualZoneNames = integer;
+                zoneName = zone;
+            }
+        }
+
+//        for (int i = 0; i < 4; i++) {
+//            String s = names[i];
+//            if (s != null) {
+//                log.info("Group number " + (i + 1) + " calculates zone number " + s);
+//                System.out.println("Group number " + (i + 1) + " calculates zone number " + s);
+//                if (zoneName == null) {
+//                    zoneName = s;
+//                }
+//                int n = 0;
+//                for (int k = 0; k < 4; k++) {
+//                    if (k != i &&
+//                            names[k] != null &&
+//                            s.compareTo(names[k]) == 0) {
+//                        n++;
+//                    }
+//                }
+//                if (n > countEqualZoneNames) {
+//                    countEqualZoneNames = n;
+//                    zoneName = s;
+//                } else {
+//                    if (s.contains("j")) {
+//                        if (i == 1 || i == 3) {
+//                            zoneName = s;
+//                        }
+//                    } else {
+//                        if (i == 0 || i == 2) {
+//                            zoneName = s;
+//                        }
+//                    }
+//
+//
+//                }
+//            }
+//        }
 
         if (zoneName == null) {
             zoneName = "NO DATA";
             MainFrame.showInformMassage(Storage.getBundle().getString("NODATA"), new Color(23, 114, 26));
             log.info("Any lightnings inside hide zone.");
+        } else {
+            MainFrame.showInformMassage(zoneName, new Color(23, 114, 26));
+            log.info("Zone number - " + zoneName);
+            System.out.println("Zone number - " + zoneName);
         }
         return zoneName;
     }
@@ -391,7 +421,7 @@ public class HideZoneLightingSearcher {
             }
         }
 
-        File file = new File(Storage.getPath()+"\\" + System.currentTimeMillis() + ".jpg");
+        File file = new File(Storage.getPath() + "\\" + System.currentTimeMillis() + ".jpg");
         try {
             file.createNewFile();
             ImageIO.write(imageToReturn, "jpg", file);

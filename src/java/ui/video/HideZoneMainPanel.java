@@ -145,9 +145,16 @@ public class HideZoneMainPanel extends JPanel {
         this.paint(g);
         String pathToSave = Storage.getPath() + "\\hideZoneImages\\" + dateFormat.format(date) + " - " + hideZoneName + ".jpeg";
         File fileImageToSave = new File(pathToSave);
+        if(!fileImageToSave.exists()){
+            try {
+                fileImageToSave.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        };
         try {
             ImageIO.write(image, "jpeg", fileImageToSave);
-            MainFrame.showInformMassage(Storage.getBundle().getString("savedbutton"), Color.GREEN);
+            MainFrame.showInformMassage(Storage.getBundle().getString("savedbutton"), new Color(23, 114, 26));
         } catch (IOException ex) {
             MainFrame.showInformMassage(Storage.getBundle().getString("cannotsaveinform"), Color.RED);
         }

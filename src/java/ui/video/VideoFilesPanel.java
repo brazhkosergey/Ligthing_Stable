@@ -238,6 +238,7 @@ public class VideoFilesPanel extends JPanel {
             createTestButton.setVisible(testMode);
             
             rigidArea = Box.createRigidArea(new Dimension(50, 30));
+            rigidArea.setVisible(!testMode);
 
             mainVideoPanel.setBorder(BorderFactory.createBevelBorder(0));
             mainVideoPanel.setMaximumSize(new Dimension(1100, 45));
@@ -270,7 +271,6 @@ public class VideoFilesPanel extends JPanel {
 
     public static void setTestMode(boolean testMode) {
         VideoFilesPanel.testMode = testMode;
-        rigidArea.setVisible(!testMode);
     }
 
     /**

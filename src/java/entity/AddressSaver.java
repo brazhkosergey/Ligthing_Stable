@@ -150,6 +150,7 @@ public class AddressSaver {
         this.hideZoneIdentificationAccuracyComparePixels = hideZoneIdentificationAccuracyComparePixels;
         this.countShowFrames = countShowFrames;
         savePasswordSaverToFile();
+        setSetting();
     }
 
     public void saveLinePoints(int groupNumber, int[][] list) {

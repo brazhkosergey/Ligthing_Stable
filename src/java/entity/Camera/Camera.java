@@ -361,13 +361,13 @@ public class Camera {
 
     private void startCatchVideo(URL urlMainStream) {
         if (urlMainStream != null) {
+            VideoCreator.getVideoCreator().setAnyCameraEnable(true);
             if (this.url != null) {
                 changeURL = true;
                 catchVideo = false;
             } else {
                 catchVideo = true;
                 cameraPanel.startShowVideo();
-                VideoCreator.getVideoCreator().setAnyCameraEnable(true);
             }
         } else {
             catchVideo = false;

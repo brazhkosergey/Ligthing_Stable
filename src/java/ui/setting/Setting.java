@@ -169,7 +169,7 @@ public class Setting extends JPanel {
         otherSetting.setPreferredSize(new Dimension(690, 68));
         otherSetting.setBorder(BorderFactory.createEtchedBorder());
 
-        JLabel opacityLabel = new JLabel(Storage.getBundle().getString("backimageopacitylabel") + Storage.getOpacitySetting() + " %");
+        JLabel opacityLabel = new JLabel(Storage.getBundle().getString("backimageopacitylabel") + (int) (Storage.getOpacitySetting() * 100) + " %");
         opacityLabel.setPreferredSize(new Dimension(680, 25));
         JSlider slider = new JSlider();
         slider.setPreferredSize(new Dimension(680, 28));
@@ -290,7 +290,7 @@ public class Setting extends JPanel {
 
                 Storage.getAddressSaver().saveSetting(countSecondsToSaveVideo, programCatchEnableCheckBox.isSelected(),
                         changeWhitePercent, lightSensitivity, opacity, port, path,
-                        hideZoneIdentificationAccuracyComparePixelsSlider.getValue(),countShowFrames);
+                        hideZoneIdentificationAccuracyComparePixelsSlider.getValue(), countShowFrames);
                 log.info("Настройки изменены. Время сохранения: " + countSecondsToSaveVideo +
                         ", Фиксируем програмные сработки: " + programCatchEnableCheckBox.isSelected() +
                         ", процент вспышки на изображении: " + changeWhitePercent +
