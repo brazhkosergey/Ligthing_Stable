@@ -46,7 +46,6 @@
     </build>
 
     <dependencies>
-
         <dependency>
             <groupId>xuggle</groupId>
             <artifactId>xuggle-xuggler</artifactId>

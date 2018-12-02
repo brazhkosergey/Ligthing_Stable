@@ -130,13 +130,8 @@ public class Storage {
         double angleMin = Math.atan(groupNumberViewAnglesTangences[0]);//Math.atan(camerasViewAnglesTangens[i][0]))
         double angleMax = Math.atan(groupNumberViewAnglesTangences[1]);
         double angleIncrement = angleMax - angleMin;
-
-        double distanceToSarcophagusMinRadius = Storage.getAddressSaver().getCamerasPosition()[groupNumber - 1][0] / Math.sin(angleMin);
         double distanceToSarcophagusMaxRadius = (Storage.getAddressSaver().getCamerasPosition()[groupNumber - 1][0] + 164) / Math.sin(angleMax);
-
-        double lengthOfViewArc = distanceToSarcophagusMinRadius * Math.sqrt(2 - 2 * Math.cos(angleIncrement));
         double[] distances = new double[linesForHideZoneParsing.size()];
-
         int[] fistPoint = linesForHideZoneParsing.get(0);
         int[] lastPoint = linesForHideZoneParsing.get(linesForHideZoneParsing.size() - 1);
         int horizontal = fistPoint[0] - lastPoint[0];
@@ -156,7 +151,7 @@ public class Storage {
             double distanceBetweenPoints = Math.sqrt((Math.pow(horizontal, 2.0) +
                     Math.pow(vertical, 2.0)));
 
-            if (groupNumber %2!=0) {
+            if (groupNumber % 2 != 0) {
                 angleOneToPointTriangle = distanceBetweenPoints / lengthOfLinePixels * angleIncrement;
                 angleSecondToPointTriangle = Math.PI - angleOneToPointTriangle - angleFirstToLineTriangle;
                 v = distanceToSarcophagusMaxRadius * Math.sin(angleOneToPointTriangle) / Math.sin(angleSecondToPointTriangle);
@@ -180,7 +175,6 @@ public class Storage {
         for (int i = 1; i < 5; i++) {
             pointsToDrawLine[i - 1] = new double[2];
         }
-
         for (int i = 0; i < linePoints.length; i++) {
             if (linePoints.length > i + 3) {
                 for (int j = 0; j < 4; j++) {
@@ -307,7 +301,7 @@ public class Storage {
         Storage.path = path;
         String pathToSave = Storage.getPath() + "\\hideZoneImages\\";
         File file = new File(pathToSave);
-        if(!file.exists()){
+        if (!file.exists()) {
             file.mkdirs();
         }
     }

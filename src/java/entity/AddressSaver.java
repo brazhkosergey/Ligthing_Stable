@@ -140,6 +140,7 @@ public class AddressSaver {
     public void saveSetting(int timeToSave, boolean programLightCatchEnable, int changeWhitePercent,
                             int lightSensitivity, int opacity, int port, String path
             , int hideZoneIdentificationAccuracyComparePixels, int countShowFrames) {
+
         this.changeWhitePercent = changeWhitePercent;
         this.lightSensitivity = lightSensitivity;
         this.opacity = opacity;

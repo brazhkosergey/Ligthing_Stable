@@ -112,20 +112,20 @@ public class HideZoneLightingSearcher {
             }
             Path moveFrom = Paths.get(folderWithFiles.getAbsolutePath());
             Path moveTo = Paths.get(folderWithFiles.getAbsolutePath() + "{" + stringBuilder.toString() + "}");
-            renameVideo(moveFrom, moveTo, 0);
+            renameVideo(moveFrom, moveTo);
         }
     }
 
-    private static void renameVideo(Path moveFrom, Path moveTo, int number) {
+    public static void renameVideo(Path moveFrom, Path moveTo) {
         try {
             Files.move(moveFrom, moveTo, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             try {
-                Thread.sleep(2000);
+                Thread.sleep(100);
             } catch (InterruptedException e1) {
                 e1.printStackTrace();
             }
-            renameVideo(moveFrom, moveTo, number);
+            renameVideo(moveFrom, moveTo);
             e.printStackTrace();
         }
     }
@@ -249,41 +249,6 @@ public class HideZoneLightingSearcher {
                 zoneName = zone;
             }
         }
-
-//        for (int i = 0; i < 4; i++) {
-//            String s = names[i];
-//            if (s != null) {
-//                log.info("Group number " + (i + 1) + " calculates zone number " + s);
-//                System.out.println("Group number " + (i + 1) + " calculates zone number " + s);
-//                if (zoneName == null) {
-//                    zoneName = s;
-//                }
-//                int n = 0;
-//                for (int k = 0; k < 4; k++) {
-//                    if (k != i &&
-//                            names[k] != null &&
-//                            s.compareTo(names[k]) == 0) {
-//                        n++;
-//                    }
-//                }
-//                if (n > countEqualZoneNames) {
-//                    countEqualZoneNames = n;
-//                    zoneName = s;
-//                } else {
-//                    if (s.contains("j")) {
-//                        if (i == 1 || i == 3) {
-//                            zoneName = s;
-//                        }
-//                    } else {
-//                        if (i == 0 || i == 2) {
-//                            zoneName = s;
-//                        }
-//                    }
-//
-//
-//                }
-//            }
-//        }
 
         if (zoneName == null) {
             zoneName = "NO DATA";
@@ -467,7 +432,6 @@ public class HideZoneLightingSearcher {
     private static boolean comparePoints(int[] linePoint, int[] lightningPoint, int accuracy) {
         return Math.abs(linePoint[0] - lightningPoint[0]) < accuracy && Math.abs(linePoint[1] - lightningPoint[1]) < accuracy;
     }
-
 
     private static int getPixelNumber(double[] pixelsSizesForHideZoneParsing, double lHorizontal, int groupNubmer) {
         int n = 0;
