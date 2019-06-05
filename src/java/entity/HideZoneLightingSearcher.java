@@ -112,21 +112,32 @@ public class HideZoneLightingSearcher {
             }
             Path moveFrom = Paths.get(folderWithFiles.getAbsolutePath());
             Path moveTo = Paths.get(folderWithFiles.getAbsolutePath() + "{" + stringBuilder.toString() + "}");
-            renameVideo(moveFrom, moveTo);
+            renameFile(moveFrom, moveTo, false);
         }
     }
 
-    public static void renameVideo(Path moveFrom, Path moveTo) {
+    public static void renameFile(Path moveFrom, Path moveTo, boolean tempFile) {
+
+//        File file = new File(moveFrom.toString());
+//        File newFile = new File(moveTo.toString());
+//        if(file.renameTo(newFile)){
+//            System.out.println("Файл переименован успешно");;
+//        }else{
+//            System.out.println("Файл не был переименован");
+//        }
+
         try {
             Files.move(moveFrom, moveTo, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
+        } catch (Exception e) {
+            log.error(e.getMessage());
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e1) {
                 e1.printStackTrace();
             }
-            renameVideo(moveFrom, moveTo);
-            e.printStackTrace();
+            if (!tempFile) {
+                renameFile(moveFrom, moveTo, tempFile);
+            }
         }
     }
 

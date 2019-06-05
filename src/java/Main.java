@@ -10,9 +10,9 @@ public class Main {
         long maxMemory = Runtime.getRuntime().maxMemory() / (1024 * 1024);
 
         log.info("Выделенная память для приложения - " + maxMemory);
-        if (false) {
-//        if (maxMemory < 10000) {
-//            log.info("Памяти не достаточно, перегружаем приложени, с указанием большего количества памяти.");
+//        if (false) {
+        if (maxMemory < 10000) {
+            log.info("Памяти не достаточно, перегружаем приложени, с указанием большего количества памяти.");
             String javaBin = "java ";
             final File currentJar;
             try {

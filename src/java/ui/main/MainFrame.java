@@ -247,57 +247,23 @@ public class MainFrame extends JFrame {
         /*
       Thread set the socket server to wait request from sensor
      */
-//        Thread alarmThread = new Thread(() -> {
-//            ServerSocket ss = null;
-//            try {
-//                ss = new ServerSocket(Storage.getPort());
-//            } catch (IOException ignored) {
-//            }
-//
-//            while (true) {
-//                try {
-//                    audioPacketCount.setForeground(new Color(29, 142, 27));
-//                    setAlarmServerLabelColor(Storage.getPort(), new Color(29, 142, 27));
-//                    log.info("Ждем сигнал сработки на порт - " + Storage.getPort());
-//                    Socket socket = ss.accept();
-//                    log.info("Получили сигнал сработки на порт " + Storage.getPort());
-//                    VideoCreator.startCatchVideo(false);
-//                    socket.close();
-//                } catch (Exception e) {
-//                    log.error(e.getLocalizedMessage());
-//                    try {
-//                        Thread.sleep(2000);
-//                    } catch (InterruptedException e1) {
-//                        e1.printStackTrace();
-//                    }
-//                    setAlarmServerLabelColor(Storage.getPort(), Color.red);
-//                    audioPacketCount.setForeground(Color.red);
-//                }
-//            }
-//        });
-//        alarmThread.setName("Alarm Thread");
-//        alarmThread.start();
 
         Thread additionaAlarmThread = new Thread(() -> {
             ServerSocket ss = null;
             BufferedReader in = null;
             try {
                 ss = new ServerSocket(Storage.getPort());
-                System.out.println("Port "+ Storage.getPort());
                 Socket socket = ss.accept();
-                System.out.println("Port accept "+ Storage.getPort());
                 in = new BufferedReader(
                         new InputStreamReader(socket.getInputStream()));
                 while (true) {
                     try {
-                        System.out.println("Starting server");
                         audioPacketCount.setForeground(new Color(29, 142, 27));
                         setAlarmServerLabelColor(Storage.getPort(), new Color(29, 142, 27));
                         log.info("Ждем сигнал сработки на порт - " + Storage.getPort());
                         String inputLine = in.readLine();
                         String[] parts = inputLine.split("\\s+");
                         if (!parts[0].equals("flash") || parts.length <= 3 || !tryParseInt(parts[3]) || Integer.parseInt(parts[3]) != 0) {
-                            System.out.println("Не сработка");
                             continue;
                         }
                         VideoCreator.getVideoCreator().startCatchVideo(false);

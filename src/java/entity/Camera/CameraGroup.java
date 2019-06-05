@@ -11,10 +11,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -172,48 +170,7 @@ public class CameraGroup {
                 if (oneSecond) {
                     try {
                         if (dequeImagesTime.size() > 0) {
-                            int size = fpsDeque.size();
-                            File temporaryFile = new File(Storage.getDefaultPath() + "\\buff\\" + groupNumber + "\\" + System.currentTimeMillis() + ".tmp");
-                            int countImagesInFile = 0;
-                            try {
-                                if (temporaryFile.createNewFile()) {
-                                    FileOutputStream fileOutputStream = new FileOutputStream(temporaryFile);
-                                    for (int i = 0; i < size; i++) {
-                                        Integer integer = fpsDeque.pollLast();
-                                        if (integer != null) {
-                                            for (int j = 0; j < integer; j++) {
-                                                Long aLong = dequeImagesTime.pollLast();
-                                                if (aLong != null) {
-                                                    byte[] remove = buffMapImages.remove(aLong);
-                                                    try {
-                                                        fileOutputStream.write(remove);
-                                                        countImagesInFile++;
-                                                    } catch (Exception e) {
-                                                        log.error(e.getMessage());
-                                                        e.printStackTrace();
-                                                    }
-                                                }
-//                                                    else {
-//                                                        log.error("Потеряли кадр, время байта - НУЛЛ");
-//                                                    }
-                                            }
-                                        }
-                                    }
-                                    fileOutputStream.flush();
-                                    fileOutputStream.close();
-                                }
-                            } catch (Exception e) {
-                                log.error(e.getMessage());
-                                e.printStackTrace();
-                            }
-                            File file = new File(Storage.getDefaultPath() + "\\buff\\" + groupNumber + "\\"
-                                    + System.currentTimeMillis() + "-" + countImagesInFile + ".tmp");
-                            file.deleteOnExit();
-                            Path moveFrom = Paths.get(temporaryFile.getAbsolutePath());
-                            Path moveTo = Paths.get(file.getAbsolutePath());
-                            HideZoneLightingSearcher.renameVideo(moveFrom, moveTo);
-                            fileDeque.addFirst(file);
-                            countsOfFramesInEachFile.put(file, countImagesInFile);
+                            createTempFile();
                         }
 
                         if (enableSaveVideo) {
@@ -221,121 +178,10 @@ public class CameraGroup {
                                 informVideoCreatorAboutStartingSaving = VideoCreator.getVideoCreator().informCreatorAboutStartingSaving(this);
                             }
                             if (stopSaveVideoInt >= Storage.getSecondsToSave() && getTotalCountFrames() > 0) {
-                                stopSaveVideoInt = 0;
-                                VideoCreator.getVideoCreator().stopCatchVideo(containProgramCatchLightning);
-                                containProgramCatchLightning = false;
-                                log.info("Сохраняем данные. Группа номер - " + groupNumber);
-                                StringBuilder stringBuilder = new StringBuilder();
-                                stringBuilder.append("[");
-                                int iCount = 0;
-                                int currentTotalCountImage = getTotalCountFrames();
-
-                                for (Integer integer : eventsFramesNumber.keySet()) {
-                                    iCount++;
-                                    if (eventsFramesNumber.get(integer)) {
-                                        stringBuilder.append("(").append(integer).append(")");
-                                    } else {
-                                        stringBuilder.append(integer);
-                                    }
-                                    if (iCount != eventsFramesNumber.size()) {
-                                        stringBuilder.append(",");
-                                    }
-                                }
-
-                                eventsFramesNumber.clear();
-                                stringBuilder.append("]");
-
-                                int totalFPSForFile = 0;
-                                for (Integer integer : fpsList) {
-                                    totalFPSForFile += integer;
-                                }
-
-                                int sizeFps = fpsList.size();
-                                for (int i = 0; i < sizeFps; i++) {
-                                    fpsList.remove(0);
-                                }
-                                double d = (double) totalFPSForFile / sizeFps;
-                                totalFPSForFile = (int) (d + 0.5);
-
-                                String eventPercent = stringBuilder.toString();
-                                String path = folderToSave.getAbsolutePath() + "\\" + groupNumber + "(" + totalFPSForFile + ")"
-                                        + eventPercent;
-
-                                File destFolder = new File(path);
-                                int size = fileDeque.size();
-                                int secondsCount = 0;
-
-                                if (destFolder.mkdirs()) {
-                                    for (int i = 0; i < size; i++) {
-                                        try {
-                                            File fileToSave = fileDeque.pollLast();
-                                            if (fileToSave != null) {
-                                                Integer remove = countsOfFramesInEachFile.remove(fileToSave);
-                                                decNumberOfFramesFromTotalCount(remove);//Отнимаем количество кадров, которое пересохранили в конце сохранения видео.
-                                                secondsCount++;
-                                                Path from = Paths.get(fileToSave.getAbsolutePath());
-                                                Path to = Paths.get(destFolder.getAbsolutePath() + "\\" + fileToSave.getName());
-                                                HideZoneLightingSearcher.renameVideo(from, to);
-                                            }
-                                        } catch (Exception ex) {
-                                            ex.printStackTrace();
-                                        }
-                                    }
-
-                                    if (backGroundImage != null) {
-                                        File imageFile = new File(folderToSave.getAbsolutePath() + "\\" + groupNumber + ".jpg");
-                                        try {
-                                            if (imageFile.createNewFile()) {
-                                                ImageIO.write(backGroundImage, "jpg", imageFile);
-                                            }
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                }
-                                log.info("Сохранили файл. Группа - " + groupNumber + ". " +
-                                        "Кадров - " + currentTotalCountImage + ". " +
-                                        "Файлов в буфере " + size + ". " +
-                                        "Сохранили секунд " + secondsCount);
-
-                                try {
-                                    Thread.sleep(1000);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                                VideoCreator.getVideoCreator().informCreatorAboutCompletingSaving(this, folderToSave);
-                                enableSaveVideo = false;
-                                informVideoCreatorAboutStartingSaving = false;
+                                saveVideoToStorage();
                             }
                         } else {
-                            while (fileDeque.size() > Storage.getSecondsToSave()) {
-                                try {
-                                    if (!enableSaveVideo) {
-                                        File fileToDel = fileDeque.pollLast();
-                                        if (fileToDel != null) {
-                                            Integer remove = countsOfFramesInEachFile.remove(fileToDel);
-                                            decNumberOfFramesFromTotalCount(remove);//отнимаем количество кадров, которое было в временном файле, который удалили.
-//                                                if (eventsFramesNumber.size() != 0) {
-//                                                    Map<Integer, Boolean> temporaryMap = new TreeMap<>();
-//                                                    for (Integer integer : eventsFramesNumber.keySet()) {
-//                                                        temporaryMap.put(integer - remove, eventsFramesNumber.get(integer));
-//                                                    }
-//                                                    eventsFramesNumber.clear();
-//                                                    for (Integer integer : temporaryMap.keySet()) {
-//                                                        eventsFramesNumber.put(integer, temporaryMap.get(integer));
-//                                                    }
-//                                                }
-                                            fpsList.remove(0);
-                                            deleteFile(fileToDel);
-                                        }
-                                    } else {
-                                        break;
-                                    }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    log.error(e.getMessage());
-                                }
-                            }
+                            cleanBuffer();
                         }
                         oneSecond = false;
                     } catch (Exception e) {
@@ -355,13 +201,162 @@ public class CameraGroup {
         saveBytesThread.start();
     }
 
+    private void createTempFile() {
+        int size = fpsDeque.size();
+        File temporaryFile = new File(Storage.getDefaultPath() + "\\buff\\" + groupNumber + "\\" + System.currentTimeMillis() + ".tmp");
+        int countImagesInFile = 0;
+
+
+        try {
+            if (temporaryFile.createNewFile()) {
+                temporaryFile.deleteOnExit();
+                FileOutputStream fileOutputStream = new FileOutputStream(temporaryFile);
+                for (int i = 0; i < size; i++) {
+                    Integer integer = fpsDeque.pollLast();
+                    if (integer != null) {
+                        for (int j = 0; j < integer; j++) {
+                            Long aLong = dequeImagesTime.pollLast();
+                            if (aLong != null) {
+                                byte[] remove = buffMapImages.remove(aLong);
+                                try {
+                                    fileOutputStream.write(remove);
+                                    countImagesInFile++;
+                                } catch (Exception e) {
+                                    log.error(e.getMessage());
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+                }
+                fileOutputStream.flush();
+                fileOutputStream.close();
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
+        File file = new File(Storage.getDefaultPath() + "\\buff\\" + groupNumber + "\\"
+                + System.currentTimeMillis() + "-" + countImagesInFile + ".tmp");
+        file.deleteOnExit();
+        Path moveFrom = Paths.get(temporaryFile.getAbsolutePath());
+        Path moveTo = Paths.get(file.getAbsolutePath());
+        HideZoneLightingSearcher.renameFile(moveFrom, moveTo, true);
+        fileDeque.addFirst(file);
+        countsOfFramesInEachFile.put(file, countImagesInFile);
+    }
+
+    private void cleanBuffer() {
+        while (fileDeque.size() > Storage.getSecondsToSave()) {
+            try {
+                if (!enableSaveVideo) {
+                    File fileToDel = fileDeque.pollLast();
+                    if (fileToDel != null) {
+                        Integer remove = countsOfFramesInEachFile.remove(fileToDel);
+                        decNumberOfFramesFromTotalCount(remove);//отнимаем количество кадров, которое было в временном файле, который удалили.
+                        fpsList.remove(0);
+                        deleteFile(fileToDel);
+                    }
+                } else {
+                    break;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                log.error(e.getMessage());
+            }
+        }
+    }
+
+    private void saveVideoToStorage() {
+        stopSaveVideoInt = 0;
+        VideoCreator.getVideoCreator().stopCatchVideo(containProgramCatchLightning);
+        containProgramCatchLightning = false;
+        log.info("Сохраняем данные. Группа номер - " + groupNumber);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("[");
+        int iCount = 0;
+        int currentTotalCountImage = getTotalCountFrames();
+
+        for (Integer integer : eventsFramesNumber.keySet()) {
+            iCount++;
+            if (eventsFramesNumber.get(integer)) {
+                stringBuilder.append("(").append(integer).append(")");
+            } else {
+                stringBuilder.append(integer);
+            }
+            if (iCount != eventsFramesNumber.size()) {
+                stringBuilder.append(",");
+            }
+        }
+
+        eventsFramesNumber.clear();
+        stringBuilder.append("]");
+
+        int totalFPSForFile = 0;
+        for (Integer integer : fpsList) {
+            totalFPSForFile += integer;
+        }
+
+        int sizeFps = fpsList.size();
+        for (int i = 0; i < sizeFps; i++) {
+            fpsList.remove(0);
+        }
+        double d = (double) totalFPSForFile / sizeFps;
+        totalFPSForFile = (int) (d + 0.5);
+
+        String eventPercent = stringBuilder.toString();
+        String path = folderToSave.getAbsolutePath() + "\\" + groupNumber + "(" + totalFPSForFile + ")"
+                + eventPercent;
+
+        File destFolder = new File(path);
+        int size = fileDeque.size();
+        int secondsCount = 0;
+
+        if (destFolder.mkdirs()) {
+            for (int i = 0; i < size; i++) {
+                try {
+                    File fileToSave = fileDeque.pollLast();
+                    if (fileToSave != null) {
+                        Integer remove = countsOfFramesInEachFile.remove(fileToSave);
+                        decNumberOfFramesFromTotalCount(remove);//Отнимаем количество кадров, которое пересохранили в конце сохранения видео.
+                        secondsCount++;
+                        Path from = Paths.get(fileToSave.getAbsolutePath());
+                        Path to = Paths.get(destFolder.getAbsolutePath() + "\\" + fileToSave.getName());
+                        HideZoneLightingSearcher.renameFile(from, to, false);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            if (backGroundImage != null) {
+                File imageFile = new File(folderToSave.getAbsolutePath() + "\\" + groupNumber + ".jpg");
+                try {
+                    if (imageFile.createNewFile()) {
+                        ImageIO.write(backGroundImage, "jpg", imageFile);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        log.info("Сохранили файл. Группа - " + groupNumber + ". " +
+                "Кадров - " + currentTotalCountImage + ". " +
+                "Файлов в буфере " + size + ". " +
+                "Сохранили секунд " + secondsCount);
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        VideoCreator.getVideoCreator().informCreatorAboutCompletingSaving(this, folderToSave);
+        enableSaveVideo = false;
+        informVideoCreatorAboutStartingSaving = false;
+    }
 
     private synchronized void incCountImage() {
         totalCountFrames++;
-    }
-
-    private synchronized void decCountImage() {
-        totalCountFrames--;
     }
 
     private synchronized int getTotalCountFrames() {
@@ -372,7 +367,6 @@ public class CameraGroup {
         totalCountFrames -= number;
     }
 
-
     private void deleteFile(File fileToDel) {
         Thread thread = new Thread(() -> {
             boolean del;
@@ -381,6 +375,7 @@ public class CameraGroup {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
+                    log.error(e.getLocalizedMessage());
                     e.printStackTrace();
                 }
             } while (!del);
